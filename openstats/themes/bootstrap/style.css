@@ -1,0 +1,231 @@
+	  
+.pagination2{ 
+    text-align:center; 
+    float:none; 
+    padding:16px; 
+	margin-left: 10px;
+} 
+.pagination{ 
+    background:#999999; 
+    text-align:left; 
+    background-color:GrayText; 
+    float:none; 
+    padding:10px; 
+    margin:0px auto;
+} 
+.pagination1{ 
+    text-align:left; 
+    background-color:darkred; 
+    float:none; 
+    padding:10px; 
+    margin:0px auto;
+} 
+.pagination3{ 
+    text-align:left; 
+    background-color:teal; 
+    float:none; 
+    padding:10px; 
+    	margin:0px auto;
+} 
+a.button { 
+    background-color:transparent; 
+    background-image: url( 'img/btn_right.png' ); 
+    background-repeat:no-repeat ; 
+    background-position:top right; 
+    color: #727272;  
+    display:block; /*opera*/  
+    display:inline-block; /*ie*/  
+    display:-moz-inline-box; /*ff*/    /*font: bold 12px arial, sans-serif;*/ 
+    font: normal 13px arial, sans-serif; 
+    height: 32px; 
+    margin-right: 0px; 
+    padding-right: 10px; 
+    text-decoration: none; 
+}
+
+a.button span { 
+    background-color:transparent; 
+    background-image: url( 'img/btn.png' ); 
+    background-repeat:no-repeat ; 
+    display: inline-block; 
+    line-height: 21px; 
+    padding: 3px 0 8px 10px; 
+}
+
+a.button span img{ 
+    margin-left:-5px; 
+    margin-top:-2px; 
+    padding-right:5px; 
+} 
+a.button:hover { 
+    background-image: url( 'img/btn_hover_right.png' ); 
+    color: #fff; 
+    outline: none; 
+}
+
+a.button:hover span { 
+    background-image:url( 'img/btn_hover.png'); 
+} 
+a.orange { 
+    background-image: url( 'img/btn_right.png' );  
+    display:block; /*opera*/  
+    display:inline-block; /*ie*/  
+    display:-moz-inline-box; /*ff*/} 
+a.orange span { 
+    background-image: url( 'img/btn.png' ); 
+}
+
+a.orange:hover { 
+    background-image: url( 'img/btn_hover_right.png' ); 
+} 
+a.orange:hover span { 
+    background-image: url( 'img/btn_hover.png' ); 
+}
+
+.pageButtons{
+   cursor: pointer;
+   margin: 0;
+   font-family: Verdana,Arial,Helvetica,sans-serif;
+   font-weight: bold;
+   text-align: left;
+   font-size: 12px;
+   padding: 1px;
+   background-color:transparent;
+   color: #FFAA00;
+   border: 0px solid #999;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+}
+
+.SingleGamePlayerName { font-weight: bold; }
+
+.active { font-weight: bold; font-size: 18px; }
+.highlight_top { background-color: #F0F0F0; font-weight: bold; padding-left: 2px; padding-right: 2px; }  
+.won { color: #27A916; }
+.lost { color: #AA1F1F; }
+.draw { color: #7A7474; }
+.assists { color: #378CD4; }
+
+.player_scores { float: right; padding-right: 8px; }
+.statsscore1 { color: #940C0C; }
+
+tr:nth-child(odd) {
+	background-color: #F3F3F3;
+}
+
+tr:nth-child(even) {
+	background-color: #fff;
+}
+
+.sentinel {text-align: left; color:#8D2323;}
+.scourge   {text-align: left; color:#04C500;}
+
+.all  {text-align:left; color:#5E5D5D;}
+
+.winner { color:#8B8B8B; }
+.winner0 { color:#8B8B8B; }
+.winner1 { color:#8D2323; }
+.winner2 { color:#04C500; }
+
+.slot0 { border-left: 40px solid #2E2E2E !important; }
+.slot1 { border-left: 10px solid #0044FB !important; }
+.slot2 { border-left: 10px solid #08E4B6 !important; }
+.slot3 { border-left: 10px solid #640388 !important; }
+.slot4 { border-left: 10px solid #FEFD0D !important; }
+.slot5 { border-left: 10px solid #FC890A !important; }
+.slot6 { border-left: 10px solid #E655B0 !important; }
+.slot7 { border-left: 10px solid #969696 !important; }
+.slot8 { border-left: 10px solid #74C0F4 !important; }
+.slot9 { border-left: 10px solid #036242 !important; }
+.slot10 {border-left: 10px solid #512905 !important; }
+
+.red     {color: #DD0000;}
+.blue     {color: #0044FB;}
+.teal     {color: #00EEEE;}
+.purple  {color: #7711AA;}
+.yellow  {color: #DAD212;}
+.orange  {color: #FF9900 ;}
+.dark-green  {color: #00751E;}
+.pink     {color: #FF66CC;}
+.gray {color: #888888;}
+.light-blue  {color: #55BBEE;}
+.darkgreen  {color: #006F3F;}
+.brown  {color: #6F3F00;}
+.observer  {color: #FFFFFF;}
+.GameSystem {color: #1F2381; text-align: left;}
+
+.best_player_title {  font-weight: bold; color: #800B0B; }
+
+.overflow_hidden { overflow: hidden; }
+.left_reason { font-size:11px; height: 20px; width: 180px; }
+.ban_reason { font-size:12px; }
+
+.refresh { font-size:14px; }
+
+.aligncenter { text-align:center;  }
+
+.imgvalign { vertical-align:middle; }
+.imgvaligntop { vertical-align:top !important; }
+
+.user_avatar { margin-bottom: 8px;  vertical-align:top; }
+
+.guides { min-height:450px; }
+
+.post_thumb { width: 200px; height: 200px; overflow:hidden; float: left; margin-right: 16px; border: 8px solid #ccc;}
+.post_thumb img { width:200px; height:auto; padding: 0; }
+
+.banned { color: #818181; }
+
+.comparePlayers { float:left; width:180px;margin-bottom: 20px; margin-left:5px; }
+
+/*.comparePlayers {  } */
+.compareButton { padding-right:2px; padding-left:2px; padding-top:5px; padding-bottom: 5px; border-radius: 6px; }
+.compareButton:hover { text-decoration: none; }
+.abc-current { padding-right:5px; }
+
+.menuButtons { background-color: #ddd; border:1px solid #ccc; color: #5a5a5a !important; cursor: pointer; float: none; padding-left: 3px; padding-right: 4px; padding-top: 2px; padding-bottom:2px; margin-top: -1px; border-radius: 6px; }
+.menuButtons:hover { background-color: #CACACA;  }
+
+.comments {  font-size: 12px;  line-height: 20px;  padding-top: 30px;  clear:both;  margin: 0; width: 680px; }
+.comments h4 {  font-size: 23px;  margin: 10px 20px;  text-transform: capitalize;  }
+
+.comments .comments-content{  margin-bottom:16px;  }
+.comments .continue a, .comments .comment .comment-actions a{  background:#BA1A00;  cursor:pointer;  color: #ffffff;  display: inline-block;  font-size: 12px;  padding:0px 8px 0px 8px;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-weight:bold;  line-height: 22px;  border:1px solid #9C1A03;  margin-top:5px;  }
+.comments .continue a:hover, .comments .comment .comment-actions a:hover{  background:#9C1A03;  color: #ffffff;  padding:0px 8px 0px 8px;  border:1px solid #9C1A03;  text-decoration: none;  }
+.comments .comments-content .comment-thread ol{  margin:20px 0 0 -10px;  overflow:hidden;}
+.comments .comments-content .inline-thread{    padding:0;}
+.comments .comments-content .comment-thread{    margin:0 0 0 -15px;}
+.comments .comments-content .comment-thread:empty{    display:none}
+.comments .comments-content .comment-replies{    margin-left:0px;margin-top:0px;}
+.comments .comments-content .comment, .comments .avatar-image-container{padding:4px;}
+.comments .comments-content .comment:first-child{padding-top:4px}
+.comments .comments-content .comment:last-child {border-bottom: 1px solid #DDDDDD;  padding-bottom:0;  }
+.comments .comments-content .comment-body{position:relative}
+.comments .comments-content .user a {  color: #222;  font-size: 12px;  font-weight: bold;  margin-left: 10px;   text-transform: capitalize;  }
+.comments .comments-content .icon.blog-author {display:inline-block;height:18px;margin:0 0 -4px 6px;width:18px}
+.comments .comments-content .datetime {  display: block;  font-size: 12px;  line-height: 14px;  margin-left: 10px;  }
+.comments .comments-content .datetime a {    color:#A41600;  }
+.comments .comments-content .datetime a:hover {  text-decoration:none; }
+.comments .comments-content .comment-header {  background: none repeat scroll 0 0 #E5E5E5;  line-height: 20px;  margin-left: 6px !important;  min-height: 40px;  padding: 10px;   position: relative;  }
+.comments .comments-content .comment-content{    padding: 10px 0 10px 50px;    position: relative;}
+.comments .comments-content .owner-actions {position:absolute;right:0;top:0}
+.comments .comments-replybox { border:none;height:250px;width:100%}
+.comments .comment-replybox-single { margin-left:4px;margin-top:5px}
+.comments .comment-replybox-thread { margin:5px 25px; }
+.comments .comments-content .loadmore a { display:block;padding:10px 16px;text-align:center}
+.comments .thread-toggle { cursor:pointer;display:none;}
+.comments .continue{ cursor:pointer; display:inline-block; margin:0 0 0 50px;}
+.comments .continue a{display:block; font-weight:bold; }
+.comments .comments-content .loadmore{cursor:pointer;margin-top:3em;max-height:3em}
+.comments .comments-content .loadmore.loaded{max-height:0;opacity:0;overflow:hidden}
+.comments .thread-chrome.thread-collapsed{display:none}
+.comments .comments-content .comment-header, .comments .comments-content .comment-content { margin:0 ; }
+.comments .thread-toggle .thread-arrow{display:inline-block;height:6px;margin:.3em;overflow:visible;padding-right:4px;width:7px}
+.comments .thread-expanded .thread-arrow{background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAG0lEQVR42mNgwAfKy8v/48I4FeA0AacVDFQBAP9wJkE/KhUMAAAAAElFTkSuQmCC") no-repeat scroll 0 0 transparent}
+.comments .thread-collapsed .thread-arrow{background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAJUlEQVR42mNgAILy8vL/DLgASBKnApgkVgXIkhgKiNKJ005s4gDLbCZBiSxfygAAAABJRU5ErkJggg==") no-repeat scroll 0 0 transparent}
+.comments .avatar-image-container{ padding-left:0; margin: 5px 10px 5px 0; max-height:34px; width:34px; }
+.comments .avatar-image-container img{  border: 4px solid #FFFFFF;  display: block;  max-width: 30px;  width: 30px;  }
+.comments .comment-block{margin-left:0px; position:relative;  }
+.comments .comments-content .comment{  background: none repeat scroll 0 0 #F5F5F5;  border: 1px solid #DDDDDD;  list-style: none outside none;  margin: 0 13px 15px 2px;  padding: 10px !important; }
+#comment-editor{  margin: 5px 5px 5px 40px;  }
+.CommentWrapper img { vertical-align: middle; }

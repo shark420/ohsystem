@@ -1,0 +1,61 @@
+span.sf-sub-indicator { padding-left: 2px; }
+div#header-top { z-index: 2; position: relative; }
+div#featured { z-index: 1; position: relative; }
+
+#page-menu { width: 50%; }
+#p-menu-left, #p-menu-right { display: none; }
+#p-menu-content { padding-left: 7px; }
+
+#featured-control { position: relative; zoom: 1; z-index: 4; }
+.top { position: relative; zoom: 1; z-index: 3; }
+
+.slide a.readmore, .slide a.readmore span { background: #00a4e8; }
+ul.nav li.sfHover ul { top: 47px; }
+
+.recent-cat { display: inline; position: relative; zoom: 1; height: 1%; }
+	.recent-cat .entry { width: 199px; }
+	
+#from-categories .last .top { border-right:1px solid #A7A6A6; }
+#from-categories .last .entry { border-right:1px solid #FFFFFF; }
+.recent-cat .entry .title { padding-bottom: 9px; }
+
+#sidebar, #recent-posts, #recent-posts .entry .post-meta a.readmore, #sidebar #firstcol, #sidebar #secondcol, #recent-posts .entry .post-meta { display: inline; }
+
+.footer-widget { width:205px; }
+#content-bottom .container { background:url("../images/content-container-bg.png") no-repeat scroll 478px 0 transparent; }
+
+#footer .last { border: none; }
+
+#recent-posts .entry p.date { padding-bottom: 10px; }
+#recent-posts .entry p.date span { display: block; }
+
+#tabbed-area ul#tab_controls li a { cursor: pointer; }
+
+body#home #content-bottom .container { background:url("../images/content-container-bg.png") no-repeat scroll 478px 0 transparent; }
+
+
+body#home #sidebar div.widget { width: 238px !important; }
+
+body#home #sidebar #wp-calendar { width:170px; }
+
+#recent-posts .entry .post-meta { width: 550px; }
+
+body#home #recent-posts .entry .post-meta { margin: 0px; width: 410px; }
+
+#content-top-shadow, div#top-shadow { display: none; }
+
+#content-bottom .container { display: none; }
+
+#sidebar { margin-top: 0px; }
+#tabbed-area ul#tab_controls li.active a { background: none; }
+
+#onecol .widget { width: 320px !important; }
+
+#sidebar #firstcol #wp-calendar td, #sidebar #firstcol #wp-calendar th, #sidebar #secondcol #wp-calendar td, #sidebar #secondcol #wp-calendar th { padding-left:0px; padding-right:0px; }
+
+#sidebar #secondcol { float: right; width: 160px; }
+	#sidebar #secondcol .widget { width: 155px; }
+	
+	#sidebar .widgetcontent { padding: 5px; }
+	
+	.reply-container a { display: inline-block; }

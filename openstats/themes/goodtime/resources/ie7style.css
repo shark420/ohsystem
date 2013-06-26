@@ -1,0 +1,11 @@
+span.sf-sub-indicator {padding-left: 2px;}
+div#header-top { z-index: 2; position: relative; }
+div#featured { z-index: 1; position: relative; }
+
+#featured-control { position: relative; zoom: 1; z-index: 4; }
+.top { position: relative; zoom: 1; z-index: 3; }
+
+#recent-posts .entry p.date { padding-bottom: 10px; }
+#recent-posts .entry p.date span { display: block; }
+
+#tabbed-area ul#tab_controls li a { cursor: pointer; }

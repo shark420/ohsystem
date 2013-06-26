@@ -1,0 +1,255 @@
+html {margin:0;padding:0;border:0;}
+body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, dialog, figure, footer, header, hgroup, nav, section {margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;}
+article, aside, details, figcaption, figure, dialog, footer, header, hgroup, menu, nav, section {display:block;}
+body, .body-fauxcolumn-outer {line-height:1.5;background:white;}
+table {border-collapse:separate;border-spacing:0;}
+caption, th, td {text-align:left;font-weight:normal;float:none !important;}
+table, th, td {vertical-align:middle;}
+body,h1,h2,h2 a,h2 a:visited,h3,h4,h5,h6,p,input,select,textarea {color: #333;	font-family: Arial, Helvetica, Tahoma, sans-serif;font-size: 14px;font-weight: normal;line-height: 22px;margin: 0;padding: 0;text-decoration: none;}
+h1, h2, h3, h4, h5, h6 {color: #333333;margin: 0 0 10px;}
+.post h1, .post h2, .post h2 a {margin: 0 0 15px;}
+h1, h2, h2 a, h2 a:visited {color: #A41600;font-size: 30px;line-height: 36px;}
+h3 {font-size:24px;}h4 {font-size:20px;}h5 {font-size:18px;}h6 {font-size:16px;}
+h1 img, h2 img, h3 img, h4 img, h5 img, h6 img {margin:0;}
+li, ol, ul {list-style-type: none; margin: 0; padding: 0; }
+ol li { list-style-type: decimal; }
+ol, ul { margin: 0; padding: 0 0 20px; }
+ol { margin: 0 0 0 35px; }
+ul li { list-style-type: square; padding: 0;}
+.post ul li, .page ul li { list-style-type: square; margin: 0 0 0 25px; }
+ul ul, ol ol { padding: 0; }
+/*****************************************
+Global Links CSS
+******************************************/
+a, a:link, a:visited{ color:#A41600;  text-decoration:none; }
+a:hover, a:active{ text-decoration:underline; }
+body{ background:#eeeeee; height: 100%; }
+.clr { clear:both; float:none; }
+/*****************************************
+Wrappers
+******************************************/
+.blogoutter-wrapper {  width: 100%;  overflow: hidden;  }
+.bloginner-wrapper {      background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/bg-header.png") repeat-x scroll 0 0 #000;  color: #fff;  min-height: 108px;  margin: 0 auto;  	overflow: hidden;  position: relative;  z-index: 999;  }
+.header-wrapper {    margin-right:auto;    width: auto;  }
+.ct-wrapper {    padding:0px 20px;    position:relative;    max-width: 960px;    margin: 0 auto;  }
+.outer-wrapper{   position: relative;  width:100%;  padding:10px 0;  }
+.main-wrapper {    width:auto;    margin-right:320px;   }
+#content {  background:#fff;  border: 5px solid #E1E1E1;  position: relative;  }
+.sidebar-wrapper {   width:300px; position:absolute;   right:0px;   margin:0;   padding:10px 0;   border:medium none;  top:0; bottom:0;  display:block;  }
+#footer-wrapper {  width:100%;  background-color: #000000;  }
+/*****************************************
+Header CSS
+******************************************/
+#header{  max-width:750px; margin: 0; float:left; width:auto; padding: 0; overflow:hidden;  z-index : 999;  min-width: 280px; }
+#header-inner{  margin: 20px 0 10px 0px; padding:0; }
+#header h1 {  font-size: 36px;  line-height: 42px;  color: #fff;  margin: 0; }
+#header h1 a, #header h1.title a:hover {  color: #fff;  text-decoration: none;  }
+#header p.description{  color: #fff;  font-family: Georgia, Times, 'Times New Roman', serif;  font-size: 14px;  font-style: italic;  }
+#header img{  border:0 none;   background:none;   width:auto;  height:auto;  margin:0 auto;}
+#header-right {   float: right;  }
+/*****************************************
+Main Menu CSS
+******************************************/
+.navigation {  float: left; width: 100%;  }
+/***** Main Menu *****/
+.main-nav-main{  background: #ba1a00 url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/nav.png") repeat-x;  border-bottom: 5px solid #ddd;  border-top: 1px solid #e14d09;  color: #fff;  font-size: 13px;  font-weight: bold;  text-shadow: -1px -1px #8e1e03;  width: 100%;  display: inline-block;  }
+.main-nav-main ul {  width: 100%;  padding: 0;  }
+.main-nav-main li{  list-style-type: none;  display: inline-block;  float: left;  }
+.main-nav-main li a{  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/nav-line.png") right no-repeat;  color: #fff;  display: block;  font-size: 13px;  padding: 5px 17px 5px 15px;  position: relative;  text-decoration: none;  }
+.main-nav-main li a:hover{  background: #9c1a03 url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/nav-line.png") right no-repeat;  color: #fff;  }
+.main-nav-main li a .sf-sub-indicator { overflow: hidden;  position: absolute;  text-indent: -9999px;  }
+.main-nav-main li li a,
+.main-nav-main li li a:link,
+.main-nav-main li li a:visited {  background: none;  background-color: #9c1a03;  border: 1px solid #ba1a00;  border-top-width: 0;  color: #fff;  font-size: 11px;  padding: 5px 10px;  position: relative;  text-transform: none;  width: 138px;  }
+.main-nav-main li li a:hover,
+.main-nav-main li li a:active {  background: none;  background-color: #ba1a00;  }
+.main-nav-main li ul {  height: auto;  left: -9999px;  margin: 0 0 0 -1px;  position: absolute;  width: 160px;  z-index: 9999;  }
+.main-nav-main li ul a {  width: 140px;  }
+.main-nav-main li ul ul {  margin: -33px 0 0 159px;  }
+.main-nav-main li:hover>ul,
+.main-nav-main li.sfHover ul {  left: auto;  }
+/***** Sub Menu *****/
+.sub-nav-menu {  background: #222;  width: 100%;  margin:15px auto;  padding:0;  z-index:299;  }
+.sub-nav-menu ul{  list-style:none;  color: #DDD;  margin:0;  padding:0;  z-index: 999;  }
+.sub-nav-menu ul li {  list-style:none;  line-height:34px;  position:relative;  display: inline-block;  }
+.sub-nav-menu li a {  background: transparent;  color: #DDDDDD;  display: block;  font-size: 13px;  font-family: Arial,Helvetica,Tahoma,sans-serif;  padding: 0px 17px 0px 15px;  position: relative;  text-decoration: none;  text-transform:capitalize;  }
+.sub-nav-menu li a:hover {  background: #333;  color: #FFFFFF;  }
+.sub-nav-menu ul li ul {  background-color: #333333;  border-color: #222222;  border-right: 1px solid #222222;  border-style: solid;
+border-width: 0 1px 1px;  width: 160px;  margin: 0px;  position:absolute;  visibility:hidden;  display: inline;  padding:0px;  height:auto;  }
+.sub-nav-menu ul li:hover ul {  visibility:visible;  }
+.sub-nav-menu ul ul ul {  left: 160px;  position: absolute;  top: 0;  visibility:hidden !important;  }
+.sub-nav-menu ul ul li:hover ul {  visibility:visible !important;  }
+.sub-nav-menu li li:first-child {  border-top:none;  }
+.sub-nav-menu li li:last-child {  border-bottom:none;  }
+.sub-nav-menu li li {  border-bottom: 1px solid #222;  border-top:#222;  float:none !important;  display:block;  }
+.sub-nav-menu li li a {  background: none repeat scroll 0 0 transparent;  color: #fff;  font-size: 11px;  padding: 5px 10px;  line-height: 22px !important;  }
+.sub-nav-menu ul li li a:hover {  background: none repeat scroll 0 0 #222;  color: #fff;  }
+/*****************************************
+Blog Post CSS
+******************************************/
+.post {  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/post.png") repeat-x scroll center bottom transparent;  border-left: 1px solid #FFFFFF;  border-right: 1px solid #FFFFFF;  padding:20px;  }
+h1.post-title {  font-family: Arial,Tahoma,Verdana;  font-weight: normal;  font-color: #A41600;  font-size: 30px;  line-height: 36px;  text-transform:capitalize;  }
+h1.post-title, a:link, a:visited {  color:#A41600;  text-decoration:none;  }
+h1.post-title a:hover {  color:#333;  text-decoration:none;  }
+.post-body {  font-size:14px;  color: #2F2E2E;  font-family: Arial,Tahoma,Verdana;  font-weight: normal;  padding:5px 0;  margin:0;  text-transform:auto;  line-height:22px;  word-wrap:break-word;  }
+.post-body img{  max-width:100%;  padding:5px;  width:auto;  }
+.post-header {  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/dotted-line.gif") repeat-x scroll center bottom transparent;  color: #666;  font-family: Georgia,Times,'Times New Roman',serif;  font-size: 14px;  margin: 0px 0 10px;  padding: 0px 0 10px;  text-transform:capitalize;  }
+.post-comment-link {  width:auto;  height:19px;  font-family: Georgia,Times,'Times New Roman',serif;  font-size:14px;  text-transform:capitalize;  background:url(http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/comment-icon.png) no-repeat 5px 5px transparent;  float:right;  text-align: right;  color:#666;  padding: 0 0 0 27px;  }
+.post-comment-link a {  color:#666;  text-decoration:none;  }
+.post-comment-link a:hover{  color:#666;  text-decoration:underline;  }
+.post-footer-line-1 {  border-top: 1px dotted #DDDDDD;  clear: both;  color: #999999;  font-family: Georgia,Times,'Times New Roman',serif;  font-size: 14px;  font-style: italic;  padding: 10px 0 0;  }
+.post-labels {  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/icon-tags.png") no-repeat scroll left top transparent;  margin: 0 0 0 10px;  padding: 1px 0 2px 20px;  color: #999999;  font-family: Georgia,Times,'Times New Roman',serif;  font-size: 14px;  font-style: italic;  }
+.post-labels a {  color:#666;  text-decoration:none;  }
+.post-labels a:hover {  color:#666;  text-decoration:underline;  }
+#blog-pager-newer-link a {  background:#BA1A00;  float: left;  display:inline;  color: #ffffff;  font-size: 12px;  padding:0px 8px 0px 8px;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-weight:bold;  line-height: 22px;  border:1px solid #9C1A03;  }
+#blog-pager-older-link a {  float: right;  display:inline;  background:#BA1A00;  color: #ffffff;  font-size: 12px;  padding:0px 8px 0px 8px;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-weight:bold;  line-height: 22px;  border:1px solid #9C1A03;  }
+#blog-pager-home-link a {  display:inline;  background:#BA1A00;  color: #ffffff;  font-size: 12px;  padding: 4px 8px 4px 8px;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-weight:bold;  line-height: 22px;  border:1px solid #9C1A03;  margin: 0 0 0 20px;  }
+#blog-pager {  text-align: left;  padding: 10px 10px 10px 20px;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-size: 14px;  font-weight: normal;  line-height: 22px;  color: #A41600;  }
+.showpageNum a {  margin:0 4px;  text-decoration: none;  border: 1px solid #DDDDDD;  padding: 5px 8px;  background: #fff;  }
+.showpageOf {  display:none;  }
+.showpageNum a:hover {  border: 1px solid #DDDDDD;  background: #f5f5f5;  text-decoration: underline;  }
+.showpagePoint {  color:#A41600;  border: 1px solid #DDDDDD;  padding: 5px 8px;  margin: 2px;  background: #f5f5f5;  text-decoration: none;  }
+/*****************************************
+post highlighter CSS
+******************************************/
+.post blockquote {  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/blockquote.png") no-repeat scroll left top #F5F5F5;  color: #666666;  font-family: Georgia,Times,'Times New Roman',serif;  font-size: 16px;  font-style: italic;  line-height: 22px;  margin: 0 0 20px -20px;  padding: 25px 30px 25px 80px;  }
+/*****************************************
+custom widget CSS
+******************************************/
+/***** Email Subscription Widget CSS *****/
+.FollowByEmail{  background:#f8f6f6;  }
+.FollowByEmail h2{  background: none no-repeat scroll 0 0 transparent !important;  border: 0 none !important;  }
+.FollowByEmail .follow-by-email-inner table{  margin:0;  }
+.FollowByEmail .follow-by-email-inner table td{  display: block;  margin: 0;  }
+.FollowByEmail .follow-by-email-inner .follow-by-email-address{  background-color: #FFFFFF;  color: #666666;  font-family: Georgia,Times,'Times New Roman',serif;  font-size: 14px;  font-style: italic;  margin: 5px 50px 0 0;  padding: 6px 0 6px 6px;  width: 200px;  height: 18px;  border: 1px solid #DDDDDD;  }
+.FollowByEmail .follow-by-email-inner .follow-by-email-submit{  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/sub.png") no-repeat scroll 0 0 transparent;  width: 47px;  height: 31px;  display:block;  margin: -31px 0 0;  text-indent:-99999em;  cursor: pointer;  float: right;  }
+.FollowByEmail .follow-by-email-inner .follow-by-email-submit:hover{  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/sub-hover.png") no-repeat scroll 0 0 transparent;  }
+/***** Search Box CSS *****/
+#search{  float: right;  padding: 40px 0 0;  }
+#search form#search-form{  display: block;  }
+#search #s{  background: #FFFFFF;  color: #666666;  font-family: Georgia,Times,'Times New Roman',serif;  font-size: 14px;  font-style: italic;  margin: 5px 1px 0 0;  padding: 5px 0 4px 6px;  width: 200px;  border: 1px solid transparent;  }
+#sbtn{  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/search.png") no-repeat scroll 0 0 transparent;  border: 0 none;  cursor: pointer;  float: none;  height: 30px;  width: 73px;  }
+#sbtn:hover{  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/search-hover.png") no-repeat scroll 0 0 transparent;  }
+/*****  Author-Box CSS *****/
+.author-box {  background: url("http://i1203.photobucket.com/albums/bb382/chandeep10/copyblogger/post.png") repeat-x scroll center bottom transparent;  margin: 0 0 20px;  overflow: hidden;  padding: 20px;  }
+.author-box p {  margin: 0;  padding: 0;  }
+.author-box img {  background: #FFFFFF;  float: left;  margin: 0 10px 0 0;  padding: 4px;  border: 1px solid #E6E6E6;  }
+/***** Profile Widget CSS *****/
+.Profile img { border:1px solid #cecece; background:#fff; float:left; margin:5px 10px 5px 0; padding:5px;  -webkit-border-radius: 50px;	-moz-border-radius: 50px;	border-radius: 50px; }
+.profile-data { color:#999999; font:bold 20px/1.6em Arial,Helvetica,Tahoma,sans-serif; font-variant:small-caps; margin:0; text-transform:capitalize;}
+.profile-datablock { margin:0.5em 0;}
+.profile-textblock { line-height:1.6em; margin:0.5em 0;}
+a.profile-link { clear:both; display:block; font:80% monospace; padding:10px 0; text-align:center; text-transform:capitalize;  }
+/*****************************************
+Sidebar CSS
+******************************************/
+.sidebar{ margin:0; padding:0; display:block; }
+.sidebar h2, .sidebar h5 {  background:#e5e5e5;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-size: 20px;  font-weight: normal;  color:#333333;  text-transform:capitalize;  text-shadow: 1px 1px #FFFFFF;  line-height: 22px;  margin: 0 0 5px;  }
+.sidebar .widget{  background-color: #E5E5E5;  margin: 0 0 15px;  padding: 20px;  }
+.sidebar .widget-content{  color: #A41600;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-size: 13px;  line-height: 20px;  text-shadow: 1px 1px #FFFFFF;  }
+.sidebar ul li{  margin:0 20px 0 20px;  padding:0;  list-style-type: square;  word-wrap: break-word;  color: #333;  }
+.sidebar a{  color:#A41600;  text-decoration:none;  }
+.sidebar a:hover{  color:#A41600;  text-decoration:underline;  }
+/*****************************************
+Footer CSS
+******************************************/
+#footer-wrap{  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-weight: normal;  font-size: 13px;  line-height: 22px;  color: #676767;  padding: 20px 0;  }
+#footer-wrap .gototop {  float: left; text-align: left;  }
+#footer-wrap .creds {  float: right;  text-align: right;  }
+#footer-wrap a{  color: #a5a5a5;  text-decoration:none;  }
+#footer-wrap a:hover{  color:#fff;  text-decoration:none;  }
+/*****************************************
+Comments CSS
+******************************************/
+.comments {  font-size: 12px;  line-height: 20px;  padding-top: 30px;  clear:both;  margin: 0;  }
+.comments h4 {  font-size: 23px;  margin: 0 20px;  text-transform: capitalize;  }
+#comments-block .avatar-image-container.avatar-stock img{  border-width:0;  padding:1px;  }
+#comments-block .avatar-image-container{    height:37px;    left:-45px;    position:absolute;    width:37px;  }
+#comments-block.avatar-comment-indent{  margin-left:45px;  position:relative;  }
+#comments-block.avatar-comment-indent dd{  margin-left:0;  }
+iframe.avatar-hovercard-iframe{  border:0 none;  padding:0;  width:25em;  height:9.4em;  margin:.5em;  }
+.comments .comments-content{  margin-bottom:16px;  }
+.comments .continue a, .comments .comment .comment-actions a{  background:#BA1A00;  cursor:pointer;  color: #ffffff;  display: inline-block;  font-size: 12px;  padding:0px 8px 0px 8px;  font-family: Arial,Helvetica,Tahoma,sans-serif;  font-weight:bold;  line-height: 22px;  border:1px solid #9C1A03;  margin-top:5px;  }
+.comments .continue a:hover, .comments .comment .comment-actions a:hover{  background:#9C1A03;  color: #ffffff;  padding:0px 8px 0px 8px;  border:1px solid #9C1A03;  text-decoration: none;  }
+.comments .comments-content .comment-thread ol{  margin:20px 0 0 -10px;  overflow:hidden;}
+.comments .comments-content .inline-thread{    padding:0;}
+.comments .comments-content .comment-thread{    margin:0 0 0 -15px;}
+.comments .comments-content .comment-thread:empty{    display:none}
+.comments .comments-content .comment-replies{    margin-left:0px;margin-top:0px;}
+.comments .comments-content .comment, .comments .avatar-image-container{padding:4px;}
+.comments .comments-content .comment:first-child{padding-top:4px}
+.comments .comments-content .comment:last-child {border-bottom: 1px solid #DDDDDD;  padding-bottom:0;  }
+.comments .comments-content .comment-body{position:relative}
+.comments .comments-content .user a {  color: #222;  font-size: 12px;  font-weight: bold;  margin-left: 10px;   text-transform: capitalize;  }
+.comments .comments-content .icon.blog-author {display:inline-block;height:18px;margin:0 0 -4px 6px;width:18px}
+.comments .comments-content .datetime {  display: block;  font-size: 12px;  line-height: 14px;  margin-left: 10px;  }
+.comments .comments-content .datetime a {    color:#A41600;  }
+.comments .comments-content .datetime a:hover {  text-decoration:none; }
+.comments .comments-content .comment-header {  background: none repeat scroll 0 0 #E5E5E5;  line-height: 20px;  margin-left: 45px !important;  min-height: 40px;  padding: 10px;   position: relative;  }
+.comments .comments-content .comment-content{    padding: 10px 0 10px 50px;    position: relative;}
+.comments .comments-content .owner-actions {position:absolute;right:0;top:0}
+.comments .comments-replybox { border:none;height:250px;width:100%}
+.comments .comment-replybox-single { margin-left:4px;margin-top:5px}
+.comments .comment-replybox-thread { margin:5px 25px; }
+.comments .comments-content .loadmore a { display:block;padding:10px 16px;text-align:center}
+.comments .thread-toggle { cursor:pointer;display:none;}
+.comments .continue{ cursor:pointer; display:inline-block; margin:0 0 0 50px;}
+.comments .continue a{display:block; font-weight:bold; }
+.comments .comments-content .loadmore{cursor:pointer;margin-top:3em;max-height:3em}
+.comments .comments-content .loadmore.loaded{max-height:0;opacity:0;overflow:hidden}
+.comments .thread-chrome.thread-collapsed{display:none}
+.comments .comments-content .comment-header, .comments .comments-content .comment-content { margin:0 ; }
+.comments .thread-toggle .thread-arrow{display:inline-block;height:6px;margin:.3em;overflow:visible;padding-right:4px;width:7px}
+.comments .thread-expanded .thread-arrow{background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAG0lEQVR42mNgwAfKy8v/48I4FeA0AacVDFQBAP9wJkE/KhUMAAAAAElFTkSuQmCC") no-repeat scroll 0 0 transparent}
+.comments .thread-collapsed .thread-arrow{background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAJUlEQVR42mNgAILy8vL/DLgASBKnApgkVgXIkhgKiNKJ005s4gDLbCZBiSxfygAAAABJRU5ErkJggg==") no-repeat scroll 0 0 transparent}
+.comments .avatar-image-container{ padding-left:0; margin: 5px 10px 5px 0; max-height:34px; width:34px; }
+.comments .avatar-image-container img{  border: 4px solid #FFFFFF;  display: block;  max-width: 30px;  width: 30px;  }
+.comments .comment-block{margin-left:0px; position:relative;  }
+.comments .comments-content .comment{  background: none repeat scroll 0 0 #F5F5F5;  border: 1px solid #DDDDDD;  list-style: none outside none;  margin: 0 13px 15px 50px;  padding: 10px !important; }
+#comment-editor{  margin: 5px 5px 5px 40px;  }
+/*****************************************
+Responsive styles
+******************************************/
+@media screen and (max-width: 960px) {
+#header {  float:none;  max-width:none;  text-align:center;  }
+#header-inner {  margin-bottom:0px;  }
+#header h1 {  margin-right:0px;  }
+#header p.description {  margin:0;  }
+#header-right {  text-align: center;  width: 100%;  }
+#search{  float: none;  padding: 5px 0 10px 0;  }
+.main-nav-main ul, .sub-nav-menu ul {  text-align: center;  }
+.main-nav-main li {  float: none;  }
+.main-nav-main li a {  background: none;  }
+.main-nav-main li a:hover {  background: #9c1a03 !important;  }
+.ct-wrapper{  padding:0;  }
+.sidebar-wrapper .widget {  border: none;  margin: 0px auto 10px auto;  padding: 10px 20px;  }
+.footer-wrap {  padding: 20px !important;  }
+#footer-wrap .gototop, #footer-wrap .creds {  float: none;  text-align: center;  }
+}
+@media screen and (max-width: 768px){
+.header-wrapper {    margin-right: 0;    min-height: 0;    width: 100%;    }
+#header {    text-align: center;    width: 100%;    max-width: none;    }
+#header-inner {   margin:30px 0 0;  }
+.main-nav-main {  border-bottom: 0;  }
+.sub-nav-menu {  margin: 0;  }
+.outer-wrapper {  padding: 0;  }
+#content {  clear: both;    border: none;  padding: 0.1px;  }
+.main-wrapper{    margin-right:0;    width:100%;    min-height: 0px;    }
+.sidebar-wrapper{   position:relative; top:auto;  right:auto;  clear:both;  left:auto;  padding: 0;  width:auto;  background: none;  }
+#comment-editor {    margin:10px;    }
+}
+@media screen and (max-width: 500px){
+#header img {    width:100%;    }
+.post-comment-link {  display: none;  }
+}
+@media screen and (max-width: 420px){
+.comments .comments-content .datetime{    display:block;    float:none;    }
+.comments .comments-content .comment-header {    height:70px;    }
+}
+@media screen and (max-width: 320px){
+.comments .comments-content .comment-replies {    margin-left: 0;    }
+}
+/*****************************************
+Hiding Header Date and Feed Links
+******************************************/
+h2.date-header{display:none;}
