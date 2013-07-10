@@ -894,7 +894,7 @@ CDBDotAPlayerSummary *MySQLDotAPlayerSummaryCheck( void *conn, string *error, ui
 	transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
 	string EscName = MySQLEscapeString( conn, name );
 	CDBDotAPlayerSummary *DotAPlayerSummary = NULL;
-	string Query = "SELECT COUNT(dotaplayers.id), SUM(kills), SUM(deaths), SUM(creepkills), SUM(creepdenies), SUM(assists), SUM(neutralkills), SUM(towerkills), SUM(raxkills), SUM(courierkills) FROM gameplayers LEFT JOIN games ON games.id=gameplayers.gameid LEFT JOIN dotaplayers ON dotaplayers.gameid=games.id AND dotaplayers.colour=gameplayers.colour WHERE name LIKE '" + EscName + "'";
+	string Query = "SELECT games, kills, deaths, creeps, denies, assists, neutrals, towers, rax, wins, losses, draw FROM stats WHERE player_lower LIKE '" + EscName + "'";
 
 	if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
 		*error = mysql_error( (MYSQL *)conn );
@@ -906,14 +906,12 @@ CDBDotAPlayerSummary *MySQLDotAPlayerSummaryCheck( void *conn, string *error, ui
 		{
 			vector<string> Row = MySQLFetchRow( Result );
 
-			if( Row.size( ) == 10 )
+			if( Row.size( ) == 12 )
 			{
 				uint32_t TotalGames = UTIL_ToUInt32( Row[0] );
 
 				if( TotalGames > 0 )
 				{
-					uint32_t TotalWins = 0;
-					uint32_t TotalLosses = 0;
 					uint32_t TotalKills = UTIL_ToUInt32( Row[1] );
 					uint32_t TotalDeaths = UTIL_ToUInt32( Row[2] );
 					uint32_t TotalCreepKills = UTIL_ToUInt32( Row[3] );
@@ -922,65 +920,15 @@ CDBDotAPlayerSummary *MySQLDotAPlayerSummaryCheck( void *conn, string *error, ui
 					uint32_t TotalNeutralKills = UTIL_ToUInt32( Row[6] );
 					uint32_t TotalTowerKills = UTIL_ToUInt32( Row[7] );
 					uint32_t TotalRaxKills = UTIL_ToUInt32( Row[8] );
-					uint32_t TotalCourierKills = UTIL_ToUInt32( Row[9] );
+					uint32_t TotalWins =  UTIL_ToUInt32( Row[9] );
+					uint32_t TotalLosses =  UTIL_ToUInt32( Row[10] );
+					uint32_t TotalDraws =  UTIL_ToUInt32( Row[11] );
 
-					// calculate total wins
-
-					string Query2 = "SELECT COUNT(*) FROM gameplayers LEFT JOIN games ON games.id=gameplayers.gameid LEFT JOIN dotaplayers ON dotaplayers.gameid=games.id AND dotaplayers.colour=gameplayers.colour LEFT JOIN dotagames ON games.id=dotagames.gameid WHERE name='" + EscName + "' AND ((winner=1 AND dotaplayers.newcolour>=1 AND dotaplayers.newcolour<=5) OR (winner=2 AND dotaplayers.newcolour>=7 AND dotaplayers.newcolour<=11))";
-
-					if( mysql_real_query( (MYSQL *)conn, Query2.c_str( ), Query2.size( ) ) != 0 )
-						*error = mysql_error( (MYSQL *)conn );
-					else
-					{
-						MYSQL_RES *Result2 = mysql_store_result( (MYSQL *)conn );
-
-						if( Result2 )
-						{
-							vector<string> Row2 = MySQLFetchRow( Result2 );
-
-							if( Row2.size( ) == 1 )
-								TotalWins = UTIL_ToUInt32( Row2[0] );
-							else
-								*error = "error checking dotaplayersummary wins [" + name + "] - row doesn't have 1 column";
-
-							mysql_free_result( Result2 );
-						}
-						else
-							*error = mysql_error( (MYSQL *)conn );
-					}
-
-					// calculate total losses
-
-					string Query3 = "SELECT COUNT(*) FROM gameplayers LEFT JOIN games ON games.id=gameplayers.gameid LEFT JOIN dotaplayers ON dotaplayers.gameid=games.id AND dotaplayers.colour=gameplayers.colour LEFT JOIN dotagames ON games.id=dotagames.gameid WHERE name='" + EscName + "' AND ((winner=2 AND dotaplayers.newcolour>=1 AND dotaplayers.newcolour<=5) OR (winner=1 AND dotaplayers.newcolour>=7 AND dotaplayers.newcolour<=11))";
-
-					if( mysql_real_query( (MYSQL *)conn, Query3.c_str( ), Query3.size( ) ) != 0 )
-						*error = mysql_error( (MYSQL *)conn );
-					else
-					{
-						MYSQL_RES *Result3 = mysql_store_result( (MYSQL *)conn );
-
-						if( Result3 )
-						{
-							vector<string> Row3 = MySQLFetchRow( Result3 );
-
-							if( Row3.size( ) == 1 )
-								TotalLosses = UTIL_ToUInt32( Row3[0] );
-							else
-								*error = "error checking dotaplayersummary losses [" + name + "] - row doesn't have 1 column";
-
-							mysql_free_result( Result3 );
-						}
-						else
-							*error = mysql_error( (MYSQL *)conn );
-					}
-
-					// done
-
-					DotAPlayerSummary = new CDBDotAPlayerSummary( string( ), name, TotalGames, TotalWins, TotalLosses, TotalKills, TotalDeaths, TotalCreepKills, TotalCreepDenies, TotalAssists, TotalNeutralKills, TotalTowerKills, TotalRaxKills, TotalCourierKills );
+					DotAPlayerSummary = new CDBDotAPlayerSummary( string( ), name, TotalGames, TotalWins, TotalLosses, TotalKills, TotalDeaths, TotalCreepKills, TotalCreepDenies, TotalAssists, TotalNeutralKills, TotalTowerKills, TotalRaxKills, TotalDraws );
 				}
 			}
 			else
-				*error = "error checking dotaplayersummary [" + name + "] - row doesn't have 10 columns";
+				*error = "error checking dotaplayersummary [" + name + "] - row doesn't have 12 columns";
 
 			mysql_free_result( Result );
 		}
@@ -1015,7 +963,7 @@ double MySQLScoreCheck( void *conn, string *error, uint32_t botid, string catego
 	string EscName = MySQLEscapeString( conn, name );
 	string EscServer = MySQLEscapeString( conn, server );
 	double Score = -100000.0;
-	string Query = "SELECT score FROM scores WHERE category='" + EscCategory + "' AND name='" + EscName + "' AND server='" + EscServer + "'";
+	string Query = "SELECT score FROM stats WHERE name='" + EscName + "' AND realm ='" + EscServer + "'";
 
 	if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
 		*error = mysql_error( (MYSQL *)conn );

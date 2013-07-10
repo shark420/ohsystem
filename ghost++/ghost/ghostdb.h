@@ -802,10 +802,10 @@ private:
 	uint32_t m_TotalNeutralKills;	// total number of neutral kills
 	uint32_t m_TotalTowerKills;		// total number of tower kills
 	uint32_t m_TotalRaxKills;		// total number of rax kills
-	uint32_t m_TotalCourierKills;	// total number of courier kills
+	uint32_t m_TotalDraws;	// total number of draw ga,es
 
 public:
-	CDBDotAPlayerSummary( string nServer, string nName, uint32_t nTotalGames, uint32_t nTotalWins, uint32_t nTotalLosses, uint32_t nTotalKills, uint32_t nTotalDeaths, uint32_t nTotalCreepKills, uint32_t nTotalCreepDenies, uint32_t nTotalAssists, uint32_t nTotalNeutralKills, uint32_t nTotalTowerKills, uint32_t nTotalRaxKills, uint32_t nTotalCourierKills );
+	CDBDotAPlayerSummary( string nServer, string nName, uint32_t nTotalGames, uint32_t nTotalWins, uint32_t nTotalLosses, uint32_t nTotalKills, uint32_t nTotalDeaths, uint32_t nTotalCreepKills, uint32_t nTotalCreepDenies, uint32_t nTotalAssists, uint32_t nTotalNeutralKills, uint32_t nTotalTowerKills, uint32_t nTotalRaxKills, uint32_t nTotalDraws );
 	~CDBDotAPlayerSummary( );
 
 	string GetServer( )					{ return m_Server; }
@@ -821,7 +821,7 @@ public:
 	uint32_t GetTotalNeutralKills( )	{ return m_TotalNeutralKills; }
 	uint32_t GetTotalTowerKills( )		{ return m_TotalTowerKills; }
 	uint32_t GetTotalRaxKills( )		{ return m_TotalRaxKills; }
-	uint32_t GetTotalCourierKills( )	{ return m_TotalCourierKills; }
+	uint32_t GetTotalDraws( )	{ return m_TotalDraws; }
 
 	float GetAvgKills( )				{ return m_TotalGames > 0 ? (float)m_TotalKills / m_TotalGames : 0; }
 	float GetAvgDeaths( )				{ return m_TotalGames > 0 ? (float)m_TotalDeaths / m_TotalGames : 0; }
@@ -831,7 +831,6 @@ public:
 	float GetAvgNeutralKills( )			{ return m_TotalGames > 0 ? (float)m_TotalNeutralKills / m_TotalGames : 0; }
 	float GetAvgTowerKills( )			{ return m_TotalGames > 0 ? (float)m_TotalTowerKills / m_TotalGames : 0; }
 	float GetAvgRaxKills( )				{ return m_TotalGames > 0 ? (float)m_TotalRaxKills / m_TotalGames : 0; }
-	float GetAvgCourierKills( )			{ return m_TotalGames > 0 ? (float)m_TotalCourierKills / m_TotalGames : 0; }
 };
 
 #endif

@@ -569,7 +569,7 @@ string CLanguage :: YourLoadingTimeWas( string loadingtime )
 	return Out;
 }
 
-string CLanguage :: HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string totalcourierkills, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills, string avgcourierkills )
+string CLanguage :: HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string totaldraws, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills )
 {
 	string Out = m_CFG->GetString( "lang_0074", "lang_0074" );
 	UTIL_Replace( Out, "$USER$", user );
@@ -584,7 +584,7 @@ string CLanguage :: HasPlayedDotAGamesWithThisBot( string user, string totalgame
 	UTIL_Replace( Out, "$TOTALNEUTRALKILLS$", totalneutralkills );
 	UTIL_Replace( Out, "$TOTALTOWERKILLS$", totaltowerkills );
 	UTIL_Replace( Out, "$TOTALRAXKILLS$", totalraxkills );
-	UTIL_Replace( Out, "$TOTALCOURIERKILLS$", totalcourierkills );
+	UTIL_Replace( Out, "$TOTALDRAWS$", totaldraws );
 	UTIL_Replace( Out, "$AVGKILLS$", avgkills );
 	UTIL_Replace( Out, "$AVGDEATHS$", avgdeaths );
 	UTIL_Replace( Out, "$AVGCREEPKILLS$", avgcreepkills );
@@ -593,7 +593,6 @@ string CLanguage :: HasPlayedDotAGamesWithThisBot( string user, string totalgame
 	UTIL_Replace( Out, "$AVGNEUTRALKILLS$", avgneutralkills );
 	UTIL_Replace( Out, "$AVGTOWERKILLS$", avgtowerkills );
 	UTIL_Replace( Out, "$AVGRAXKILLS$", avgraxkills );
-	UTIL_Replace( Out, "$AVGCOURIERKILLS$", avgcourierkills );
 	return Out;
 }
 
