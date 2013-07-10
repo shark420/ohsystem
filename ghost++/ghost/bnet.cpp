@@ -415,6 +415,18 @@ bool CBNET :: Update( void *fd, void *send_fd )
 		m_LastAdminRefreshTime = GetTime( );
 	}
 
+        // checking for finished games
+        if( m_GHost->m_OHUpdateStats && GetTime( ) - m_GHost->m_CheckForFinishedGames >= 5 && m_GHost->m_FinishedGames > 0 )
+        {
+#ifdef WIN32
+		system( "stats.exe" );
+#else
+                system( "./stats" );
+#endif
+                m_GHost->m_CheckForFinishedGames = GetTime();
+                m_GHost->m_FinishedGames--;
+        }
+
 	// refresh the ban list every 60 minutes
 
 	if( !m_CallableBanList && GetTime( ) - m_LastBanRefreshTime >= 3600 )
@@ -1017,6 +1029,22 @@ void CBNET :: ProcessChatEvent( CIncomingChatEvent *chatEvent )
 			{
 				CONSOLE_Print( "[BNET: " + m_ServerAlias + "] admin [" + User + "] sent command [" + Message + "]" );
 
+				/********************
+				* OHSYSTEM COMMANDS *
+				********************/
+
+				//
+				// !UPDATE STATS (all)
+				//
+				if( Command == "updatestats" && IsRootAdmin( User ) )
+				{
+#ifdef WIN32
+			                system( "stats.exe" );
+#else
+			                system( "./stats" );
+#endif
+				}
+
 				/*****************
 				* ADMIN COMMANDS *
 				******************/
@@ -1025,7 +1053,7 @@ void CBNET :: ProcessChatEvent( CIncomingChatEvent *chatEvent )
 				// !ADDADMIN
 				//
 
-				if( Command == "addadmin" && !Payload.empty( ) )
+				else if( Command == "addadmin" && !Payload.empty( ) )
 				{
 					if( IsRootAdmin( User ) )
 					{

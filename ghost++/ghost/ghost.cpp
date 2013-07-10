@@ -402,8 +402,9 @@ CGHost :: CGHost( CConfig *CFG )
 	m_CRC->Initialize( );
 	m_SHA = new CSHA1( );
 	m_CurrentGame = NULL;
-	string DBType = CFG->GetString( "db_type", "sqlite3" );
+	string DBType = CFG->GetString( "db_type", "mysql" );
 	CONSOLE_Print( "[GHOST] opening primary database" );
+        m_FinishedGames = 0;
 
 	if( DBType == "mysql" )
 	{
@@ -517,6 +518,9 @@ CGHost :: CGHost( CConfig *CFG )
 	m_ReplayWar3Version = CFG->GetInt( "replay_war3version", 26 );
 	m_ReplayBuildNumber = CFG->GetInt( "replay_buildnumber", 6059 );
 	SetConfigs( CFG );
+
+	// OHSYSTEM
+	m_OHUpdateStats = CFG->GetInt( "oh_updatestats", 0 ) == 0 ? false : true;
 
 	// load the battle.net connections
 	// we're just loading the config data and creating the CBNET classes here, the connections are established later (in the Update function)
@@ -761,6 +765,8 @@ bool CGHost :: Update( long usecBlock )
 		if( m_CurrentGame )
 		{
 			CONSOLE_Print( "[GHOST] deleting current game in preparation for exiting nicely" );
+                        m_FinishedGames += 1;
+                        m_CheckForFinishedGames = GetTime();
 			delete m_CurrentGame;
 			m_CurrentGame = NULL;
 		}
