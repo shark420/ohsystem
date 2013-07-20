@@ -18,6 +18,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -312,7 +313,9 @@ int main( int argc, char **argv )
 						rowids[num_players] = 0;
 
 					names[num_players] = Row[1];
-					lnames[num_players] = Row[1];
+                                        string name = Row[1];
+                                        std::transform( name.begin(), name.end(), name.begin(), ::tolower);
+                                        lnames[num_players] = name;
 					servers[num_players] = Row[10];
                                         score[num_players] = "";
                                         nscore[num_players] = 0;
