@@ -80,6 +80,11 @@ CGame :: ~CGame( )
 {
 	if( m_CallableGameAdd && m_CallableGameAdd->GetReady( ) )
 	{
+		if (m_GHost->m_GameIDReplays)
+		{
+			m_DatabaseID = m_CallableGameAdd->GetResult();
+		}
+
 		if( m_CallableGameAdd->GetResult( ) > 0 )
 		{
 			CONSOLE_Print( "[GAME: " + m_GameName + "] saving player/stats data to database" );

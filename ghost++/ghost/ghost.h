@@ -137,6 +137,7 @@ public:
         uint32_t m_FinishedGames;
         uint32_t m_CheckForFinishedGames;
 	bool m_OHUpdateStats;
+	bool m_GameIDReplays;					// config value: save replays with database game id or not
 
 	CGHost( CConfig *CFG );
 	~CGHost( );
