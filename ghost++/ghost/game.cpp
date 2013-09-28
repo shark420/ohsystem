@@ -119,6 +119,9 @@ CGame :: ~CGame( )
 	for( vector<PairedDPSCheck> :: iterator i = m_PairedDPSChecks.begin( ); i != m_PairedDPSChecks.end( ); ++i )
 		m_GHost->m_Callables.push_back( i->second );
 
+        for( vector<PairedQS> :: iterator i = m_PairedQSChecks.begin( ); i != m_PairedQSChecks.end( ); ++i )
+                m_GHost->m_Callables.push_back( i->second );
+
 	for( vector<CDBBan *> :: iterator i = m_DBBans.begin( ); i != m_DBBans.end( ); ++i )
 		delete *i;
 
@@ -286,6 +289,34 @@ bool CGame :: Update( void *fd, void *send_fd )
 		else
 			++i;
 	}
+
+        for( vector<PairedQS> :: iterator i = m_PairedQSChecks.begin( ); i != m_PairedQSChecks.end( ); )
+        {
+                if( i->second->GetReady( ) )
+                {
+                        string Result = i->second->GetResult( );
+			uint32_t Type = i->second->GetType( );
+			uint32_t SubType = i->second->GetSubType( );
+			string StringOne = i->second->GetStringOne( );
+			string StringTwo = i->second->GetStringTwo( );
+			uint32_t IntOne = i->second->GetIntOne( );
+			uint32_t IntTwo = i->second->GetIntTwo( );
+
+			if( Result == "failed" )
+			{
+			debug:
+			        CONSOLE_Print( "[QuerySystem] Error. You have done something wrong, recheck all your input." );
+				CONSOLE_Print( "[QuerySystem] Type: "+UTIL_ToString( i->second->GetType( ) )+" | SubType: "+UTIL_ToString( i->second->GetSubType( ) ) );
+				CONSOLE_Print( "[QuerySystem] String1: "+i->second->GetStringOne( )+" | String2: "+i->second->GetStringTwo( ) );
+				CONSOLE_Print( "[QuerySystem] Int1: "+UTIL_ToString( i->second->GetIntOne( ) )+" | Int2: "+UTIL_ToString( i->second->GetIntTwo( ) ) );
+			}
+                        m_GHost->m_DB->RecoverCallable( i->second );
+                        delete i->second;
+                        i = m_PairedQSChecks.erase( i );
+                }
+                else
+                        ++i;
+        }
 
 	return CBaseGame :: Update( fd, send_fd );
 }

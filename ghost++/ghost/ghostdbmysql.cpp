@@ -448,6 +448,19 @@ CCallableW3MMDVarAdd *CGHostDBMySQL :: ThreadedW3MMDVarAdd( uint32_t gameid, map
 	return Callable;
 }
 
+CCallableQuerySystem *CGHostDBMySQL :: ThreadedQuerySystem( uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two )
+{
+        void *Connection = GetIdleConnection( );
+
+        if( !Connection )
+                ++m_NumConnections;
+
+        CCallableQuerySystem *Callable = new CMySQLCallableQuerySystem( type, subtype, string_one, string_two, int_one, int_two, Connection, m_BotID, m_Server, m_Database, m_User, m_Password, m_Port );
+        CreateThread( Callable );
+        ++m_OutstandingCallables;
+        return Callable;
+}
+
 void *CGHostDBMySQL :: GetIdleConnection( )
 {
 	void *Connection = NULL;
@@ -1085,6 +1098,14 @@ bool MySQLW3MMDVarAdd( void *conn, string *error, uint32_t botid, uint32_t gamei
 	return Success;
 }
 
+string MySQLQuerySystem( void *conn, string *error, uint32_t botid, uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two )
+{
+	string EscString_One = MySQLEscapeString( conn, string_one );
+	string EscString_Two = MySQLEscapeString( conn, string_two );
+
+	return "failed";
+}
+
 //
 // MySQL Callables
 //
@@ -1334,6 +1355,16 @@ void CMySQLCallableW3MMDVarAdd :: operator( )( )
 	}
 
 	Close( );
+}
+
+void CMySQLCallableQuerySystem :: operator( )( )
+{
+        Init( );
+
+        if( m_Error.empty( ) )
+                m_Result = MySQLQuerySystem( m_Connection, &m_Error, m_SQLBotID, m_Type, m_SubType, m_String_One, m_String_Two, m_Int_One, m_Int_Two );
+
+        Close( );
 }
 
 #endif

@@ -46,6 +46,7 @@ class CCallableDownloadAdd;
 class CCallableScoreCheck;
 class CCallableW3MMDPlayerAdd;
 class CCallableW3MMDVarAdd;
+class CCallableQuerySystem;
 class CDBBan;
 class CDBGame;
 class CDBGamePlayer;
@@ -100,6 +101,7 @@ public:
 	virtual bool W3MMDVarAdd( uint32_t gameid, map<VarP,int32_t> var_ints );
 	virtual bool W3MMDVarAdd( uint32_t gameid, map<VarP,double> var_reals );
 	virtual bool W3MMDVarAdd( uint32_t gameid, map<VarP,string> var_strings );
+	virtual string QuerySystem( uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two );
 
 	// threaded database functions
 
@@ -127,6 +129,7 @@ public:
 	virtual CCallableW3MMDVarAdd *ThreadedW3MMDVarAdd( uint32_t gameid, map<VarP,int32_t> var_ints );
 	virtual CCallableW3MMDVarAdd *ThreadedW3MMDVarAdd( uint32_t gameid, map<VarP,double> var_reals );
 	virtual CCallableW3MMDVarAdd *ThreadedW3MMDVarAdd( uint32_t gameid, map<VarP,string> var_strings );
+	virtual CCallableQuerySystem *ThreadedQuerySystem( uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two );
 };
 
 //
@@ -552,6 +555,31 @@ public:
 
 	virtual bool GetResult( )				{ return m_Result; }
 	virtual void SetResult( bool nResult )	{ m_Result = nResult; }
+};
+
+class CCallableQuerySystem : virtual public CBaseCallable
+{
+protected:
+	uint32_t m_Type;
+	uint32_t m_SubType;
+	string m_String_One;
+	string m_String_Two;
+	uint32_t m_Int_One;
+	uint32_t m_Int_Two;
+	string m_Result;
+
+public:
+        CCallableQuerySystem( uint32_t nType, uint32_t nSubType, string nString_One, string nString_Two, uint32_t nInt_One, uint32_t nInt_Two )  : CBaseCallable( ), m_Type( nType ), m_SubType( nSubType ), m_String_One( nString_One ), m_String_Two( nString_Two ), m_Int_One( nInt_One ), m_Int_Two( nInt_Two ), m_Result( "failed" ) { }
+	virtual ~CCallableQuerySystem( );
+
+	virtual uint32_t GetType( )		{ return m_Type; }
+	virtual uint32_t GetSubType( )		{ return m_SubType; }
+	virtual string GetStringOne( )		{ return m_String_One; }
+	virtual string GetStringTwo( )		{ return m_String_Two; }
+	virtual uint32_t GetIntOne( )		{ return m_Int_One; }
+        virtual uint32_t GetIntTwo( )		{ return m_Int_Two; }
+        virtual string GetResult( )                               { return m_Result; }
+        virtual void SetResult( string nResult )  { m_Result = nResult; }
 };
 
 //

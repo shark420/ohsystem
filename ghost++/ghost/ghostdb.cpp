@@ -182,6 +182,11 @@ bool CGHostDB :: W3MMDVarAdd( uint32_t gameid, map<VarP,string> var_strings )
 	return false;
 }
 
+string CGHostDB :: QuerySystem( uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two )
+{
+        return "";
+}
+
 void CGHostDB :: CreateThread( CBaseCallable *callable )
 {
 	callable->SetReady( true );
@@ -302,6 +307,11 @@ CCallableW3MMDVarAdd *CGHostDB :: ThreadedW3MMDVarAdd( uint32_t gameid, map<VarP
 	return NULL;
 }
 
+CCallableQuerySystem *CGHostDB :: ThreadedQuerySystem( uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two )
+{
+        return NULL;
+}
+
 //
 // Callables
 //
@@ -413,6 +423,11 @@ CCallableW3MMDPlayerAdd :: ~CCallableW3MMDPlayerAdd( )
 }
 
 CCallableW3MMDVarAdd :: ~CCallableW3MMDVarAdd( )
+{
+
+}
+
+CCallableQuerySystem :: ~CCallableQuerySystem( )
 {
 
 }
