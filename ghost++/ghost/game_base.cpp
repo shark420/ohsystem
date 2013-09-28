@@ -1171,7 +1171,7 @@ void CBaseGame :: SendVirtualHostPlayerInfo( CGamePlayer *player )
 	IP.push_back( 0 );
 	IP.push_back( 0 );
 	IP.push_back( 0 );
-	Send( player, m_Protocol->SEND_W3GS_PLAYERINFO( m_VirtualHostPID, m_VirtualHostName, IP, IP ) );
+	Send( player, m_Protocol->SEND_W3GS_PLAYERINFO( m_VirtualHostPID, m_VirtualHostName, IP, IP, string( ) ) );
 }
 
 void CBaseGame :: SendFakePlayerInfo( CGamePlayer *player )
@@ -1184,7 +1184,7 @@ void CBaseGame :: SendFakePlayerInfo( CGamePlayer *player )
 	IP.push_back( 0 );
 	IP.push_back( 0 );
 	IP.push_back( 0 );
-	Send( player, m_Protocol->SEND_W3GS_PLAYERINFO( m_FakePlayerPID, "FakePlayer", IP, IP ) );
+	Send( player, m_Protocol->SEND_W3GS_PLAYERINFO( m_FakePlayerPID, "FakePlayer", IP, IP, string( ) ) );
 }
 
 void CBaseGame :: SendAllActions( )
@@ -2007,17 +2007,17 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 			if( (*i)->GetSocket( ) )
 			{
 				if( m_GHost->m_HideIPAddresses )
-					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), BlankIP, BlankIP ) );
+					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), BlankIP, BlankIP, GetColoredName( Player->GetName( ) ) ) );
 				else
-					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), Player->GetExternalIP( ), Player->GetInternalIP( ) ) );
+					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), Player->GetExternalIP( ), Player->GetInternalIP( ), GetColoredName( Player->GetName( ) ) ) );
 			}
 
 			// send info about every other player to the new player
 
 			if( m_GHost->m_HideIPAddresses )
-				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), BlankIP, BlankIP ) );
+				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), BlankIP, BlankIP, GetColoredName( (*i)->GetName( ) ) ) );
 			else
-				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), (*i)->GetExternalIP( ), (*i)->GetInternalIP( ) ) );
+				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), (*i)->GetExternalIP( ), (*i)->GetInternalIP( ), GetColoredName( (*i)->GetName( ) ) ) );
 		}
 	}
 
@@ -2397,17 +2397,17 @@ void CBaseGame :: EventPlayerJoinedWithScore( CPotentialPlayer *potential, CInco
 			if( (*i)->GetSocket( ) )
 			{
 				if( m_GHost->m_HideIPAddresses )
-					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), BlankIP, BlankIP ) );
+					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), BlankIP, BlankIP, GetColoredName( Player->GetName( ) ) ) );
 				else
-					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), Player->GetExternalIP( ), Player->GetInternalIP( ) ) );
+					(*i)->Send( m_Protocol->SEND_W3GS_PLAYERINFO( Player->GetPID( ), Player->GetName( ), Player->GetExternalIP( ), Player->GetInternalIP( ), GetColoredName( Player->GetName( ) ) ) );
 			}
 
 			// send info about every other player to the new player
 
 			if( m_GHost->m_HideIPAddresses )
-				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), BlankIP, BlankIP ) );
+				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), BlankIP, BlankIP, GetColoredName( (*i)->GetName( ) ) ) );
 			else
-				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), (*i)->GetExternalIP( ), (*i)->GetInternalIP( ) ) );
+				Player->Send( m_Protocol->SEND_W3GS_PLAYERINFO( (*i)->GetPID( ), (*i)->GetName( ), (*i)->GetExternalIP( ), (*i)->GetInternalIP( ), GetColoredName( (*i)->GetName( ) ) ) );
 		}
 	}
 
@@ -4578,7 +4578,7 @@ void CBaseGame :: CreateVirtualHost( )
 	IP.push_back( 0 );
 	IP.push_back( 0 );
 	IP.push_back( 0 );
-	SendAll( m_Protocol->SEND_W3GS_PLAYERINFO( m_VirtualHostPID, m_VirtualHostName, IP, IP ) );
+	SendAll( m_Protocol->SEND_W3GS_PLAYERINFO( m_VirtualHostPID, m_VirtualHostName, IP, IP, string( ) ) );
 }
 
 void CBaseGame :: DeleteVirtualHost( )
@@ -4608,7 +4608,7 @@ void CBaseGame :: CreateFakePlayer( )
 		IP.push_back( 0 );
 		IP.push_back( 0 );
 		IP.push_back( 0 );
-		SendAll( m_Protocol->SEND_W3GS_PLAYERINFO( m_FakePlayerPID, "FakePlayer", IP, IP ) );
+		SendAll( m_Protocol->SEND_W3GS_PLAYERINFO( m_FakePlayerPID, "FakePlayer", IP, IP, string( ) ) );
 		m_Slots[SID] = CGameSlot( m_FakePlayerPID, 100, SLOTSTATUS_OCCUPIED, 0, m_Slots[SID].GetTeam( ), m_Slots[SID].GetColour( ), m_Slots[SID].GetRace( ) );
 		SendAllSlotInfo( );
 	}
@@ -4628,4 +4628,26 @@ void CBaseGame :: DeleteFakePlayer( )
 	SendAll( m_Protocol->SEND_W3GS_PLAYERLEAVE_OTHERS( m_FakePlayerPID, PLAYERLEAVE_LOBBY ) );
 	SendAllSlotInfo( );
 	m_FakePlayerPID = 255;
+}
+
+string CBaseGame :: GetColoredName( string defaultname )
+{
+        transform( defaultname.begin( ), defaultname.end( ), defaultname.begin( ), (int(*)(int))tolower );
+
+        for( vector<string> :: iterator i = m_GHost->m_ColoredNames.begin( ); i != m_GHost->m_ColoredNames.end( ); )
+        {
+                string listdefaultname;
+                string coloredname;
+                stringstream SS;
+                SS << *i;
+                SS >> listdefaultname;
+                SS >> coloredname;
+
+                if( defaultname == listdefaultname )
+                        return "|cFF"+coloredname;
+
+                i++;
+        }
+
+        return "";
 }

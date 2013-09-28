@@ -138,6 +138,7 @@ public:
         uint32_t m_CheckForFinishedGames;
 	bool m_OHUpdateStats;
 	bool m_GameIDReplays;					// config value: save replays with database game id or not
+        vector<string> m_ColoredNames;
 
 	CGHost( CConfig *CFG );
 	~CGHost( );
@@ -167,6 +168,7 @@ public:
 	void ExtractScripts( );
 	void LoadIPToCountryData( );
 	void CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper );
+        void LoadColoredNames( );
 };
 
 #endif

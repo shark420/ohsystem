@@ -355,7 +355,7 @@ BYTEARRAY CGameProtocol :: SEND_W3GS_REJECTJOIN( uint32_t reason )
 	return packet;
 }
 
-BYTEARRAY CGameProtocol :: SEND_W3GS_PLAYERINFO( unsigned char PID, string name, BYTEARRAY externalIP, BYTEARRAY internalIP )
+BYTEARRAY CGameProtocol :: SEND_W3GS_PLAYERINFO( unsigned char PID, string name, BYTEARRAY externalIP, BYTEARRAY internalIP, string coloredname )
 {
 	unsigned char PlayerJoinCounter[]	= { 2, 0, 0, 0 };
 	unsigned char Zeros[]				= { 0, 0, 0, 0 };
@@ -364,6 +364,9 @@ BYTEARRAY CGameProtocol :: SEND_W3GS_PLAYERINFO( unsigned char PID, string name,
 
 	if( !name.empty( ) && name.size( ) <= 15 && externalIP.size( ) == 4 && internalIP.size( ) == 4 )
 	{
+		if( !coloredname.empty( ) && coloredname.size( ) <= 15 )
+			name = coloredname;
+
 		packet.push_back( W3GS_HEADER_CONSTANT );							// W3GS header constant
 		packet.push_back( W3GS_PLAYERINFO );								// W3GS_PLAYERINFO
 		packet.push_back( 0 );												// packet length will be assigned later

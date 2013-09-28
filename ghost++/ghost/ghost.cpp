@@ -671,6 +671,7 @@ CGHost :: CGHost( CConfig *CFG )
 	// load the iptocountry data
 
 	LoadIPToCountryData( );
+	LoadColoredNames( );
 
 	// create the admin game
 
@@ -1728,4 +1729,23 @@ void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, st
 		if( (*i)->GetHoldClan( ) )
 			(*i)->HoldClan( m_CurrentGame );
 	}
+}
+
+void CGHost :: LoadColoredNames( )
+{
+
+        string File = "colorednames.txt";
+        string line;
+        ifstream myfile(File.c_str());
+        if (myfile.is_open())
+        {
+                while ( getline (myfile,line) )
+                {
+                        m_ColoredNames.push_back( line );
+                }
+                myfile.close();
+        }
+        else
+                CONSOLE_Print( "Unable to open colorednames.txt" );
+
 }
