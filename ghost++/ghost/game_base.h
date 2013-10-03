@@ -138,6 +138,7 @@ public:
 	virtual unsigned char GetGameState( )			{ return m_GameState; }
 	virtual unsigned char GetGProxyEmptyActions( )	{ return m_GProxyEmptyActions; }
 	virtual string GetGameName( )					{ return m_GameName; }
+	virtual string GetMapName( );
 	virtual string GetLastGameName( )				{ return m_LastGameName; }
 	virtual string GetVirtualHostName( )			{ return m_VirtualHostName; }
 	virtual string GetOwnerName( )					{ return m_OwnerName; }
@@ -238,6 +239,7 @@ public:
 	virtual CGamePlayer *GetPlayerFromName( string name, bool sensitive );
 	virtual uint32_t GetPlayerFromNamePartial( string name, CGamePlayer **player );
 	virtual CGamePlayer *GetPlayerFromColour( unsigned char colour );
+	virtual string GetPlayerList( );
 	virtual unsigned char GetNewPID( );
 	virtual unsigned char GetNewColour( );
 	virtual BYTEARRAY GetPIDs( );
