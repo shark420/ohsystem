@@ -928,7 +928,9 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 					{
 						m_Denied.push_back( LastMatch->GetName() + " " + LastMatch->GetExternalIPString( ) + " 0" );
 						SendAllChat( "Denied User [" + LastMatch->GetName( ) + "] for this game lobby" );
-						LastMatch->SetLeftCode( PLAYERLEAVE_LOBBY );
+                                                LastMatch->SetDeleteMe( true );
+                                                LastMatch->SetLeftReason( "got denied for this lobby" );
+                                                LastMatch->SetLeftCode( PLAYERLEAVE_LOBBY );
 						OpenSlot( GetSIDFromPID( LastMatch->GetPID( ) ), false );
                                                 m_Balanced = false;
                                         }

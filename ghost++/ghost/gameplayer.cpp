@@ -372,17 +372,33 @@ bool CGamePlayer :: Update( void *fd )
 */
 	// disconnect if the player is downloading too slowly
 
+	// make this a bit dynamically, first 10 KB/s is a bit too low, increasing to 100KB/s
+	//decreasing the checktime to 5 seconds
+	// adding an actual playercheck how many players are ingame, if there less than 1 open slots we deny users with a download rate under 500KB/s
 	if( m_DownloadStarted && !m_DownloadFinished && !m_Game->GetGameLoaded() && !m_Game->GetGameLoading() && GetLastMapPartSent( ) > 0 )
 	{
 		uint32_t downloadingTime = GetTicks( ) - m_StartedDownloadingTicks;
 
-		if( downloadingTime > 8000 && GetLastMapPartAcked( ) / downloadingTime < 10 ) // GetLastMapPartAcked( ) / downloadingTime is B/ms, approximately KB/sec
+		if( downloadingTime > 5000 )
 		{
-			CONSOLE_Print( "[DENY] Kicking player: download speed too low" );
-			m_DeleteMe = true;
-	                SetLeftReason( "download speed too low" );
-            		SetLeftCode( PLAYERLEAVE_LOBBY );
-       			m_Game->OpenSlot( m_Game->GetSIDFromPID( GetPID( ) ), false );
+			if( GetLastMapPartAcked( ) / downloadingTime < 500 && m_Game->GetSlotsOccupied( ) <= 1 )
+			{
+				CONSOLE_Print( "[DENY] Kicking player: download speed too low" );
+				m_DeleteMe = true;
+	        	        SetLeftReason( "download speed too low" );
+            			SetLeftCode( PLAYERLEAVE_LOBBY );
+				m_Game->SendAllChat( "Kicking Player["+m_Name+"] for having a too slow download rate." );
+       				m_Game->OpenSlot( m_Game->GetSIDFromPID( GetPID( ) ), false );
+			}
+			else if( GetLastMapPartAcked( ) / downloadingTime < 100 )
+                        {
+                                CONSOLE_Print( "[DENY] Kicking player: download speed too low" );
+                                m_DeleteMe = true;
+                                SetLeftReason( "download speed too low" );
+                                SetLeftCode( PLAYERLEAVE_LOBBY );
+                                m_Game->SendAllChat( "Kicking Player["+m_Name+"] for having a too slow download rate." );
+                                m_Game->OpenSlot( m_Game->GetSIDFromPID( GetPID( ) ), false );
+                        }
 	        }
 	}
 
