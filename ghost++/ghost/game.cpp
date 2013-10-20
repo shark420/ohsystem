@@ -115,8 +115,6 @@ CGame :: ~CGame( )
 		}
   	}
 
-	boost::mutex::scoped_lock callablesLock( m_GHost->m_CallablesMutex );
-
 	if( m_CallableGameAdd && m_CallableGameAdd->GetReady( ) )
 	{
 
@@ -177,8 +175,6 @@ CGame :: ~CGame( )
         for( vector<PairedSS> :: iterator i = m_PairedSSs.begin( ); i != m_PairedSSs.end( ); ++i )
                 m_GHost->m_Callables.push_back( i->second );
 
-	callablesLock.unlock( );
-
 	for( vector<CDBBan *> :: iterator i = m_DBBans.begin( ); i != m_DBBans.end( ); ++i )
 		delete *i;
 
@@ -197,9 +193,7 @@ CGame :: ~CGame( )
 	if( m_CallableGameAdd )
 	{
 		CONSOLE_Print( "[GAME: " + m_GameName + "] game is being deleted before all game data was saved, game data has been lost" );
-		boost::mutex::scoped_lock lock( m_GHost->m_CallablesMutex );
 		m_GHost->m_Callables.push_back( m_CallableGameAdd );
-		callablesLock.unlock( );
 	}
 }
 
@@ -610,8 +604,6 @@ bool CGame :: Update( void *fd, void *send_fd )
 
 void CGame :: EventPlayerDeleted( CGamePlayer *player )
 {
-        //DEBUG
-        //CONSOLE_Print( "in" );
 
 	CBaseGame :: EventPlayerDeleted( player );
 
@@ -651,9 +643,6 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
 
 		if( Team != 12 && m_GameOverTime == 0 && m_ForfeitTime == 0 )
 		{
-        //DEBUG
-        //CONSOLE_Print( "ae-in" );
-
 			// check if everyone on leaver's team left but other team has more than two players
 			char sid, team;
 			uint32_t CountAlly = 0;
@@ -726,17 +715,11 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
 					m_GameOverTime = GetTime( );
 				}
 			}
-        //DEBUG
-        //CONSOLE_Print( "ae-out" );
-
 		}
 
 		// if stats and not solo, and at least two leavers in first four minutes, then draw the game
 		if( !m_SoftGameOver && m_Stats && m_GameOverTime == 0 && Team != 12 && m_GameTicks < 1000 * 60 * 5 && m_GHost->m_EarlyEnd )
 		{
-        //DEBUG
-        //CONSOLE_Print( "ae1-in" );
-
 			// check how many leavers, by starting from start players and subtracting each non-leaver player
 			uint32_t m_NumLeavers = m_StartPlayers;
 
@@ -758,9 +741,6 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
 				m_SoftGameOver = true;
 				m_Stats->LockStats( );
 			}
-        //DEBUG
-        //CONSOLE_Print( "ae1-out" );
-
 		}
 	}
 }
@@ -782,9 +762,6 @@ bool CGame :: EventPlayerAction( CGamePlayer *player, CIncomingAction *action )
 
 bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string payload )
 {
-        //DEBUG
-        //CONSOLE_Print( "c-in" );
-
 	bool HideCommand = CBaseGame :: EventPlayerBotCommand( player, command, payload );
 
 	// todotodo: don't be lazy
@@ -3653,9 +3630,6 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 		SendChat( player, "Error. You require a reserved slot to be able to use this command." );
         }
 */
-        //DEBUG
-        //CONSOLE_Print( "c-out" );
-
 	return HideCommand;
 }
 

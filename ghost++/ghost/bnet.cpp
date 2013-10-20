@@ -62,10 +62,6 @@ CBNET :: CBNET( CGHost *nGHost, string nServer, string nServerAlias, string nBNL
 	string LowerServer = m_Server;
 	m_AdminLog = vector<string>();
 	transform( LowerServer.begin( ), LowerServer.end( ), LowerServer.begin( ), (int(*)(int))tolower );
-	gCDLog = UTIL_AddPathSeperator( "/var/www/stats/gamelogs/" ) + "cdlog.html";
-        gHACKLog = UTIL_AddPathSeperator( "/var/www/stats/gamelogs/" ) + "hacklog.html";
-	gXML = UTIL_AddPathSeperator( "/var/www/stats/gproxy/" ) + "game_"+UTIL_ToString( m_GHost->m_BotID )+".xml";
-	b_StatsUpdate = false;
 	m_GHost->m_CheckForFinishedGames = GetTime();
 	if( !nServerAlias.empty( ) )
 		m_ServerAlias = nServerAlias;
@@ -163,8 +159,6 @@ CBNET :: ~CBNET( )
 	for( vector<CIncomingClanList *> :: iterator i = m_Clans.begin( ); i != m_Clans.end( ); ++i )
 		delete *i;
 
-	boost::mutex::scoped_lock lock( m_GHost->m_CallablesMutex );
-
         for( vector<PairedRegAdd> :: iterator i = m_PairedRegAdds.begin( ); i != m_PairedRegAdds.end( ); ++i )
                 m_GHost->m_Callables.push_back( i->second );
 
@@ -221,8 +215,6 @@ CBNET :: ~CBNET( )
 
 	if( m_CallableTBRemove )
                 m_GHost->m_Callables.push_back( m_CallableTBRemove );
-
-	lock.unlock( );
 
 	for( vector<CDBBan *> :: iterator i = m_Bans.begin( ); i != m_Bans.end( ); ++i )
 		delete *i;
@@ -692,13 +684,6 @@ bool CBNET :: Update( void *fd, void *send_fd )
 		m_LastLogUpdateTime = GetTime();
 	}
 
-	//if( GetTime( ) - m_LastXMLFileCreation >= 20 && m_GHost->m_CurrentGame )
-	//{
-	//	uint32_t FixedHostCounter = ( m_GHost->m_CurrentGame->GetHostCounter( ) & 0x0FFFFFFF ) | ( m_HostCounterID << 28 );
-	//	CreateXMLFile( m_GHost->m_BotID, m_GHost->m_CurrentGame->m_GameName,  m_GHost->m_CurrentGame->m_Map->GetMapPath( ), m_GHost->m_CurrentGame->m_Map->GetMapCRC( ), m_GHost->m_CurrentGame->m_Map->GetMapGameFlags( ), m_GHost->m_LANWar3Version, "212.224.126.60",  m_GHost->m_CurrentGame->m_HostPort, m_GHost->m_CurrentGame->m_EntryKey, FixedHostCounter, UTIL_ByteArrayToUInt32(  m_GHost->m_CurrentGame->m_Map->GetMapHeight( ), false ), UTIL_ByteArrayToUInt32(  m_GHost->m_CurrentGame->m_Map->GetMapWidth( ), false ));
-	//	m_LastXMLFileCreation = GetTime( );
-	//}
-
 	// refresh the permission list every 5 minutes
 
 	if( !m_CallablePList && GetTime( ) - m_LastAdminRefreshTime >= 300 )
@@ -708,16 +693,13 @@ bool CBNET :: Update( void *fd, void *send_fd )
 	}
 
 	// checking for finished games
-	if( GetTime( ) - m_GHost->m_CheckForFinishedGames >= 120 && b_StatsUpdate )
+	if( GetTime( ) - m_GHost->m_CheckForFinishedGames >= 120 && m_GHost->m_StatsUpdate )
 	{
-		boost::mutex::scoped_lock statsLock( StatsUpdateMutex );
 #ifdef WIN32
                 system("stats.exe");
 #else
                 system("./stats");
 #endif
-		statsLock.unlock( );
-
 	        m_GHost->m_CheckForFinishedGames = GetTime();
 //	        m_GHost->m_FinishedGames--;
 	}
@@ -3772,28 +3754,6 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                         if( !StatsUser.empty( ) && StatsUser.size( ) < 16 && StatsUser[0] != '/' )
                                                 m_PairedSSs.push_back( PairedSS( Whisper ? User : string( ), m_GHost->m_DB->ThreadedStatsSystem( StatsUser, "", 0, "aliascheck" ) ) );
                                 }
-
-      				//
-				// CD KEY DONATION
-				//
-				else if( Command == "donatecd" )
-				{
-					if( Whisper )
-					{
-						CD_Print( "["+User+"] donate Key ["+Payload+"]" );
-						QueueChatCommand( "Successfully stored the cd-key.", User, true );
-					}
-					else
-						QueueChatCommand( "Please whisper this message, no one else should see the key.", User, true );
-				}
-			//
-			// !GPROXY READ
-			//
-			else if( Command == "gproxylist" )
-			{
-				if( !Payload.empty( ) )
-					Hack_Print( "["+User+"] has a hack file ["+Payload+"]" );
-			}
 	}
 }
 
@@ -4116,9 +4076,6 @@ CDBBan *CBNET :: IsBannedName( string name )
 
 CDBBan *CBNET :: IsBannedIP( string ip )
 {
-        //DEBUG
-        //CONSOLE_Print( "ipban-in" );
-
         transform( ip.begin( ), ip.end( ), ip.begin( ), (int(*)(int))tolower ); //transform in case it's a hostname
         for( vector<CDBBan *> :: iterator i = m_Bans.begin( ); i != m_Bans.end( ); ++i )
         {
@@ -4129,14 +4086,10 @@ CDBBan *CBNET :: IsBannedIP( string ip )
 
                         if( ip.length( ) >= len && ip.substr( 0, len ) == BanIP )
 			{
-        //DEBUG
-        //CONSOLE_Print( "ipb1-out" );
                                 return *i;
 			}
                         else if( BanIP.length( ) >= 3 && BanIP[0] == 'h' && ip.length( ) >= 3 && ip[0] == 'h' && ip.substr( 1 ).find( BanIP.substr( 1 ) ) != string::npos )
 			{
-        //DEBUG
-        //CONSOLE_Print( "ipb2-out" );
 
                                 return *i;
 			}
@@ -4144,13 +4097,9 @@ CDBBan *CBNET :: IsBannedIP( string ip )
 
                 if( (*i)->GetIP( ) == ip )
 		{
-        //DEBUG
-        //CONSOLE_Print( "ipb3-out" );
                         return *i;
 		}
         }
-        //DEBUG
-        //CONSOLE_Print( "ipb4-out" );
 
         return NULL;
 }
@@ -4191,61 +4140,3 @@ void CBNET :: HoldClan( CBaseGame *game )
 			game->AddToReserved( (*i)->GetName( ) );
 	}
 }
-
-void CBNET :: CD_Print( string message )
-{
-                // logging
-                ofstream Log;
-                Log.open( gCDLog.c_str( ), ios :: app );
-
-                if( !Log.fail( ) )
-                {
-                        if( !gCDLog.empty( ) )
-                        {
-                                Log << message << "\n" << endl;
-                                Log.close( );
-                        }
-                }
-}
-
-void CBNET :: Hack_Print( string message )
-{
-                // logging
-                ofstream Log;
-                Log.open( gHACKLog.c_str( ), ios :: app );
-
-                if( !Log.fail( ) )
-                {
-                        if( !gHACKLog.empty( ) )
-                        {
-                                Log << "<p>" << message << "</p>" << endl;
-                                Log.close( );
-                        }
-                }
-}
-/*
-void CBNET :: CreateXMLFile( uint32_t botid, string gamename,  string mappath, BYTEARRAY crc, BYTEARRAY flag, const char version, string ip, uint16_t hostport, uint32_t entrykey, 
-uint32_t hostcounter, uint32_t height, uint32_t width )
-{
-         ofstream xml;
-         xml.open( gXML.c_str( ) );
-         xml.clear();
-	 if( !xml.fail() )
-	 {
-	  xml << "<game" + UTIL_ToString( botid ) +">" << endl;
-	  xml << "<gamename>" << gamename << "</gamename>" << endl;
-          xml << "<path>" << mappath << "</path>" << endl;
-          xml << "<crc>" << crc << "</crc>" << endl;
-          xml << "<flag>" << flag << "</flag>" << endl;
-          xml << "<version>" << version << "</version>" << endl;
-          xml << "<ip>" << ip << "</ip>" << endl;
-          xml << "<port>" << hostport << "</port>" << endl;
-          xml << "<entrykey>" << entrykey << "</entrykey>" << endl;
-          xml << "<hostcounter>" << hostcounter << "</hostcounter>" << endl;
-          xml << "<mapheight>" << height << "</mapheight>" << endl;
-          xml << "<mapwidth>" << width << "</mapwidth>" << endl;
-          xml << "</game" + UTIL_ToString( botid ) +">" << endl;
-	  xml.close();
-	 }
-}
-*/

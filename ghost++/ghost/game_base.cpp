@@ -214,8 +214,6 @@ CBaseGame :: ~CBaseGame( )
         for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
 		delete *i;
 
-	boost::mutex::scoped_lock callableslock( m_GHost->m_CallablesMutex );
-
         for( vector<CCallableScoreCheck *> :: iterator i = m_ScoreChecks.begin( ); i != m_ScoreChecks.end( ); ++i )
 		m_GHost->m_Callables.push_back( *i );
 
@@ -236,8 +234,6 @@ CBaseGame :: ~CBaseGame( )
 
 	for( vector<PairedLogUpdate> :: iterator i = m_PairedLogUpdates.begin( ); i != m_PairedLogUpdates.end( ); ++i )
                 m_GHost->m_Callables.push_back( i->second );
-
-	callableslock.unlock( );
 
 	while( !m_Actions.empty( ) )
 	{
@@ -2271,9 +2267,6 @@ void CBaseGame :: EventPlayerDisconnectConnectionClosed( CGamePlayer *player )
 
 void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinPlayer *joinPlayer )
 {
-        //DEBUG
-        //CONSOLE_Print( "pj-in" );
-
         uint32_t HostCounterID = joinPlayer->GetHostCounter( ) >> 28;
         string JoinedRealm = "garena";
 
@@ -2397,9 +2390,6 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 
 			if( Ban )
 			{
-        //DEBUG
-        //CONSOLE_Print( "bj-in" );
-
 				if( m_GHost->m_BanMethod == 1 || m_GHost->m_BanMethod == 3 )
 				{
 					CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is trying to join the game but is banned by name" );
@@ -2418,20 +2408,15 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 					return;
 				}
 				break;
-        //DEBUG
-        //CONSOLE_Print( "bj-out" );
-
 			}
 
 			CDBBan *IPBan = (*i)->IsBannedIP( potential->GetExternalIPString( ) );
+			// Disabled, created laags if a player join
                         //if( !IPBan && !potential->GetSocket( )->GetHostName( ).empty( ) )
                         //        IPBan = (*i)->IsBannedIP( "h" + potential->GetSocket( )->GetHostName( ) );
 
 			if( IPBan )
 			{
-        //DEBUG
-        //CONSOLE_Print( "bj1-in" );
-
 				if( m_GHost->m_BanMethod == 2 || m_GHost->m_BanMethod == 3 )
 				{
 					CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is trying to join the game but is banned by IP address" );
@@ -2452,9 +2437,6 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 					return;
 				}
 				break;
-        //DEBUG
-        //CONSOLE_Print( "bj2-out" );
-
 			}
 		}
 	}
@@ -2609,36 +2591,25 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 
 				if( Ban )
 				{
-        //DEBUG
-        //CONSOLE_Print( "bj3-in" );
-
 					CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is using a banned name" );
 					SendAllChat( m_GHost->m_Language->HasBannedName( joinPlayer->GetName( ) ) );
 					SendAllChat( m_GHost->m_Language->UserWasBannedOnByBecause( Ban->GetServer( ), Ban->GetName( ), Ban->GetDate( ), Ban->GetAdmin( ), Ban->GetReason( ), Ban->GetExpire( ), Ban->GetMonths( ) ) );
 					m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
 					break;
-        //DEBUG
-        //CONSOLE_Print( "bj3-out" );
-
 				}
 			}
 
 			CDBBan *Ban = (*i)->IsBannedIP( potential->GetExternalIPString( ) );
+			// disabled, created laggs on the join event
 			//if( !Ban && !potential->GetSocket( )->GetHostName( ).empty( ) )
 			//        Ban = (*i)->IsBannedIP( "h" + potential->GetSocket( )->GetHostName( ) );
 			if( Ban )
 			{
-        //DEBUG
-        //CONSOLE_Print( "bj4-in" );
-
 				CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is using a banned IP address" );
 				SendAllChat( m_GHost->m_Language->HasBannedIP( joinPlayer->GetName( ), potential->GetExternalIPString( ), Ban->GetName( ) ) );
 				SendAllChat( m_GHost->m_Language->UserWasBannedOnByBecause( Ban->GetServer( ), Ban->GetName( ), Ban->GetDate( ), Ban->GetAdmin( ), Ban->GetReason( ), Ban->GetExpire( ), Ban->GetMonths( ) ) );
 				m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
 				break;
-        //DEBUG
-        //CONSOLE_Print( "bj4-out" );
-
 			}
 		}
 	}
@@ -2865,11 +2836,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 	Player->SetSpoofedRealm( JoinedRealm );
 
 	// check leaveperc
-	//if( Player->GetLeavePerc( ) >= 60 )
-	//	SendAllChat( "User " + Player->GetName( ) + " got a huge leaver percentage of " + UTIL_ToString( Player->GetLeavePerc( ), 2 ) + "%");
-        //DEBUG
-        //CONSOLE_Print( "pj-out" );
-
+	if( Player->GetLeavePerc( ) >= 60 )
+		SendAllChat( "User " + Player->GetName( ) + " got a huge leaver percentage of " + UTIL_ToString( Player->GetLeavePerc( ), 2 ) + "%");
 }
 
 void CBaseGame :: EventPlayerJoinedWithScore( CPotentialPlayer *potential, CIncomingJoinPlayer *joinPlayer, double score )

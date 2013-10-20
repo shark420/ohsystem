@@ -66,7 +66,6 @@ public:
 	CGHostDB *m_DB;							// database
 	CGHostDB *m_DBLocal;					// local database (for temporary data)
 	vector<CBaseCallable *> m_Callables;	// vector of orphaned callables waiting to die
-	boost::mutex m_CallablesMutex;
 	vector<BYTEARRAY> m_LocalAddresses;		// vector of local IP addresses
 	CLanguage *m_Language;					// language
 	CMap *m_Map;							// the currently loaded map
@@ -97,6 +96,7 @@ public:
         uint32_t m_MinPlayerAutoEnd;
         uint32_t m_MaxAllowedSpread;
         bool m_EarlyEnd;
+	bool m_StatsUpdate;
 	uint32_t m_AutoHostMaximumGames;		// maximum number of games to auto host
 	uint32_t m_AutoHostAutoStartPlayers;	// when using auto hosting auto start the game when this many players have joined
 	uint32_t m_LastAutoHostTime;			// GetTime when the last auto host was attempted

@@ -173,7 +173,6 @@ private:
 	uint32_t m_NumConnections;
 	uint32_t m_OutstandingCallables;
 	vector<string> m_Name;
-	boost::mutex m_DatabaseMutex;
 
 public:
 	CGHostDBMySQL( CConfig *CFG );

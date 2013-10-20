@@ -757,8 +757,6 @@ bool CGHost :: Update( long usecBlock )
 
 	// update callables
 
-	boost::mutex::scoped_lock callablesLock( m_CallablesMutex );
-
 	for( vector<CBaseCallable *> :: iterator i = m_Callables.begin( ); i != m_Callables.end( ); )
 	{
 		if( (*i)->GetReady( ) )
@@ -770,8 +768,6 @@ bool CGHost :: Update( long usecBlock )
 		else
                         ++i;
 	}
-
-	callablesLock.unlock( );
 
 	// create the GProxy++ reconnect listener
 
@@ -1480,6 +1476,7 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_MinPlayerAutoEnd = CFG->GetInt( "autoend_minplayer", 2 );
 	m_MaxAllowedSpread = CFG->GetInt( "autoend_maxspread", 2 );
 	m_EarlyEnd = CFG->GetInt( "autoend_earlyend", 1 ) == 0 ? false : true;
+	m_StatsUpdate = CFG->GetInt( "oh_updatestats", 0 ) == 0 ? false : true;
 	//m_VoteingModes = CFG->GetInt( "oh_modevoting", 0 ) == 0 ? false : true;
 }
 
