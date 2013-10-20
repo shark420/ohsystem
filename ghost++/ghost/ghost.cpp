@@ -22,12 +22,10 @@
 #include "util.h"
 #include "crc32.h"
 #include "sha1.h"
-#include "csvparser.h"
 #include "config.h"
 #include "language.h"
 #include "socket.h"
 #include "ghostdb.h"
-#include "ghostdbsqlite.h"
 #include "ghostdbmysql.h"
 #include "bnet.h"
 #include "map.h"
@@ -35,7 +33,9 @@
 #include "savegame.h"
 #include "gameplayer.h"
 #include "gameprotocol.h"
+#include "gameprotocol.h"
 #include "gpsprotocol.h"
+#include "gcbiprotocol.h"
 #include "game_base.h"
 #include "game.h"
 #include "game_admin.h"
@@ -49,43 +49,6 @@
 
 #define __STORMLIB_SELF__
 #include <stormlib/StormLib.h>
-
-/*
-
-#include "ghost.h"
-#include "util.h"
-#include "crc32.h"
-#include "sha1.h"
-#include "csvparser.h"
-#include "config.h"
-#include "language.h"
-#include "socket.h"
-#include "commandpacket.h"
-#include "ghostdb.h"
-#include "ghostdbsqlite.h"
-#include "ghostdbmysql.h"
-#include "bncsutilinterface.h"
-#include "warden.h"
-#include "bnlsprotocol.h"
-#include "bnlsclient.h"
-#include "bnetprotocol.h"
-#include "bnet.h"
-#include "map.h"
-#include "packed.h"
-#include "savegame.h"
-#include "replay.h"
-#include "gameslot.h"
-#include "gameplayer.h"
-#include "gameprotocol.h"
-#include "gpsprotocol.h"
-#include "game_base.h"
-#include "game.h"
-#include "game_admin.h"
-#include "stats.h"
-#include "statsdota.h"
-#include "sqlite3.h"
-
-*/
 
 #ifdef WIN32
  #include <windows.h>
@@ -170,6 +133,7 @@ void SignalCatcher( int s )
 
 void CONSOLE_Print( string message )
 {
+
 	cout << message << endl;
 
 	// logging
@@ -209,6 +173,7 @@ void CONSOLE_Print( string message )
 		}
 	}
 }
+
 
 void DEBUG_Print( string message )
 {
@@ -398,29 +363,22 @@ CGHost :: CGHost( CConfig *CFG )
 	m_UDPSocket->SetDontRoute( CFG->GetInt( "udp_dontroute", 0 ) == 0 ? false : true );
 	m_ReconnectSocket = NULL;
 	m_GPSProtocol = new CGPSProtocol( );
+	m_GCBIProtocol = new CGCBIProtocol( );
 	m_CRC = new CCRC32( );
 	m_CRC->Initialize( );
 	m_SHA = new CSHA1( );
 	m_CurrentGame = NULL;
+	m_FinishedGames = 0;
 	m_CallableGameUpdate = NULL;
+	m_CallableFlameList = NULL;
+	m_CallableAnnounceList = NULL;
+	m_CallableDCountryList = NULL;
+	m_CallableCommandList = NULL;
+	m_CheckForFinishedGames = 0;
 	string DBType = CFG->GetString( "db_type", "mysql" );
 	CONSOLE_Print( "[GHOST] opening primary database" );
-        m_FinishedGames = 0;
 
-	if( DBType == "mysql" )
-	{
-#ifdef GHOST_MYSQL
-		m_DB = new CGHostDBMySQL( CFG );
-#else
-		CONSOLE_Print( "[GHOST] warning - this binary was not compiled with MySQL database support, using SQLite database instead" );
-		m_DB = new CGHostDBSQLite( CFG );
-#endif
-	}
-	else
-		m_DB = new CGHostDBSQLite( CFG );
-
-	CONSOLE_Print( "[GHOST] opening secondary (local) database" );
-	m_DBLocal = new CGHostDBSQLite( CFG );
+	m_DB = new CGHostDBMySQL( CFG );
 
 	// get a list of local IP addresses
 	// this list is used elsewhere to determine if a player connecting to the bot is local or not
@@ -495,14 +453,14 @@ CGHost :: CGHost( CConfig *CFG )
 	m_AutoHostGameName = CFG->GetString( "autohost_gamename", string( ) );
 	m_AutoHostOwner = CFG->GetString( "autohost_owner", string( ) );
 	m_LastAutoHostTime = GetTime( );
+	m_LastCommandListTime = GetTime( );
 	m_LastGameUpdateTime  = GetTime( );
+	m_LastFlameListUpdate = 0;
+	m_LastAnnounceListUpdate = 0;
+	m_LastDCountryUpdate = 0;
 	m_AutoHostMatchMaking = false;
 	m_AutoHostMinimumScore = 0.0;
 	m_AutoHostMaximumScore = 0.0;
-	m_AllGamesFinished = false;
-	m_AllGamesFinishedTime = 0;
-	m_TFT = CFG->GetInt( "bot_tft", 1 ) == 0 ? false : true;
-
 	if( m_TFT )
 		CONSOLE_Print( "[GHOST] acting as Warcraft III: The Frozen Throne" );
 	else
@@ -520,10 +478,8 @@ CGHost :: CGHost( CConfig *CFG )
 	m_ReplayWar3Version = CFG->GetInt( "replay_war3version", 26 );
 	m_ReplayBuildNumber = CFG->GetInt( "replay_buildnumber", 6059 );
 	m_GameIDReplays = CFG->GetInt( "bot_gameidreplays", 1 ) == 0 ? false : true;
+	m_BotID = CFG->GetInt( "db_mysql_botid", 0 );
 	SetConfigs( CFG );
-
-	// OHSYSTEM
-	m_OHUpdateStats = CFG->GetInt( "oh_updatestats", 0 ) == 0 ? false : true;
 
 	// load the battle.net connections
 	// we're just loading the config data and creating the CBNET classes here, the connections are established later (in the Update function)
@@ -617,7 +573,7 @@ CGHost :: CGHost( CConfig *CFG )
 #endif
 		}
 
-		m_BNETs.push_back( new CBNET( this, Server, ServerAlias, BNLSServer, (uint16_t)BNLSPort, (uint32_t)BNLSWardenCookie, CDKeyROC, CDKeyTFT, CountryAbbrev, Country, LocaleID, UserName, UserPassword, FirstChannel, RootAdmin, BNETCommandTrigger[0], HoldFriends, HoldClan, PublicCommands, War3Version, EXEVersion, EXEVersionHash, PasswordHashType, PVPGNRealmName, MaxMessageLength, i ) );
+		m_BNETs.push_back( new CBNET( this, Server, ServerAlias, BNLSServer, (uint16_t)BNLSPort, (uint32_t)BNLSWardenCookie, CDKeyROC, CDKeyTFT, CountryAbbrev, Country, LocaleID, UserName, UserPassword, FirstChannel, BNETCommandTrigger[0], HoldFriends, HoldClan, PublicCommands, War3Version, EXEVersion, EXEVersionHash, PasswordHashType, PVPGNRealmName, MaxMessageLength, i ) );
 	}
 
 	if( m_BNETs.empty( ) )
@@ -670,11 +626,6 @@ CGHost :: CGHost( CConfig *CFG )
 	m_AutoHostMap = new CMap( *m_Map );
 	m_SaveGame = new CSaveGame( );
 
-	// load the iptocountry data
-
-	LoadIPToCountryData( );
-	LoadColoredNames( );
-
 	// create the admin game
 
 	if( m_AdminGameCreate )
@@ -696,6 +647,9 @@ CGHost :: CGHost( CConfig *CFG )
 #else
 	CONSOLE_Print( "[GHOST] GHost++ Version " + m_Version + " (without MySQL support)" );
 #endif
+
+
+
 }
 
 CGHost :: ~CGHost( )
@@ -707,6 +661,7 @@ CGHost :: ~CGHost( )
 		delete *i;
 
 	delete m_GPSProtocol;
+	delete m_GCBIProtocol;
 	delete m_CRC;
 	delete m_SHA;
 
@@ -720,14 +675,13 @@ CGHost :: ~CGHost( )
 		delete *i;
 
 	delete m_DB;
-	delete m_DBLocal;
 
 	// warning: we don't delete any entries of m_Callables here because we can't be guaranteed that the associated threads have terminated
 	// this is fine if the program is currently exiting because the OS will clean up after us
 	// but if you try to recreate the CGHost object within a single session you will probably leak resources!
 
-	if( !m_Callables.empty( ) )
-		CONSOLE_Print( "[GHOST] warning - " + UTIL_ToString( m_Callables.size( ) ) + " orphaned callables were leaked (this is not an error)" );
+//	if( !m_Callables.empty( ) )
+//		CONSOLE_Print( "[GHOST] warning - " + UTIL_ToString( m_Callables.size( ) ) + " orphaned callables were leaked (this is not an error)" );
 
 	delete m_Language;
 	delete m_Map;
@@ -738,17 +692,12 @@ CGHost :: ~CGHost( )
 
 bool CGHost :: Update( long usecBlock )
 {
+
 	// todotodo: do we really want to shutdown if there's a database error? is there any way to recover from this?
 
 	if( m_DB->HasError( ) )
 	{
 		CONSOLE_Print( "[GHOST] database error - " + m_DB->GetError( ) );
-		return true;
-	}
-
-	if( m_DBLocal->HasError( ) )
-	{
-		CONSOLE_Print( "[GHOST] local database error - " + m_DBLocal->GetError( ) );
 		return true;
 	}
 
@@ -769,8 +718,6 @@ bool CGHost :: Update( long usecBlock )
 		if( m_CurrentGame )
 		{
 			CONSOLE_Print( "[GHOST] deleting current game in preparation for exiting nicely" );
-                        m_FinishedGames += 1;
-                        m_CheckForFinishedGames = GetTime();
 			delete m_CurrentGame;
 			m_CurrentGame = NULL;
 		}
@@ -810,6 +757,8 @@ bool CGHost :: Update( long usecBlock )
 
 	// update callables
 
+	boost::mutex::scoped_lock callablesLock( m_CallablesMutex );
+
 	for( vector<CBaseCallable *> :: iterator i = m_Callables.begin( ); i != m_Callables.end( ); )
 	{
 		if( (*i)->GetReady( ) )
@@ -821,6 +770,8 @@ bool CGHost :: Update( long usecBlock )
 		else
                         ++i;
 	}
+
+	callablesLock.unlock( );
 
 	// create the GProxy++ reconnect listener
 
@@ -837,6 +788,7 @@ bool CGHost :: Update( long usecBlock )
 				CONSOLE_Print( "[GHOST] error listening for GProxy++ reconnects on port " + UTIL_ToString( m_ReconnectPort ) );
 				delete m_ReconnectSocket;
 				m_ReconnectSocket = NULL;
+
 				m_Reconnect = false;
 			}
 		}
@@ -946,6 +898,8 @@ bool CGHost :: Update( long usecBlock )
 		if( m_CurrentGame->Update( &fd, &send_fd ) )
 		{
 			CONSOLE_Print( "[GHOST] deleting current game [" + m_CurrentGame->GetGameName( ) + "]" );
+			m_FinishedGames += 1;
+			m_CheckForFinishedGames = GetTime();
 			delete m_CurrentGame;
 			m_CurrentGame = NULL;
 
@@ -980,10 +934,10 @@ bool CGHost :: Update( long usecBlock )
 	{
 		if( (*i)->Update( &fd, &send_fd ) )
 		{
-			CONSOLE_Print( "[GHOST] deleting game [" + (*i)->GetGameName( ) + "]" );
-			EventGameDeleted( *i );
-			delete *i;
-			i = m_Games.erase( i );
+				CONSOLE_Print( "[GHOST] deleting game [" + (*i)->GetGameName( ) + "]" );
+				EventGameDeleted( *i );
+				delete *i;
+				i = m_Games.erase( i );
 		}
 		else
 		{
@@ -1127,10 +1081,12 @@ bool CGHost :: Update( long usecBlock )
 
 				if( GameName.size( ) <= 31 )
 				{
-					CreateGame( m_AutoHostMap, GAME_PUBLIC, false, GameName, m_AutoHostOwner, m_AutoHostOwner, m_AutoHostServer, false );
+					CreateGame( m_AutoHostMap, GAME_PUBLIC, false, GameName, m_AutoHostOwner, m_AutoHostOwner, m_AutoHostServer, m_AutoHostGameType, false );
 
 					if( m_CurrentGame )
 					{
+						if( m_ObserverFake )
+							m_CurrentGame->CreateFakePlayer( );
 						m_CurrentGame->SetAutoStartPlayers( m_AutoHostAutoStartPlayers );
 
 						if( m_AutoHostMatchMaking )
@@ -1183,32 +1139,107 @@ bool CGHost :: Update( long usecBlock )
 		m_LastAutoHostTime = GetTime( );
 	}
 
-    //update gamelist every 10 seconds
-    if( !m_CallableGameUpdate && GetTime() - m_LastGameUpdateTime >= 10) {
-    	uint32_t TotalGames = m_Games.size( );
-    	uint32_t TotalPlayers = 0;
+    	//update gamelist every 10 seconds
+    	if( !m_CallableGameUpdate && GetTime() - m_LastGameUpdateTime >= 10)
+	{
+    		uint32_t TotalGames = m_Games.size( );
+    		uint32_t TotalPlayers = 0;
 
-    	for( vector<CBaseGame *> :: iterator i = m_Games.begin( ); i != m_Games.end( ); ++i )
-    		TotalPlayers += (*i)->GetNumHumanPlayers( );
+    		for( vector<CBaseGame *> :: iterator i = m_Games.begin( ); i != m_Games.end( ); ++i )
+    			TotalPlayers += (*i)->GetNumHumanPlayers( );
 
-        if(m_CurrentGame) {
-        	TotalGames++;
-        	TotalPlayers += m_CurrentGame->GetNumHumanPlayers( );
+	        if(m_CurrentGame)
+		{
+        		TotalGames++;
+        		TotalPlayers += m_CurrentGame->GetNumHumanPlayers( );
 
-            m_CallableGameUpdate = m_DB->ThreadedGameUpdate(m_CurrentGame->GetMapName(), m_CurrentGame->GetGameName(), m_CurrentGame->GetOwnerName(), m_CurrentGame->GetCreatorName(), m_CurrentGame->GetSlotsOccupied(), m_CurrentGame->GetPlayerList( ), m_CurrentGame->GetSlotsOccupied() + m_CurrentGame->GetSlotsOpen(), TotalGames, TotalPlayers, true);
-        } else {
-            m_CallableGameUpdate = m_DB->ThreadedGameUpdate("", "", "", "", 0, "", 0, TotalGames, TotalPlayers, true);
+	            	m_CallableGameUpdate = m_DB->ThreadedGameUpdate(m_CurrentGame->GetMapName(), m_CurrentGame->GetGameName(), m_CurrentGame->GetOwnerName(), m_CurrentGame->GetCreatorName(), m_CurrentGame->GetSlotsOccupied(), m_CurrentGame->GetPlayerList( ), m_CurrentGame->GetSlotsOccupied() + m_CurrentGame->GetSlotsOpen(), TotalGames, TotalPlayers, true);
+        	}
+		else
+            		m_CallableGameUpdate = m_DB->ThreadedGameUpdate("", "", "", "", 0, "", 0, TotalGames, TotalPlayers, true);
+
+        	m_LastGameUpdateTime = GetTime();
+	}
+
+    	if( m_CallableGameUpdate && m_CallableGameUpdate->GetReady())
+	{
+        	m_LastGameUpdateTime = GetTime();
+        	m_DB->RecoverCallable( m_CallableGameUpdate );
+        	delete m_CallableGameUpdate;
+        	m_CallableGameUpdate = NULL;
+    	}
+
+
+	// refresh flamelist all 5 minutes
+	if( !m_CallableFlameList && GetTime( ) - m_LastFlameListUpdate >= 300 )
+	{
+		m_CallableFlameList = m_DB->ThreadedFlameList( );
+		m_LastFlameListUpdate = GetTime( );
+	}
+
+        if( m_CallableFlameList && m_CallableFlameList->GetReady( ) )
+        {
+                m_Flames = m_CallableFlameList->GetResult( );
+                m_DB->RecoverCallable( m_CallableFlameList );
+                delete m_CallableFlameList;
+                m_CallableFlameList = NULL;
         }
 
-        m_LastGameUpdateTime = GetTime();
-    }
+	// refresh announce list all 5 minutes
+        if( !m_CallableAnnounceList && GetTime( ) - m_LastAnnounceListUpdate >= 300 )
+        {
+                m_CallableAnnounceList = m_DB->ThreadedAnnounceList( );
+                m_LastAnnounceListUpdate = GetTime( );
+        }
 
-    if( m_CallableGameUpdate && m_CallableGameUpdate->GetReady()) {
-        m_LastGameUpdateTime = GetTime();
-        m_DB->RecoverCallable( m_CallableGameUpdate );
-        delete m_CallableGameUpdate;
-        m_CallableGameUpdate = NULL;
-    }
+        if( m_CallableAnnounceList && m_CallableAnnounceList->GetReady( ) )
+        {
+                m_Announces = m_CallableAnnounceList->GetResult( );
+                m_DB->RecoverCallable( m_CallableAnnounceList );
+                delete m_CallableAnnounceList;
+                m_CallableAnnounceList = NULL;
+		//update announcenumber
+		m_AnnounceLines = m_Announces.size();
+        }
+
+        // refresh denied country list all 5 minutes
+        if( !m_CallableDCountryList && GetTime( ) - m_LastDCountryUpdate >= 300 )
+        {
+                m_CallableDCountryList = m_DB->ThreadedDCountryList( );
+                m_LastDCountryUpdate = GetTime( );
+        }
+
+        if( m_CallableDCountryList && m_CallableDCountryList->GetReady( ) )
+        {
+                m_DCountries = m_CallableDCountryList->GetResult( );
+                m_DB->RecoverCallable( m_CallableDCountryList );
+                delete m_CallableDCountryList;
+                m_CallableDCountryList = NULL;
+        }
+
+	//refresh command list every 5 seconds
+	if( !m_CallableCommandList && GetTime( ) - m_LastCommandListTime >= 5 )
+	{
+	    m_CallableCommandList = m_DB->ThreadedCommandList( );
+	    m_LastCommandListTime = GetTime();
+	}
+
+	if( m_CallableCommandList && m_CallableCommandList->GetReady( ) )
+	{
+		vector<string> commands = m_CallableCommandList->GetResult( );
+
+        	for( vector<string> :: iterator i = commands.begin( ); i != commands.end( ); ++i )
+	    	{
+            		CONSOLE_Print("[GHOST] Executing command from MYSQL: " + *i);
+		    	m_BNETs[0]->BotCommand(*i, m_BNETs[0]->GetUserName(), true, true );
+	    	}
+
+		m_DB->RecoverCallable( m_CallableCommandList );
+		delete m_CallableCommandList;
+		m_CallableCommandList = NULL;
+	    	m_LastCommandListTime = GetTime();
+	}
+
 	return m_Exiting || AdminExit || BNETExit;
 }
 
@@ -1374,6 +1405,10 @@ void CGHost :: SetConfigs( CConfig *CFG )
 
 	m_CommandTrigger = BotCommandTrigger[0];
 	m_MapCFGPath = UTIL_AddPathSeperator( CFG->GetString( "bot_mapcfgpath", string( ) ) );
+	m_GameLogging = CFG->GetInt( "game_logging", 0 ) == 0 ? false : true;
+	m_GameLoggingID = CFG->GetInt( "game_loggingid", 1 );
+	m_GameLogFilePath = UTIL_AddPathSeperator( CFG->GetString( "game_logpath", string( ) ) );
+	m_ColoredNamePath = UTIL_AddPathSeperator( CFG->GetString( "oh_coloredname", "/home/ghostfiles/" ) );
 	m_SaveGamePath = UTIL_AddPathSeperator( CFG->GetString( "bot_savegamepath", string( ) ) );
 	m_MapPath = UTIL_AddPathSeperator( CFG->GetString( "bot_mappath", string( ) ) );
 	m_SaveReplays = CFG->GetInt( "bot_savereplays", 0 ) == 0 ? false : true;
@@ -1407,7 +1442,8 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_SyncLimit = CFG->GetInt( "bot_synclimit", 50 );
 	m_VoteKickAllowed = CFG->GetInt( "bot_votekickallowed", 1 ) == 0 ? false : true;
 	m_VoteKickPercentage = CFG->GetInt( "bot_votekickpercentage", 100 );
-
+	LoadHostCounter();
+	LoadDatas();
 	if( m_VoteKickPercentage > 100 )
 	{
 		m_VoteKickPercentage = 100;
@@ -1421,6 +1457,30 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_TCPNoDelay = CFG->GetInt( "tcp_nodelay", 0 ) == 0 ? false : true;
 	m_MatchMakingMethod = CFG->GetInt( "bot_matchmakingmethod", 1 );
 	m_MapGameType = CFG->GetUInt( "bot_mapgametype", 0 );
+	m_AutoMuteSpammer = CFG->GetInt( "bot_automutespammer", 1 ) == 0 ? false : true;
+        m_AutoHostGameType = CFG->GetInt( "oh_autohosttype", 3 );
+        m_AllGamesFinished = false;
+        m_AllGamesFinishedTime = 0;
+        m_MinVIPGames = CFG->GetInt( "vip_mingames", 25 );
+        m_RegVIPGames = CFG->GetInt( "vip_reg", 0 ) == 0 ? false : true;
+        m_TFT = CFG->GetInt( "bot_tft", 1 ) == 0 ? false : true;
+        m_OHBalance = CFG->GetInt( "oh_balance", 1 ) == 0 ? false : true;
+        m_HighGame = CFG->GetInt( "oh_rankedgame", 0 ) == 0 ? false : true;
+        m_MinLimit = CFG->GetInt( "oh_mingames", 25 );
+        m_ObserverFake = CFG->GetInt( "oh_observer", 1 ) == 0 ? false : true;
+	m_NoGarena = CFG->GetInt( "oh_nogarena", 0 ) == 0 ? false : true;
+	m_CheckIPRange = CFG->GetInt( "oh_checkiprangeonjoin", 0 ) == 0 ? false : true;
+	m_DenieProxy = CFG->GetInt( "oh_proxykick", 0 ) == 0 ? false : true;
+	m_LiveGames = CFG->GetInt( "oh_livegames", 0 ) == 0 ? false : true;
+        m_MinFF = CFG->GetInt( "oh_minff", 20 );
+        m_MinimumLeaverKills = CFG->GetInt( "antifarm_minkills", 3 );
+        m_MinimumLeaverDeaths = CFG->GetInt( "antifarm_mindeaths", 3 );
+        m_MinimumLeaverAssists = CFG->GetInt( "antifarm_minassists", 3 );
+        m_DeathsByLeaverReduction =  CFG->GetInt( "antifarm_deathsbyleaver", 1 );
+	m_MinPlayerAutoEnd = CFG->GetInt( "autoend_minplayer", 2 );
+	m_MaxAllowedSpread = CFG->GetInt( "autoend_maxspread", 2 );
+	m_EarlyEnd = CFG->GetInt( "autoend_earlyend", 1 ) == 0 ? false : true;
+	//m_VoteingModes = CFG->GetInt( "oh_modevoting", 0 ) == 0 ? false : true;
 }
 
 void CGHost :: ExtractScripts( )
@@ -1493,74 +1553,7 @@ void CGHost :: ExtractScripts( )
 		CONSOLE_Print( "[GHOST] warning - unable to load MPQ file [" + PatchMPQFileName + "] - error code " + UTIL_ToString( GetLastError( ) ) );
 }
 
-void CGHost :: LoadIPToCountryData( )
-{
-	ifstream in;
-	in.open( "ip-to-country.csv" );
-
-	if( in.fail( ) )
-		CONSOLE_Print( "[GHOST] warning - unable to read file [ip-to-country.csv], iptocountry data not loaded" );
-	else
-	{
-		CONSOLE_Print( "[GHOST] started loading [ip-to-country.csv]" );
-
-		// the begin and commit statements are optimizations
-		// we're about to insert ~4 MB of data into the database so if we allow the database to treat each insert as a transaction it will take a LONG time
-		// todotodo: handle begin/commit failures a bit more gracefully
-
-		if( !m_DBLocal->Begin( ) )
-			CONSOLE_Print( "[GHOST] warning - failed to begin local database transaction, iptocountry data not loaded" );
-		else
-		{
-			unsigned char Percent = 0;
-			string Line;
-			string IP1;
-			string IP2;
-			string Country;
-			CSVParser parser;
-
-			// get length of file for the progress meter
-
-			in.seekg( 0, ios :: end );
-			uint32_t FileLength = in.tellg( );
-			in.seekg( 0, ios :: beg );
-
-			while( !in.eof( ) )
-			{
-				getline( in, Line );
-
-				if( Line.empty( ) )
-					continue;
-
-				parser << Line;
-				parser >> IP1;
-				parser >> IP2;
-				parser >> Country;
-				m_DBLocal->FromAdd( UTIL_ToUInt32( IP1 ), UTIL_ToUInt32( IP2 ), Country );
-
-				// it's probably going to take awhile to load the iptocountry data (~10 seconds on my 3.2 GHz P4 when using SQLite3)
-				// so let's print a progress meter just to keep the user from getting worried
-
-				unsigned char NewPercent = (unsigned char)( (float)in.tellg( ) / FileLength * 100 );
-
-				if( NewPercent != Percent && NewPercent % 10 == 0 )
-				{
-					Percent = NewPercent;
-					CONSOLE_Print( "[GHOST] iptocountry data: " + UTIL_ToString( Percent ) + "% loaded" );
-				}
-			}
-
-			if( !m_DBLocal->Commit( ) )
-				CONSOLE_Print( "[GHOST] warning - failed to commit local database transaction, iptocountry data not loaded" );
-			else
-				CONSOLE_Print( "[GHOST] finished loading [ip-to-country.csv]" );
-		}
-
-		in.close( );
-	}
-}
-
-void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper )
+void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, uint32_t gameType, bool whisper )
 {
 	if( !m_Enabled )
 	{
@@ -1685,11 +1678,12 @@ void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, st
 	}
 
 	CONSOLE_Print( "[GHOST] creating game [" + gameName + "]" );
+	m_Callables.push_back( m_DB->Threadedgs( m_HostCounter, gameName, 1, gameType ) );
 
 	if( saveGame )
-		m_CurrentGame = new CGame( this, map, m_SaveGame, m_HostPort, gameState, gameName, ownerName, creatorName, creatorServer );
+		m_CurrentGame = new CGame( this, map, m_SaveGame, m_HostPort, gameState, gameName, ownerName, creatorName, creatorServer, gameType );
 	else
-		m_CurrentGame = new CGame( this, map, NULL, m_HostPort, gameState, gameName, ownerName, creatorName, creatorServer );
+		m_CurrentGame = new CGame( this, map, NULL, m_HostPort, gameState, gameName, ownerName, creatorName, creatorServer, gameType );
 
 	// todotodo: check if listening failed and report the error to the user
 
@@ -1757,6 +1751,7 @@ void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, st
 		if( (*i)->GetHoldClan( ) )
 			(*i)->HoldClan( m_CurrentGame );
 	}
+
     //update mysql current games list
     if( m_CallableGameUpdate && m_CallableGameUpdate->GetReady()) {
         m_DB->RecoverCallable( m_CallableGameUpdate );
@@ -1775,23 +1770,84 @@ void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, st
         m_CallableGameUpdate = m_DB->ThreadedGameUpdate(m_CurrentGame->GetMapName( ), m_CurrentGame->GetGameName(), m_CurrentGame->GetOwnerName(), m_CurrentGame->GetCreatorName(), m_CurrentGame->GetSlotsOccupied(), m_CurrentGame->GetPlayerList( ), m_CurrentGame->GetSlotsOccupied() + m_CurrentGame->GetSlotsOpen(), TotalGames, TotalPlayers, true);
         m_LastGameUpdateTime = GetTime();
     }
+    m_CurrentGame->GAME_Print( 11, "", "", "System", "", "Game Created ["+m_CurrentGame->GetMapName( )+"|"+m_CurrentGame->GetGameName()+"] game created by ["+m_CurrentGame->GetCreatorName()+"]" );
 }
 
-void CGHost :: LoadColoredNames( )
+void CGHost :: SaveHostCounter()
 {
+	string File = "hostcounter.cfg";
+	ofstream tmpcfg;
+	tmpcfg.open( File.c_str( ), ios :: trunc );
+	tmpcfg << "hostcounter = " << UTIL_ToString(m_HostCounter) << endl;
+	tmpcfg.close( );
+}
 
-        string File = "colorednames.txt";
-        string line;
-        ifstream myfile(File.c_str());
-        if (myfile.is_open())
+void CGHost :: LoadHostCounter()
+{
+	string File = "hostcounter.cfg";
+	CConfig CFGH;
+	CFGH.Read( File );
+	m_HostCounter = CFGH.GetInt( "hostcounter", 1 );
+}
+
+bool CGHost :: FlameCheck( string message )
+{
+	transform( message.begin( ), message.end( ), message.begin( ), (int(*)(int))tolower );
+
+	char forbidden[] = {",.!§$%&/()={[]}*'+#-_.:,;?|"};
+	char *check;
+	int len = message.length();
+	int c = 1;
+
+	for( std::string::iterator i=message.begin( );i!=message.end( );)
+	{
+  		check=forbidden;
+  		while(*check)
+		{
+    			if ( *i == *check )
+			{
+				if( c != len )
+				{
+					i=message.erase(i);
+					c++;
+					continue;
+				}
+			}
+    			check++;
+  		}
+  		i++;
+	c++;
+	}
+
+	for( int i = 0; i < m_Flames.size( ); )
+	{
+		if( message.find( m_Flames[i] ) != string :: npos )
+		{
+			return true;
+		}
+		i++;
+	}
+
+	return false;
+}
+
+void CGHost :: LoadDatas( )
+{
+	CConfig CFG;
+        CFG.Read( m_ColoredNamePath + "oh_config.cfg" );
+
+        for( uint32_t i = 1; i < 20; ++i )
         {
-                while ( getline (myfile,line) )
-                {
-                        m_ColoredNames.push_back( line );
-                }
-                myfile.close();
-        }
-        else
-                CONSOLE_Print( "Unable to open colorednames.txt" );
+                string Prefix;
 
+                if( i == 1 )
+                        Prefix = "oh_";
+                else
+                        Prefix = "oh" + UTIL_ToString( i ) + "_";
+
+                string CName = CFG.GetString( Prefix + "cname", string( ) );
+		//string Mode = CFG.GetString( "mode", string( ) );
+		//m_Modes.push_back( Mode );
+		m_ColoredNames.push_back( CName );
+	}
 }

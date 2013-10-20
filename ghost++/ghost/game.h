@@ -28,19 +28,25 @@
 class CDBBan;
 class CDBGame;
 class CDBGamePlayer;
+class CDBInbox;
 class CStats;
 class CCallableBanCheck;
-class CCallableBanAdd;
+class CCallablePassCheck;
 class CCallableGameAdd;
 class CCallableGamePlayerSummaryCheck;
-class CCallableDotAPlayerSummaryCheck;
-class CCallableQuerySystem;
+class CCallableStatsPlayerSummaryCheck;
+class CCallableInboxSummaryCheck;
+//class CCallablePlayerSummaryCheck;
+class CCallableStatsSystem;
 
 typedef pair<string,CCallableBanCheck *> PairedBanCheck;
-typedef pair<string,CCallableBanAdd *> PairedBanAdd;
-typedef pair<string,CCallableGamePlayerSummaryCheck *> PairedGPSCheck;
-typedef pair<string,CCallableDotAPlayerSummaryCheck *> PairedDPSCheck;
-typedef pair<string,CCallableQuerySystem *> PairedQS;
+typedef pair<string,CCallablePassCheck *> PairedPassCheck;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedGSCheck;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedRankCheck;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedStreakCheck;
+typedef pair<string,CCallableInboxSummaryCheck *> PairedINCheck;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedSCheck;
+typedef pair<string,CCallableStatsSystem *> PairedSS;
 
 class CGame : public CBaseGame
 {
@@ -52,13 +58,21 @@ protected:
 	CStats *m_Stats;							// class to keep track of game stats such as kills/deaths/assists in dota
 	CCallableGameAdd *m_CallableGameAdd;		// threaded database game addition in progress
 	vector<PairedBanCheck> m_PairedBanChecks;	// vector of paired threaded database ban checks in progress
-	vector<PairedBanAdd> m_PairedBanAdds;		// vector of paired threaded database ban adds in progress
-	vector<PairedGPSCheck> m_PairedGPSChecks;	// vector of paired threaded database game player summary checks in progress
-	vector<PairedDPSCheck> m_PairedDPSChecks;	// vector of paired threaded database DotA player summary checks in progress
-	vector<PairedQS> m_PairedQSChecks;
+        vector<PairedPassCheck> m_PairedPassChecks;       // vector of paired threaded database password checks in progress
+	vector<PairedGSCheck> m_PairedGSChecks;	// vector of paired threaded database game player summary checks in progress
+        vector<PairedRankCheck> m_PairedRankChecks;
+        vector<PairedINCheck> m_PairedINChecks;       // vector of paired threaded database ingame checks in progress
+        vector<PairedStreakCheck> m_PairedStreakChecks;       // vector of paired threaded database ingame checks in progress
+	vector<PairedSCheck> m_PairedSChecks;	// vector of paired threaded database DotA player summary checks in progress
+        vector<PairedSS> m_PairedSSs;
+	vector<string> m_AutoBans;
+	bool m_EarlyDraw;
+	bool IsAutoBanned( string name );
+	uint32_t m_ForfeitTime;						// time that players forfeited, or 0 if not forfeited
+	uint32_t m_ForfeitTeam;						// id of team that forfeited
 
 public:
-	CGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16_t nHostPort, unsigned char nGameState, string nGameName, string nOwnerName, string nCreatorName, string nCreatorServer );
+	CGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16_t nHostPort, unsigned char nGameState, string nGameName, string nOwnerName, string nCreatorName, string nCreatorServer, uint32_t nGameType );
 	virtual ~CGame( );
 
 	virtual bool Update( void *fd, void *send_fd );
@@ -68,6 +82,7 @@ public:
 	virtual void EventGameStarted( );
 	virtual bool IsGameDataSaved( );
 	virtual void SaveGameData( );
+	virtual bool CustomVoteKickReason( string reason );
 };
 
 #endif

@@ -287,16 +287,30 @@ CGHostDBSQLite :: CGHostDBSQLite( CConfig *CFG ) : CGHostDB( CFG )
 		SchemaNumber = "8";
 	}
 
-	if( m_DB->Exec( "CREATE TEMPORARY TABLE iptocountry ( ip1 INTEGER NOT NULL, ip2 INTEGER NOT NULL, country TEXT NOT NULL, PRIMARY KEY ( ip1, ip2 ) )" ) != SQLITE_OK )
-		CONSOLE_Print( "[SQLITE3] error creating temporary iptocountry table - " + m_DB->GetError( ) );
+        if( m_DB->Exec( "CREATE TEMPORARY TABLE iptocountry ( ip1 INTEGER NOT NULL, ip2 INTEGER NOT NULL, country text NOT NULL, PRIMARY KEY ( ip1, ip2 ) )" ) != SQLITE_OK )
+                CONSOLE_Print( "[SQLITE3] error creating temporary iptoblock table - " + m_DB->GetError( ) );
 
-	FromAddStmt = NULL;
+	if( m_DB->Exec( "CREATE TEMPORARY TABLE iptoblock ( ip1 INTEGER NOT NULL, ip2 INTEGER NOT NULL, block INTEGER NOT NULL, PRIMARY KEY ( ip1, ip2 ) )" ) != SQLITE_OK )
+		CONSOLE_Print( "[SQLITE3] error creating temporary iptoblock table - " + m_DB->GetError( ) );
+
+        if( m_DB->Exec( "CREATE TEMPORARY TABLE blocktocountry ( block INTEGER NOT NULL, country TEXT NOT NULL, city TEXT NOT NULL, PRIMARY KEY ( block ) )" ) != SQLITE_OK )
+                CONSOLE_Print( "[SQLITE3] error creating temporary blocktocountry table - " + m_DB->GetError( ) );
+
+        FromAddStmt = NULL;
+	FromAdd2Stmt = NULL;
+	BlockAddStmt = NULL;
 }
 
 CGHostDBSQLite :: ~CGHostDBSQLite( )
 {
 	if( FromAddStmt )
 		m_DB->Finalize( FromAddStmt );
+
+        if( FromAdd2Stmt )
+                m_DB->Finalize( FromAdd2Stmt );
+
+        if( BlockAddStmt )
+                m_DB->Finalize( BlockAddStmt );
 
 	CONSOLE_Print( "[SQLITE3] closing database [" + m_File + "]" );
 	delete m_DB;
@@ -555,142 +569,6 @@ bool CGHostDBSQLite :: Commit( )
 	return m_DB->Exec( "COMMIT TRANSACTION" ) == SQLITE_OK;
 }
 
-uint32_t CGHostDBSQLite :: AdminCount( string server )
-{
-	uint32_t Count = 0;
-	sqlite3_stmt *Statement;
-	m_DB->Prepare( "SELECT COUNT(*) FROM admins WHERE server=?", (void **)&Statement );
-
-	if( Statement )
-	{
-		sqlite3_bind_text( Statement, 1, server.c_str( ), -1, SQLITE_TRANSIENT );
-		int RC = m_DB->Step( Statement );
-
-		if( RC == SQLITE_ROW )
-			Count = sqlite3_column_int( Statement, 0 );
-		else if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error counting admins [" + server + "] - " + m_DB->GetError( ) );
-
-		m_DB->Finalize( Statement );
-	}
-	else
-		CONSOLE_Print( "[SQLITE3] prepare error counting admins [" + server + "] - " + m_DB->GetError( ) );
-
-	return Count;
-}
-
-bool CGHostDBSQLite :: AdminCheck( string server, string user )
-{
-	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
-	bool IsAdmin = false;
-	sqlite3_stmt *Statement;
-	m_DB->Prepare( "SELECT * FROM admins WHERE server=? AND name=?", (void **)&Statement );
-
-	if( Statement )
-	{
-		sqlite3_bind_text( Statement, 1, server.c_str( ), -1, SQLITE_TRANSIENT );
-		sqlite3_bind_text( Statement, 2, user.c_str( ), -1, SQLITE_TRANSIENT );
-		int RC = m_DB->Step( Statement );
-
-		// we're just checking to see if the query returned a row, we don't need to check the row data itself
-
-		if( RC == SQLITE_ROW )
-			IsAdmin = true;
-		else if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error checking admin [" + server + " : " + user + "] - " + m_DB->GetError( ) );
-
-		m_DB->Finalize( Statement );
-	}
-	else
-		CONSOLE_Print( "[SQLITE3] prepare error checking admin [" + server + " : " + user + "] - " + m_DB->GetError( ) );
-
-	return IsAdmin;
-}
-
-bool CGHostDBSQLite :: AdminAdd( string server, string user )
-{
-	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
-	bool Success = false;
-	sqlite3_stmt *Statement;
-	m_DB->Prepare( "INSERT INTO admins ( server, name ) VALUES ( ?, ? )", (void **)&Statement );
-
-	if( Statement )
-	{
-		sqlite3_bind_text( Statement, 1, server.c_str( ), -1, SQLITE_TRANSIENT );
-		sqlite3_bind_text( Statement, 2, user.c_str( ), -1, SQLITE_TRANSIENT );
-		int RC = m_DB->Step( Statement );
-
-		if( RC == SQLITE_DONE )
-			Success = true;
-		else if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error adding admin [" + server + " : " + user + "] - " + m_DB->GetError( ) );
-
-		m_DB->Finalize( Statement );
-	}
-	else
-		CONSOLE_Print( "[SQLITE3] prepare error adding admin [" + server + " : " + user + "] - " + m_DB->GetError( ) );
-
-	return Success;
-}
-
-bool CGHostDBSQLite :: AdminRemove( string server, string user )
-{
-	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
-	bool Success = false;
-	sqlite3_stmt *Statement;
-	m_DB->Prepare( "DELETE FROM admins WHERE server=? AND name=?", (void **)&Statement );
-
-	if( Statement )
-	{
-		sqlite3_bind_text( Statement, 1, server.c_str( ), -1, SQLITE_TRANSIENT );
-		sqlite3_bind_text( Statement, 2, user.c_str( ), -1, SQLITE_TRANSIENT );
-		int RC = m_DB->Step( Statement );
-
-		if( RC == SQLITE_DONE )
-			Success = true;
-		else if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error removing admin [" + server + " : " + user + "] - " + m_DB->GetError( ) );
-
-		m_DB->Finalize( Statement );
-	}
-	else
-		CONSOLE_Print( "[SQLITE3] prepare error removing admin [" + server + " : " + user + "] - " + m_DB->GetError( ) );
-
-	return Success;
-}
-
-vector<string> CGHostDBSQLite :: AdminList( string server )
-{
-	vector<string> AdminList;
-	sqlite3_stmt *Statement;
-	m_DB->Prepare( "SELECT name FROM admins WHERE server=?", (void **)&Statement );
-
-	if( Statement )
-	{
-		sqlite3_bind_text( Statement, 1, server.c_str( ), -1, SQLITE_TRANSIENT );
-		int RC = m_DB->Step( Statement );
-
-		while( RC == SQLITE_ROW )
-		{
-			vector<string> *Row = m_DB->GetRow( );
-
-			if( Row->size( ) == 1 )
-				AdminList.push_back( (*Row)[0] );
-
-			RC = m_DB->Step( Statement );
-		}
-
-		if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error retrieving admin list [" + server + "] - " + m_DB->GetError( ) );
-
-		m_DB->Finalize( Statement );
-	}
-	else
-		CONSOLE_Print( "[SQLITE3] prepare error retrieving admin list [" + server + "] - " + m_DB->GetError( ) );
-
-	return AdminList;
-}
-
 uint32_t CGHostDBSQLite :: BanCount( string server )
 {
 	uint32_t Count = 0;
@@ -741,7 +619,7 @@ CDBBan *CGHostDBSQLite :: BanCheck( string server, string user, string ip )
 			vector<string> *Row = m_DB->GetRow( );
 
 			if( Row->size( ) == 6 )
-				Ban = new CDBBan( server, (*Row)[0], (*Row)[1], (*Row)[2], (*Row)[3], (*Row)[4], (*Row)[5] );
+				Ban = new CDBBan( server, (*Row)[0], (*Row)[1], (*Row)[2], (*Row)[3], (*Row)[4], (*Row)[5], (*Row)[6], (*Row)[8], (*Row)[9], (*Row)[10], (*Row)[11] );
 			else
 				CONSOLE_Print( "[SQLITE3] error checking ban [" + server + " : " + user + " : " + ip + "] - row doesn't have 6 columns" );
 		}
@@ -756,7 +634,7 @@ CDBBan *CGHostDBSQLite :: BanCheck( string server, string user, string ip )
 	return Ban;
 }
 
-bool CGHostDBSQLite :: BanAdd( string server, string user, string ip, string gamename, string admin, string reason )
+string CGHostDBSQLite :: BanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
 {
 	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
 	bool Success = false;
@@ -784,7 +662,7 @@ bool CGHostDBSQLite :: BanAdd( string server, string user, string ip, string gam
 	else
 		CONSOLE_Print( "[SQLITE3] prepare error adding ban [" + server + " : " + user + " : " + ip + " : " + gamename + " : " + admin + " : " + reason + "] - " + m_DB->GetError( ) );
 
-	return Success;
+	return "";
 }
 
 bool CGHostDBSQLite :: BanRemove( string server, string user )
@@ -854,7 +732,7 @@ vector<CDBBan *> CGHostDBSQLite :: BanList( string server )
 			vector<string> *Row = m_DB->GetRow( );
 
 			if( Row->size( ) == 6 )
-				BanList.push_back( new CDBBan( server, (*Row)[0], (*Row)[1], (*Row)[2], (*Row)[3], (*Row)[4], (*Row)[5] ) );
+				BanList.push_back( new CDBBan( server, (*Row)[0], (*Row)[1], (*Row)[2], (*Row)[3], (*Row)[4], (*Row)[5], (*Row)[6], (*Row)[7], (*Row)[8], (*Row)[9], (*Row)[10] ) );
 
 			RC = m_DB->Step( Statement );
 		}
@@ -870,7 +748,7 @@ vector<CDBBan *> CGHostDBSQLite :: BanList( string server )
 	return BanList;
 }
 
-uint32_t CGHostDBSQLite :: GameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver )
+uint32_t CGHostDBSQLite :: GameAdd(  string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype )
 {
 	uint32_t RowID = 0;
 	sqlite3_stmt *Statement;
@@ -1047,7 +925,7 @@ uint32_t CGHostDBSQLite :: DotAGameAdd( uint32_t gameid, uint32_t winner, uint32
 	return RowID;
 }
 
-uint32_t CGHostDBSQLite :: DotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills )
+uint32_t CGHostDBSQLite :: DotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string spell1, string spell2, string spell3, string spell4, string spell5, string spell6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills, uint32_t level )
 {
 	uint32_t RowID = 0;
 	sqlite3_stmt *Statement;
@@ -1075,13 +953,14 @@ uint32_t CGHostDBSQLite :: DotAPlayerAdd( uint32_t gameid, uint32_t colour, uint
 		sqlite3_bind_int( Statement, 18, towerkills );
 		sqlite3_bind_int( Statement, 19, raxkills );
 		sqlite3_bind_int( Statement, 20, courierkills );
+		sqlite3_bind_int( Statement, 21, level );
 
 		int RC = m_DB->Step( Statement );
 
 		if( RC == SQLITE_DONE )
 			RowID = m_DB->LastRowID( );
 		else if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error adding dotaplayer [" + UTIL_ToString( gameid ) + " : " + UTIL_ToString( colour ) + " : " + UTIL_ToString( kills ) + " : " + UTIL_ToString( deaths ) + " : " + UTIL_ToString( creepkills ) + " : " + UTIL_ToString( creepdenies ) + " : " + UTIL_ToString( assists ) + " : " + UTIL_ToString( gold ) + " : " + UTIL_ToString( neutralkills ) + " : " + item1 + " : " + item2 + " : " + item3 + " : " + item4 + " : " + item5 + " : " + item6 + " : " + hero + " : " + UTIL_ToString( newcolour ) + " : " + UTIL_ToString( towerkills ) + " : " + UTIL_ToString( raxkills ) + " : " + UTIL_ToString( courierkills ) + "] - " + m_DB->GetError( ) );
+			CONSOLE_Print( "[SQLITE3] error adding dotaplayer [" + UTIL_ToString( gameid ) + " : " + UTIL_ToString( colour ) + " : " + UTIL_ToString( kills ) + " : " + UTIL_ToString( deaths ) + " : " + UTIL_ToString( creepkills ) + " : " + UTIL_ToString( creepdenies ) + " : " + UTIL_ToString( assists ) + " : " + UTIL_ToString( gold ) + " : " + UTIL_ToString( neutralkills ) + " : " + item1 + " : " + item2 + " : " + item3 + " : " + item4 + " : " + item5 + " : " + item6 + " : " + hero + " : " + UTIL_ToString( newcolour ) + " : " + UTIL_ToString( towerkills ) + " : " + UTIL_ToString( raxkills ) + " : " + UTIL_ToString( courierkills ) + " : " + UTIL_ToString( level ) + "] - " + m_DB->GetError( ) );
 
 		m_DB->Finalize( Statement );
 	}
@@ -1208,11 +1087,82 @@ CDBDotAPlayerSummary *CGHostDBSQLite :: DotAPlayerSummaryCheck( string name )
 
 string CGHostDBSQLite :: FromCheck( uint32_t ip )
 {
+        // a big thank you to tjado for help with the iptocountry feature
+
+        string From = "??";
+        sqlite3_stmt *Statement;
+        m_DB->Prepare( "SELECT country FROM iptocountry WHERE ip1<=? AND ip2>=?", (void **)&Statement );
+
+        if( Statement )
+        {
+                // we bind the ip as an int64 because SQLite treats it as signed
+
+                sqlite3_bind_int64( Statement, 1, ip );
+                sqlite3_bind_int64( Statement, 2, ip );
+                int RC = m_DB->Step( Statement );
+
+                if( RC == SQLITE_ROW )
+                {
+                        vector<string> *Row = m_DB->GetRow( );
+
+                        if( Row->size( ) == 1 )
+                                From = (*Row)[0];
+                        else
+                                CONSOLE_Print( "[SQLITE3] error checking iptocountry [" + UTIL_ToString( ip ) + "] - row doesn't have 1 column" );
+                }
+                else if( RC == SQLITE_ERROR )
+                        CONSOLE_Print( "[SQLITE3] error checking iptocountry [" + UTIL_ToString( ip ) + "] - " + m_DB->GetError( ) );
+
+                m_DB->Finalize( Statement );
+        }
+        else
+                CONSOLE_Print( "[SQLITE3] prepare error checking iptocountry [" + UTIL_ToString( ip ) + "] - " + m_DB->GetError( ) );
+
+        return From;
+}
+
+bool CGHostDBSQLite :: FromAdd( uint32_t ip1, uint32_t ip2, string country )
+{
+        // a big thank you to tjado for help with the iptocountry feature
+
+        bool Success = false;
+
+        if( !FromAddStmt )
+                m_DB->Prepare( "INSERT INTO iptocountry VALUES ( ?, ?, ? )", (void **)&FromAddStmt );
+
+        if( FromAddStmt )
+        {
+                // we bind the ip as an int64 because SQLite treats it as signed
+
+                sqlite3_bind_int64( (sqlite3_stmt *)FromAddStmt, 1, ip1 );
+                sqlite3_bind_int64( (sqlite3_stmt *)FromAddStmt, 2, ip2 );
+                sqlite3_bind_text( (sqlite3_stmt *)FromAddStmt, 3, country.c_str( ), -1, SQLITE_TRANSIENT );
+
+                int RC = m_DB->Step( FromAddStmt );
+
+                if( RC == SQLITE_DONE )
+                        Success = true;
+                else if( RC == SQLITE_ERROR )
+                        CONSOLE_Print( "[SQLITE3] error adding iptocountry [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + country + "] - " + m_DB->GetError( ) );
+
+                m_DB->Reset( FromAddStmt );
+        }
+        else
+                CONSOLE_Print( "[SQLITE3] prepare error adding iptocountry [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + country + "] - " + m_DB->GetError( ) );
+
+        return Success;
+}
+/*
+string CGHostDBSQLite :: FromCheck( uint32_t ip )
+{
 	// a big thank you to tjado for help with the iptocountry feature
 
 	string From = "??";
 	sqlite3_stmt *Statement;
-	m_DB->Prepare( "SELECT country FROM iptocountry WHERE ip1<=? AND ip2>=?", (void **)&Statement );
+	if( db == 0 )
+		m_DB->Prepare( "SELECT country FROM iptocountry WHERE ip1<=? AND ip2>=?", (void **)&Statement );
+	else if ( db == 1 )
+		m_DB->Prepare( "SELECT b.city, b.country FROM iptoblock as s LEFT JOIN blocktocountry as b ON s.block=b.block WHERE ip1<=? AND ip2>=?", (void **)&Statement );
 
 	if( Statement )
 	{
@@ -1220,60 +1170,131 @@ string CGHostDBSQLite :: FromCheck( uint32_t ip )
 
 		sqlite3_bind_int64( Statement, 1, ip );
 		sqlite3_bind_int64( Statement, 2, ip );
+		sqlite3_bind_int64( Statement, 3, db );
 		int RC = m_DB->Step( Statement );
 
 		if( RC == SQLITE_ROW )
 		{
 			vector<string> *Row = m_DB->GetRow( );
+			if( db == 0 )
+			{
+				CONSOLE_Print( "its database 1 iptocountry" );
+				if( Row->size( ) == 1 )
+					From = (*Row)[0];
+				else
+					CONSOLE_Print( "[SQLITE3] error checking iptoblock [" + UTIL_ToString( ip ) + "] - row doesn't have 1 column" );
+			} else {
+                                CONSOLE_Print( "its database 2" );
+                                if( Row->size( ) == 2 )
+                                        From = (*Row)[1] + "("+(*Row)[0]+")";
+                                else
+                                        CONSOLE_Print( "[SQLITE3] error checking iptoblock [" + UTIL_ToString( ip ) + "] - row doesn't have 2 column" );
+                        }
 
-			if( Row->size( ) == 1 )
-				From = (*Row)[0];
-			else
-				CONSOLE_Print( "[SQLITE3] error checking iptocountry [" + UTIL_ToString( ip ) + "] - row doesn't have 1 column" );
 		}
 		else if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error checking iptocountry [" + UTIL_ToString( ip ) + "] - " + m_DB->GetError( ) );
+			CONSOLE_Print( "[SQLITE3] error checking iptoblock [" + UTIL_ToString( ip ) + "] - " + m_DB->GetError( ) );
 
 		m_DB->Finalize( Statement );
 	}
 	else
-		CONSOLE_Print( "[SQLITE3] prepare error checking iptocountry [" + UTIL_ToString( ip ) + "] - " + m_DB->GetError( ) );
+		CONSOLE_Print( "[SQLITE3] prepare error checking iptoblock [" + UTIL_ToString( ip ) + "] - " + m_DB->GetError( ) );
 
 	return From;
 }
+*/
+bool CGHostDBSQLite :: BlockAdd( uint32_t block, string country, string city )
+{
+        bool Success = false;
 
-bool CGHostDBSQLite :: FromAdd( uint32_t ip1, uint32_t ip2, string country )
+        if( !BlockAddStmt )
+                m_DB->Prepare( "INSERT INTO blocktocountry VALUES ( ?, ?, ? )", (void **)&BlockAddStmt );
+
+        if( BlockAddStmt )
+        {
+                sqlite3_bind_int64( (sqlite3_stmt *)BlockAddStmt, 1, block );
+                sqlite3_bind_text( (sqlite3_stmt *)BlockAddStmt, 2, country.c_str( ), -1, SQLITE_TRANSIENT );
+                sqlite3_bind_text( (sqlite3_stmt *)BlockAddStmt, 3, city.c_str( ), -1, SQLITE_TRANSIENT );
+
+                int RC = m_DB->Step( BlockAddStmt );
+
+                if( RC == SQLITE_DONE )
+                        Success = true;
+                else if( RC == SQLITE_ERROR )
+			CONSOLE_Print( "[SQLITE3] error adding blocktocountry [" + UTIL_ToString( block ) + " : " + country + " : " + city + "] - " + m_DB->GetError( ) );
+
+                m_DB->Reset( BlockAddStmt );
+        }
+        else
+                CONSOLE_Print( "[SQLITE3] prepare error adding blocktocountry [" + UTIL_ToString( block ) + " : " + country + " : " + city + "] - " + m_DB->GetError( ) );
+
+        return Success;
+}
+
+bool CGHostDBSQLite :: FromAdd2( uint32_t ip1, uint32_t ip2, string country )
+{
+        // a big thank you to tjado for help with the iptocountry feature
+
+        bool Success = false;
+
+        if( !FromAddStmt )
+                m_DB->Prepare( "INSERT INTO iptocountry VALUES ( ?, ?, ? )", (void **)&FromAddStmt );
+
+        if( FromAddStmt )
+        {
+                // we bind the ip as an int64 because SQLite treats it as signed
+
+                sqlite3_bind_int64( (sqlite3_stmt *)FromAddStmt, 1, ip1 );
+                sqlite3_bind_int64( (sqlite3_stmt *)FromAddStmt, 2, ip2 );
+                sqlite3_bind_text( (sqlite3_stmt *)FromAddStmt, 3, country.c_str( ), -1, SQLITE_TRANSIENT );
+
+                int RC = m_DB->Step( FromAddStmt );
+
+                if( RC == SQLITE_DONE )
+                        Success = true;
+                else if( RC == SQLITE_ERROR )
+                        CONSOLE_Print( "[SQLITE3] error adding iptocountry [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + country + "] - " + m_DB->GetError( ) );
+
+                m_DB->Reset( FromAdd2Stmt );
+        }
+        else
+                CONSOLE_Print( "[SQLITE3] prepare error adding iptocountry [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + country + "] - " + m_DB->GetError( ) );
+
+        return Success;
+}
+/*
+bool CGHostDBSQLite :: FromAdd( uint32_t ip1, uint32_t ip2, uint32_t block )
 {
 	// a big thank you to tjado for help with the iptocountry feature
 
 	bool Success = false;
 
-	if( !FromAddStmt )
-		m_DB->Prepare( "INSERT INTO iptocountry VALUES ( ?, ?, ? )", (void **)&FromAddStmt );
+	if( !FromAdd2Stmt )
+		m_DB->Prepare( "INSERT INTO iptoblock VALUES ( ?, ?, ? )", (void **)&FromAdd2Stmt );
 
-	if( FromAddStmt )
+	if( FromAdd2Stmt )
 	{
 		// we bind the ip as an int64 because SQLite treats it as signed
 
-		sqlite3_bind_int64( (sqlite3_stmt *)FromAddStmt, 1, ip1 );
-		sqlite3_bind_int64( (sqlite3_stmt *)FromAddStmt, 2, ip2 );
-		sqlite3_bind_text( (sqlite3_stmt *)FromAddStmt, 3, country.c_str( ), -1, SQLITE_TRANSIENT );
+		sqlite3_bind_int64( (sqlite3_stmt *)FromAdd2Stmt, 1, ip1 );
+		sqlite3_bind_int64( (sqlite3_stmt *)FromAdd2Stmt, 2, ip2 );
+		sqlite3_bind_int64( (sqlite3_stmt *)FromAdd2Stmt, 3, block );
 
-		int RC = m_DB->Step( FromAddStmt );
+		int RC = m_DB->Step( FromAdd2Stmt );
 
 		if( RC == SQLITE_DONE )
 			Success = true;
 		else if( RC == SQLITE_ERROR )
-			CONSOLE_Print( "[SQLITE3] error adding iptocountry [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + country + "] - " + m_DB->GetError( ) );
+			CONSOLE_Print( "[SQLITE3] error adding iptoblock [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + UTIL_ToString( block ) + "] - " + m_DB->GetError( ) );
 
 		m_DB->Reset( FromAddStmt );
 	}
 	else
-		CONSOLE_Print( "[SQLITE3] prepare error adding iptocountry [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + country + "] - " + m_DB->GetError( ) );
+		CONSOLE_Print( "[SQLITE3] prepare error adding iptoblock [" + UTIL_ToString( ip1 ) + " : " + UTIL_ToString( ip2 ) + " : " + UTIL_ToString( block ) + "] - " + m_DB->GetError( ) );
 
 	return Success;
 }
-
+*/
 bool CGHostDBSQLite :: DownloadAdd( string map, uint32_t mapsize, string name, string ip, uint32_t spoofed, string spoofedrealm, uint32_t downloadtime )
 {
 	bool Success = false;
@@ -1471,46 +1492,6 @@ bool CGHostDBSQLite :: W3MMDVarAdd( uint32_t gameid, map<VarP,string> var_string
 	return Success;
 }
 
-CCallableAdminCount *CGHostDBSQLite :: ThreadedAdminCount( string server )
-{
-	CCallableAdminCount *Callable = new CCallableAdminCount( server );
-	Callable->SetResult( AdminCount( server ) );
-	Callable->SetReady( true );
-	return Callable;
-}
-
-CCallableAdminCheck *CGHostDBSQLite :: ThreadedAdminCheck( string server, string user )
-{
-	CCallableAdminCheck *Callable = new CCallableAdminCheck( server, user );
-	Callable->SetResult( AdminCheck( server, user ) );
-	Callable->SetReady( true );
-	return Callable;
-}
-
-CCallableAdminAdd *CGHostDBSQLite :: ThreadedAdminAdd( string server, string user )
-{
-	CCallableAdminAdd *Callable = new CCallableAdminAdd( server, user );
-	Callable->SetResult( AdminAdd( server, user ) );
-	Callable->SetReady( true );
-	return Callable;
-}
-
-CCallableAdminRemove *CGHostDBSQLite :: ThreadedAdminRemove( string server, string user )
-{
-	CCallableAdminRemove *Callable = new CCallableAdminRemove( server, user );
-	Callable->SetResult( AdminRemove( server, user ) );
-	Callable->SetReady( true );
-	return Callable;
-}
-
-CCallableAdminList *CGHostDBSQLite :: ThreadedAdminList( string server )
-{
-	CCallableAdminList *Callable = new CCallableAdminList( server );
-	Callable->SetResult( AdminList( server ) );
-	Callable->SetReady( true );
-	return Callable;
-}
-
 CCallableBanCount *CGHostDBSQLite :: ThreadedBanCount( string server )
 {
 	CCallableBanCount *Callable = new CCallableBanCount( server );
@@ -1527,10 +1508,10 @@ CCallableBanCheck *CGHostDBSQLite :: ThreadedBanCheck( string server, string use
 	return Callable;
 }
 
-CCallableBanAdd *CGHostDBSQLite :: ThreadedBanAdd( string server, string user, string ip, string gamename, string admin, string reason )
+CCallableBanAdd *CGHostDBSQLite :: ThreadedBanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
 {
-	CCallableBanAdd *Callable = new CCallableBanAdd( server, user, ip, gamename, admin, reason );
-	Callable->SetResult( BanAdd( server, user, ip, gamename, admin, reason ) );
+	CCallableBanAdd *Callable = new CCallableBanAdd( server, user, ip, gamename, admin, reason, bantime, country );
+	Callable->SetResult( BanAdd( server, user, ip, gamename, admin, reason, bantime, country ) );
 	Callable->SetReady( true );
 	return Callable;
 }
@@ -1559,10 +1540,10 @@ CCallableBanList *CGHostDBSQLite :: ThreadedBanList( string server )
 	return Callable;
 }
 
-CCallableGameAdd *CGHostDBSQLite :: ThreadedGameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver )
+CCallableGameAdd *CGHostDBSQLite :: ThreadedGameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype )
 {
-	CCallableGameAdd *Callable = new CCallableGameAdd( server, map, gamename, ownername, duration, gamestate, creatorname, creatorserver );
-	Callable->SetResult( GameAdd( server, map, gamename, ownername, duration, gamestate, creatorname, creatorserver ) );
+	CCallableGameAdd *Callable = new CCallableGameAdd( server, map, gamename, ownername, duration, gamestate, creatorname, creatorserver, gametype );
+	Callable->SetResult( GameAdd( server, map, gamename, ownername, duration, gamestate, creatorname, creatorserver, gametype ) );
 	Callable->SetReady( true );
 	return Callable;
 }
@@ -1591,10 +1572,10 @@ CCallableDotAGameAdd *CGHostDBSQLite :: ThreadedDotAGameAdd( uint32_t gameid, ui
 	return Callable;
 }
 
-CCallableDotAPlayerAdd *CGHostDBSQLite :: ThreadedDotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills )
+CCallableDotAPlayerAdd *CGHostDBSQLite :: ThreadedDotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string spell1, string spell2, string spell3, string spell4, string spell5, string spell6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills, uint32_t level )
 {
-	CCallableDotAPlayerAdd *Callable = new CCallableDotAPlayerAdd( gameid, colour, kills, deaths, creepkills, creepdenies, assists, gold, neutralkills, item1, item2, item3, item4, item5, item6, hero, newcolour, towerkills, raxkills, courierkills );
-	Callable->SetResult( DotAPlayerAdd( gameid, colour, kills, deaths, creepkills, creepdenies, assists, gold, neutralkills, item1, item2, item3, item4, item5, item6, hero, newcolour, towerkills, raxkills, courierkills ) );
+	CCallableDotAPlayerAdd *Callable = new CCallableDotAPlayerAdd( gameid, colour, kills, deaths, creepkills, creepdenies, assists, gold, neutralkills, item1, item2, item3, item4, item5, item6, spell1, spell2, spell3, spell4, spell5, spell6, hero, newcolour, towerkills, raxkills, courierkills, level );
+	Callable->SetResult( DotAPlayerAdd( gameid, colour, kills, deaths, creepkills, creepdenies, assists, gold, neutralkills, item1, item2, item3, item4, item5, item6, spell1, spell2, spell3, spell4, spell5, spell6, hero, newcolour, towerkills, raxkills, courierkills, level ) );
 	Callable->SetReady( true );
 	return Callable;
 }

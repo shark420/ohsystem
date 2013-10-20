@@ -46,7 +46,7 @@ void CConfig :: Read( string file )
 		CONSOLE_Print( "[CONFIG] warning - unable to read file [" + file + "]" );
 	else
 	{
-		CONSOLE_Print( "[CONFIG] loading file [" + file + "]" );
+		//CONSOLE_Print( "[CONFIG] loading file [" + file + "]" );
 		string Line;
 
 		while( !in.eof( ) )

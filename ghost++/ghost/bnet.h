@@ -33,30 +33,42 @@ class CBNLSClient;
 class CIncomingFriendList;
 class CIncomingClanList;
 class CIncomingChatEvent;
-class CCallableAdminCount;
-class CCallableAdminAdd;
-class CCallableAdminRemove;
-class CCallableAdminList;
+class CCallableRegAdd;
+class CCallableStatsSystem;
+class CCallablepm;
+class CCallablePassCheck;
+class CCallablepenp;
+class CCallablePList;
 class CCallableBanCount;
+class CCallableBanCheck2;
 class CCallableBanAdd;
+class CCallablePUp;
 class CCallableBanRemove;
 class CCallableBanList;
+class CCallableTBRemove;
 class CCallableGamePlayerSummaryCheck;
+class CCallableStatsPlayerSummaryCheck;
+class CCallableInboxSummaryCheck;
 class CCallableDotAPlayerSummaryCheck;
 class CDBBan;
 class CCallableGameUpdate;
-class CCallableQuerySystem;
 
-typedef pair<string,CCallableAdminCount *> PairedAdminCount;
-typedef pair<string,CCallableAdminAdd *> PairedAdminAdd;
-typedef pair<string,CCallableAdminRemove *> PairedAdminRemove;
+typedef pair<string,CCallablePassCheck *> PairedPassCheck;
+typedef pair<string,CCallableRegAdd *> PairedRegAdd;
+typedef pair<string,CCallableStatsSystem *> PairedSS;
+typedef pair<string,CCallablepm *> Pairedpm;
+typedef pair<string,CCallablepenp *> Pairedpenp;
 typedef pair<string,CCallableBanCount *> PairedBanCount;
+typedef pair<string,CCallableBanCheck2 *> PairedBanCheck2;
 typedef pair<string,CCallableBanAdd *> PairedBanAdd;
+typedef pair<string,CCallablePUp *> PairedPUp;
 typedef pair<string,CCallableBanRemove *> PairedBanRemove;
-typedef pair<string,CCallableGamePlayerSummaryCheck *> PairedGPSCheck;
-typedef pair<string,CCallableDotAPlayerSummaryCheck *> PairedDPSCheck;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedGSCheck;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedStreakCheck;
+typedef pair<string,CCallableInboxSummaryCheck *> PairedINCheck;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedSCheck;
 typedef pair<string,CCallableGameUpdate *> PairedGameUpdate;
-typedef pair<string,CCallableQuerySystem *> PairedQS;
+typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedRankCheck;
 
 class CBNET
 {
@@ -72,19 +84,25 @@ private:
 	queue<BYTEARRAY> m_OutPackets;					// queue of outgoing packets to be sent (to prevent getting kicked for flooding)
 	vector<CIncomingFriendList *> m_Friends;		// vector of friends
 	vector<CIncomingClanList *> m_Clans;			// vector of clan members
-	vector<PairedAdminCount> m_PairedAdminCounts;	// vector of paired threaded database admin counts in progress
-	vector<PairedAdminAdd> m_PairedAdminAdds;		// vector of paired threaded database admin adds in progress
-	vector<PairedAdminRemove> m_PairedAdminRemoves;	// vector of paired threaded database admin removes in progress
+	vector<PairedRegAdd> m_PairedRegAdds;               // vector of paired threaded database reg adds in progress
+	vector<PairedSS> m_PairedSSs;
+        vector<Pairedpm> m_Pairedpms;               // vector of paired threaded database update for personal message in progress
+        vector<Pairedpenp> m_Pairedpenps;
 	vector<PairedBanCount> m_PairedBanCounts;		// vector of paired threaded database ban counts in progress
+        vector<PairedBanCheck2> m_PairedBanCheck2s;
 	vector<PairedBanAdd> m_PairedBanAdds;			// vector of paired threaded database ban adds in progress
+	vector<PairedPUp> m_PairedPUps;                   // vector of paired threaded database permission changes in progress
 	vector<PairedBanRemove> m_PairedBanRemoves;		// vector of paired threaded database ban removes in progress
-	vector<PairedGPSCheck> m_PairedGPSChecks;		// vector of paired threaded database game player summary checks in progress
-	vector<PairedDPSCheck> m_PairedDPSChecks;		// vector of paired threaded database DotA player summary checks in progress
-	vector<PairedGameUpdate> m_PairedGameUpdates;	// vector of paired threaded database gamelist query checks in progress
-        vector<PairedQS> m_PairedQSChecks;
-	CCallableAdminList *m_CallableAdminList;		// threaded database admin list in progress
+	vector<PairedGSCheck> m_PairedGSChecks;		// vector of paired threaded database game player summary checks in progress
+        vector<PairedRankCheck> m_PairedRankChecks;
+        vector<PairedStreakCheck> m_PairedStreakChecks;               // vector of paired threaded database streak in progress
+	vector<PairedINCheck> m_PairedINChecks;               // vector of paired threaded database inbox checks in progress
+	vector<PairedSCheck> m_PairedSChecks;		// vector of paired threaded database DotA player summary checks in progress
+	vector<PairedGameUpdate> m_PairedGameUpdates;	// vector of paired threaded database gamelist queue
+        vector<PairedPassCheck> m_PairedPassChecks;       // vector of paired threaded database password checks in progress
+        CCallablePList *m_CallablePList;                // threaded database permission list in progress
 	CCallableBanList *m_CallableBanList;			// threaded database ban list in progress
-	vector<string> m_Admins;						// vector of cached admins
+	CCallableTBRemove *m_CallableTBRemove;
 	vector<CDBBan *> m_Bans;						// vector of cached bans
 	bool m_Exiting;									// set to true and this class will be deleted next update
 	string m_Server;								// battle.net server to connect to
@@ -126,10 +144,25 @@ private:
 	bool m_HoldFriends;								// whether to auto hold friends when creating a game or not
 	bool m_HoldClan;								// whether to auto hold clan members when creating a game or not
 	bool m_PublicCommands;							// whether to allow public commands or not
+	uint32_t m_LastRegisterProcess;
+	uint32_t m_LastLogUpdateTime;
+	//string m_AdminLog;
+	string gCDLog;
+	string gHACKLog;
+	uint32_t m_LastXMLFileCreation;
+	string gXML;
+	string m_XMLGames;
+	bool m_XMLUpdate;
+	bool m_ForcedInfo;
+	boost::mutex StatsUpdateMutex;
+	bool b_StatsUpdate;
 
 public:
-	CBNET( CGHost *nGHost, string nServer, string nServerAlias, string nBNLSServer, uint16_t nBNLSPort, uint32_t nBNLSWardenCookie, string nCDKeyROC, string nCDKeyTFT, string nCountryAbbrev, string nCountry, uint32_t nLocaleID, string nUserName, string nUserPassword, string nFirstChannel, string nRootAdmin, char nCommandTrigger, bool nHoldFriends, bool nHoldClan, bool nPublicCommands, unsigned char nWar3Version, BYTEARRAY nEXEVersion, BYTEARRAY nEXEVersionHash, string nPasswordHashType, string nPVPGNRealmName, uint32_t nMaxMessageLength, uint32_t nHostCounterID );
+	CBNET( CGHost *nGHost, string nServer, string nServerAlias, string nBNLSServer, uint16_t nBNLSPort, uint32_t nBNLSWardenCookie, string nCDKeyROC, string nCDKeyTFT, string nCountryAbbrev, string nCountry, uint32_t nLocaleID, string nUserName, string nUserPassword, string nFirstChannel, char nCommandTrigger, bool nHoldFriends, bool nHoldClan, bool nPublicCommands, unsigned char nWar3Version, BYTEARRAY nEXEVersion, BYTEARRAY nEXEVersionHash, string nPasswordHashType, string nPVPGNRealmName, uint32_t nMaxMessageLength, uint32_t nHostCounterID );
 	~CBNET( );
+
+	vector<string> m_Permissions;
+	vector<string> m_AdminLog;
 
 	bool GetExiting( )					{ return m_Exiting; }
 	string GetServer( )					{ return m_Server; }
@@ -162,6 +195,7 @@ public:
 	void ExtractPackets( );
 	void ProcessPackets( );
 	void ProcessChatEvent( CIncomingChatEvent *chatEvent );
+	void BotCommand( string Message, string User, bool Whisper, bool ForceRoot );
 
 	// functions to send packets to battle.net
 
@@ -181,16 +215,18 @@ public:
 
 	// other functions
 
-	bool IsAdmin( string name );
-	bool IsRootAdmin( string name );
+	uint32_t IsLevel( string name );
+	string GetLevelName ( uint32_t level );
+        bool IsRootAdmin( string name );
 	CDBBan *IsBannedName( string name );
 	CDBBan *IsBannedIP( string ip );
-	void AddAdmin( string name );
 	void AddBan( string name, string ip, string gamename, string admin, string reason );
-	void RemoveAdmin( string name );
 	void RemoveBan( string name );
 	void HoldFriends( CBaseGame *game );
 	void HoldClan( CBaseGame *game );
+	void CD_Print( string message );
+	void Hack_Print( string message );
+	//void CreateXMLFile( uint32_t botid, string gamename,  string mappath, BYTEARRAY crc, BYTEARRAY flag, const char version, string ip, uint16_t hostport, uint32_t entrykey, uint32_t hostcounter, uint32_t height, uint32_t width );
 };
 
 #endif

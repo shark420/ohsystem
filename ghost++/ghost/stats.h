@@ -39,6 +39,7 @@ class CStats
 {
 protected:
 	CBaseGame *m_Game;
+	bool m_Locked;
 
 public:
 	CStats( CBaseGame *nGame );
@@ -46,6 +47,8 @@ public:
 
 	virtual bool ProcessAction( CIncomingAction *Action );
 	virtual void Save( CGHost *GHost, CGHostDB *DB, uint32_t GameID );
+	virtual void SetWinner( uint32_t nWinner ) {}
+	virtual void LockStats( ) { m_Locked = true; }
 };
 
 #endif

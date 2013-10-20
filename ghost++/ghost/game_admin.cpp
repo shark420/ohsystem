@@ -44,7 +44,8 @@ using namespace boost :: filesystem;
 // CAdminGame
 //
 
-CAdminGame :: CAdminGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16_t nHostPort, unsigned char nGameState, string nGameName, string nPassword ) : CBaseGame( nGHost, nMap, nSaveGame, nHostPort, nGameState, nGameName, string( ), string( ), string( ) )
+
+CAdminGame :: CAdminGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16_t nHostPort, unsigned char nGameState, string nGameName, string nPassword ) : CBaseGame( nGHost, nMap, nSaveGame, nHostPort, nGameState, nGameName, string( ), string( ), string( ), uint32_t() )
 {
         m_VirtualHostName = "|cFFC04040Admin";
         m_MuteLobby = true;
@@ -54,25 +55,13 @@ CAdminGame :: CAdminGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint
 
 CAdminGame :: ~CAdminGame( )
 {
-        for( vector<PairedAdminCount> :: iterator i = m_PairedAdminCounts.begin( ); i != m_PairedAdminCounts.end( ); ++i )
-		m_GHost->m_Callables.push_back( i->second );
-
-        for( vector<PairedAdminAdd> :: iterator i = m_PairedAdminAdds.begin( ); i != m_PairedAdminAdds.end( ); ++i )
-		m_GHost->m_Callables.push_back( i->second );
-
-        for( vector<PairedAdminRemove> :: iterator i = m_PairedAdminRemoves.begin( ); i != m_PairedAdminRemoves.end( ); ++i )
-		m_GHost->m_Callables.push_back( i->second );
 
         for( vector<PairedBanCount> :: iterator i = m_PairedBanCounts.begin( ); i != m_PairedBanCounts.end( ); ++i )
 		m_GHost->m_Callables.push_back( i->second );
-
-	/*
-
+/*
         for( vector<PairedBanAdd> :: iterator i = m_PairedBanAdds.begin( ); i != m_PairedBanAdds.end( ); ++i )
 		m_GHost->m_Callables.push_back( i->second );
-
-	*/
-
+*/
         for( vector<PairedBanRemove> :: iterator i = m_PairedBanRemoves.begin( ); i != m_PairedBanRemoves.end( ); ++i )
 		m_GHost->m_Callables.push_back( i->second );
 }
@@ -82,94 +71,6 @@ bool CAdminGame :: Update( void *fd, void *send_fd )
 	//
 	// update callables
 	//
-
-	for( vector<PairedAdminCount> :: iterator i = m_PairedAdminCounts.begin( ); i != m_PairedAdminCounts.end( ); )
-	{
-		if( i->second->GetReady( ) )
-		{
-			CGamePlayer *Player = GetPlayerFromName( i->first, true );
-
-			if( Player )
-			{
-				uint32_t Count = i->second->GetResult( );
-
-				if( Count == 0 )
-					SendChat( Player, m_GHost->m_Language->ThereAreNoAdmins( i->second->GetServer( ) ) );
-				else if( Count == 1 )
-					SendChat( Player, m_GHost->m_Language->ThereIsAdmin( i->second->GetServer( ) ) );
-				else
-					SendChat( Player, m_GHost->m_Language->ThereAreAdmins( i->second->GetServer( ), UTIL_ToString( Count ) ) );
-			}
-
-			m_GHost->m_DB->RecoverCallable( i->second );
-			delete i->second;
-			i = m_PairedAdminCounts.erase( i );
-		}
-		else
-                        ++i;
-	}
-
-	for( vector<PairedAdminAdd> :: iterator i = m_PairedAdminAdds.begin( ); i != m_PairedAdminAdds.end( ); )
-	{
-		if( i->second->GetReady( ) )
-		{
-			if( i->second->GetResult( ) )
-			{
-                                for( vector<CBNET *> :: iterator j = m_GHost->m_BNETs.begin( ); j != m_GHost->m_BNETs.end( ); ++j )
-				{
-					if( (*j)->GetServer( ) == i->second->GetServer( ) )
-						(*j)->AddAdmin( i->second->GetUser( ) );
-				}
-			}
-
-			CGamePlayer *Player = GetPlayerFromName( i->first, true );
-
-			if( Player )
-			{
-				if( i->second->GetResult( ) )
-					SendChat( Player, m_GHost->m_Language->AddedUserToAdminDatabase( i->second->GetServer( ), i->second->GetUser( ) ) );
-				else
-					SendChat( Player, m_GHost->m_Language->ErrorAddingUserToAdminDatabase( i->second->GetServer( ), i->second->GetUser( ) ) );
-			}
-
-			m_GHost->m_DB->RecoverCallable( i->second );
-			delete i->second;
-			i = m_PairedAdminAdds.erase( i );
-		}
-		else
-                        ++i;
-	}
-
-	for( vector<PairedAdminRemove> :: iterator i = m_PairedAdminRemoves.begin( ); i != m_PairedAdminRemoves.end( ); )
-	{
-		if( i->second->GetReady( ) )
-		{
-			if( i->second->GetResult( ) )
-			{
-                                for( vector<CBNET *> :: iterator j = m_GHost->m_BNETs.begin( ); j != m_GHost->m_BNETs.end( ); ++j )
-				{
-					if( (*j)->GetServer( ) == i->second->GetServer( ) )
-						(*j)->RemoveAdmin( i->second->GetUser( ) );
-				}
-			}
-
-			CGamePlayer *Player = GetPlayerFromName( i->first, true );
-
-			if( Player )
-			{
-				if( i->second->GetResult( ) )
-					SendChat( Player, m_GHost->m_Language->DeletedUserFromAdminDatabase( i->second->GetServer( ), i->second->GetUser( ) ) );
-				else
-					SendChat( Player, m_GHost->m_Language->ErrorDeletingUserFromAdminDatabase( i->second->GetServer( ), i->second->GetUser( ) ) );
-			}
-
-			m_GHost->m_DB->RecoverCallable( i->second );
-			delete i->second;
-			i = m_PairedAdminRemoves.erase( i );
-		}
-		else
-                        ++i;
-	}
 
 	for( vector<PairedBanCount> :: iterator i = m_PairedBanCounts.begin( ); i != m_PairedBanCounts.end( ); )
 	{
@@ -282,8 +183,8 @@ void CAdminGame :: SendWelcomeMessage( CGamePlayer *player )
 {
 	SendChat( player, "GHost++ Admin Game                     http://www.codelain.com/" );
 	SendChat( player, "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" );
-	SendChat( player, "Commands: addadmin, autohost, autohostmm, checkadmin" );
-	SendChat( player, "Commands: checkban, countadmins, countbans, deladmin" );
+	SendChat( player, "Commands: autohost, autohostmm, checkadmin" );
+	SendChat( player, "Commands: checkban, countadmins, countbans" );
 	SendChat( player, "Commands: delban, disable, downloads, enable, end, enforcesg" );
 	SendChat( player, "Commands: exit, getgame, getgames, hostsg, load, loadsg" );
 	SendChat( player, "Commands: map, password, priv, privby, pub, pubby, quit" );
@@ -337,66 +238,12 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 		* ADMIN COMMANDS *
 		******************/
 
-		//
-		// !ADDADMIN
-		//
-
-		if( Command == "addadmin" && !Payload.empty( ) )
-		{
-			// extract the name and the server
-			// e.g. "Varlock useast.battle.net" -> name: "Varlock", server: "useast.battle.net"
-
-			string Name;
-			string Server;
-			stringstream SS;
-			SS << Payload;
-			SS >> Name;
-
-			if( SS.eof( ) )
-			{
-				if( m_GHost->m_BNETs.size( ) == 1 )
-					Server = m_GHost->m_BNETs[0]->GetServer( );
-				else
-					CONSOLE_Print( "[ADMINGAME] missing input #2 to addadmin command" );
-			}
-			else
-				SS >> Server;
-
-			if( !Server.empty( ) )
-			{
-				string Servers;
-				bool FoundServer = false;
-
-                                for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
-				{
-					if( Servers.empty( ) )
-						Servers = (*i)->GetServer( );
-					else
-						Servers += ", " + (*i)->GetServer( );
-
-					if( (*i)->GetServer( ) == Server )
-					{
-						FoundServer = true;
-
-						if( (*i)->IsAdmin( Name ) )
-							SendChat( player, m_GHost->m_Language->UserIsAlreadyAnAdmin( Server, Name ) );
-						else
-							m_PairedAdminAdds.push_back( PairedAdminAdd( player->GetName( ), m_GHost->m_DB->ThreadedAdminAdd( Server, Name ) ) );
-
-						break;
-					}
-				}
-
-				if( !FoundServer )
-					SendChat( player, m_GHost->m_Language->ValidServers( Servers ) );
-			}
-		}
 
 		//
 		// !AUTOHOST
 		//
 
-                else if( Command == "autohost" )
+                if( Command == "autohost" )
 		{
 			if( Payload.empty( ) || Payload == "off" )
 			{
@@ -587,7 +434,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 					{
 						FoundServer = true;
 
-						if( (*i)->IsAdmin( Name ) )
+						if( (*i)->IsLevel( Name ) >= 9 )
 							SendChat( player, m_GHost->m_Language->UserIsAnAdmin( Server, Name ) );
 						else
 							SendChat( player, m_GHost->m_Language->UserIsNotAnAdmin( Server, Name ) );
@@ -643,11 +490,11 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 						FoundServer = true;
 						CDBBan *Ban = (*i)->IsBannedName( Name );
 
-						if( Ban )
-							SendChat( player, m_GHost->m_Language->UserWasBannedOnByBecause( Server, Name, Ban->GetDate( ), Ban->GetAdmin( ), Ban->GetReason( ) ) );
+/*						if( Ban )
+							SendChat( player, m_GHost->m_Language->UserWasBannedOnByBecause( Server, Name, Ban->GetDate( ), Ban->GetAdmin( ), Ban->GetReason( ), Ban->GetExpire( ), Ban->GetRemain( ) ) );
 						else
 							SendChat( player, m_GHost->m_Language->UserIsNotBanned( Server, Name ) );
-
+*/
 						break;
 					}
 				}
@@ -655,21 +502,6 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 				if( !FoundServer )
 					SendChat( player, m_GHost->m_Language->ValidServers( Servers ) );
 			}
-		}
-
-		//
-		// !COUNTADMINS
-		//
-
-                else if( Command == "countadmins" )
-		{
-			string Server = Payload;
-
-			if( Server.empty( ) && m_GHost->m_BNETs.size( ) == 1 )
-				Server = m_GHost->m_BNETs[0]->GetServer( );
-
-			if( !Server.empty( ) )
-				m_PairedAdminCounts.push_back( PairedAdminCount( player->GetName( ), m_GHost->m_DB->ThreadedAdminCount( Server ) ) );
 		}
 
 		//
@@ -685,61 +517,6 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 
 			if( !Server.empty( ) )
 				m_PairedBanCounts.push_back( PairedBanCount( player->GetName( ), m_GHost->m_DB->ThreadedBanCount( Server ) ) );
-		}
-
-		//
-		// !DELADMIN
-		//
-
-                else if( Command == "deladmin" && !Payload.empty( ) )
-		{
-			// extract the name and the server
-			// e.g. "Varlock useast.battle.net" -> name: "Varlock", server: "useast.battle.net"
-
-			string Name;
-			string Server;
-			stringstream SS;
-			SS << Payload;
-			SS >> Name;
-
-			if( SS.eof( ) )
-			{
-				if( m_GHost->m_BNETs.size( ) == 1 )
-					Server = m_GHost->m_BNETs[0]->GetServer( );
-				else
-					CONSOLE_Print( "[ADMINGAME] missing input #2 to deladmin command" );
-			}
-			else
-				SS >> Server;
-
-			if( !Server.empty( ) )
-			{
-				string Servers;
-				bool FoundServer = false;
-
-                                for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
-				{
-					if( Servers.empty( ) )
-						Servers = (*i)->GetServer( );
-					else
-						Servers += ", " + (*i)->GetServer( );
-
-					if( (*i)->GetServer( ) == Server )
-					{
-						FoundServer = true;
-
-						if( !(*i)->IsAdmin( Name ) )
-							SendChat( player, m_GHost->m_Language->UserIsNotAnAdmin( Server, Name ) );
-						else
-							m_PairedAdminRemoves.push_back( PairedAdminRemove( player->GetName( ), m_GHost->m_DB->ThreadedAdminRemove( Server, Name ) ) );
-
-						break;
-					}
-				}
-
-				if( !FoundServer )
-					SendChat( player, m_GHost->m_Language->ValidServers( Servers ) );
-			}
 		}
 
 		//
@@ -894,7 +671,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 		//
 
                 else if( Command == "hostsg" && !Payload.empty( ) )
-			m_GHost->CreateGame( m_GHost->m_Map, GAME_PRIVATE, true, Payload, User, User, string( ), false );
+			m_GHost->CreateGame( m_GHost->m_Map, GAME_PRIVATE, true, Payload, User, User, string( ), 1, false );
 
 		//
 		// !LOAD (load config file)
@@ -1094,7 +871,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 		//
 
                 else if( Command == "priv" && !Payload.empty( ) )
-			m_GHost->CreateGame( m_GHost->m_Map, GAME_PRIVATE, false, Payload, User, User, string( ), false );
+			m_GHost->CreateGame( m_GHost->m_Map, GAME_PRIVATE, false, Payload, User, User, string( ), 1, false );
 
 		//
 		// !PRIVBY (host private game by other player)
@@ -1113,7 +890,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 			{
 				Owner = Payload.substr( 0, GameNameStart );
 				GameName = Payload.substr( GameNameStart + 1 );
-				m_GHost->CreateGame( m_GHost->m_Map, GAME_PRIVATE, false, GameName, Owner, User, string( ), false );
+				m_GHost->CreateGame( m_GHost->m_Map, GAME_PRIVATE, false, GameName, Owner, User, string( ), 1, false );
 			}
 		}
 
@@ -1122,7 +899,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 		//
 
                 else if( Command == "pub" && !Payload.empty( ) )
-			m_GHost->CreateGame( m_GHost->m_Map, GAME_PUBLIC, false, Payload, User, User, string( ), false );
+			m_GHost->CreateGame( m_GHost->m_Map, GAME_PUBLIC, false, Payload, User, User, string( ), 2, false );
 
 		//
 		// !PUBBY (host public game by other player)
@@ -1141,7 +918,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 			{
 				Owner = Payload.substr( 0, GameNameStart );
 				GameName = Payload.substr( GameNameStart + 1 );
-				m_GHost->CreateGame( m_GHost->m_Map, GAME_PUBLIC, false, GameName, Owner, User, string( ), false );
+				m_GHost->CreateGame( m_GHost->m_Map, GAME_PUBLIC, false, GameName, Owner, User, string( ), 2, false );
 			}
 		}
 

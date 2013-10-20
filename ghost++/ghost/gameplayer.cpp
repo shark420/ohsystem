@@ -27,14 +27,17 @@
 #include "map.h"
 #include "gameplayer.h"
 #include "gameprotocol.h"
+#include "gcbiprotocol.h"
 #include "gpsprotocol.h"
 #include "game_base.h"
+#include "ghost.h"
+#include "ghostdb.h"
 
 //
 // CPotentialPlayer
 //
 
-CPotentialPlayer :: CPotentialPlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket ) : m_Protocol( nProtocol ), m_Game( nGame ), m_Socket( nSocket ), m_DeleteMe( false ), m_Error( false ), m_IncomingJoinPlayer( NULL )
+CPotentialPlayer :: CPotentialPlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket ) : m_Protocol( nProtocol ), m_Game( nGame ), m_Socket( nSocket ), m_DeleteMe( false ), m_Error( false ), m_IncomingJoinPlayer( NULL ), m_IncomingGarenaUser( NULL )
 {
 
 }
@@ -51,22 +54,42 @@ CPotentialPlayer :: ~CPotentialPlayer( )
 	}
 
 	delete m_IncomingJoinPlayer;
+	delete m_IncomingGarenaUser;
+}
+
+BYTEARRAY CPotentialPlayer :: GetGarenaIP( )
+{
+	if( m_IncomingGarenaUser == NULL ) {
+		return UTIL_CreateByteArray( (uint32_t) 0, true );
+	} else {
+		return UTIL_CreateByteArray( m_IncomingGarenaUser->GetIP( ), true );
+	}
 }
 
 BYTEARRAY CPotentialPlayer :: GetExternalIP( )
 {
 	unsigned char Zeros[] = { 0, 0, 0, 0 };
 
-	if( m_Socket )
-		return m_Socket->GetIP( );
+	if( m_Socket ) {
+		if( m_IncomingGarenaUser != NULL )
+			return GetGarenaIP( );
+		else
+			return m_Socket->GetIP( );
+	}
 
 	return UTIL_CreateByteArray( Zeros, 4 );
 }
 
 string CPotentialPlayer :: GetExternalIPString( )
 {
-	if( m_Socket )
-		return m_Socket->GetIPString( );
+	if( m_Socket ) {
+		if( m_IncomingGarenaUser != NULL ) {
+			BYTEARRAY GarenaIP = GetGarenaIP( );
+			return UTIL_ToString(GarenaIP[0]) + "." + UTIL_ToString(GarenaIP[1]) + "." + UTIL_ToString(GarenaIP[2]) + "." + UTIL_ToString(GarenaIP[3]);
+		} else {
+			return m_Socket->GetIPString( );
+		}
+	}
 
 	return string( );
 }
@@ -103,7 +126,7 @@ void CPotentialPlayer :: ExtractPackets( )
 
 	while( Bytes.size( ) >= 4 )
 	{
-		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT )
+		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT || Bytes[0] == GCBI_HEADER_CONSTANT )
 		{
 			// bytes 2 and 3 contain the length of the packet
 
@@ -170,6 +193,16 @@ void CPotentialPlayer :: ProcessPackets( )
 			}
 		}
 
+		else if( Packet->GetPacketType( ) == GCBI_HEADER_CONSTANT )
+		{
+			if( Packet->GetID( ) == CGCBIProtocol :: GCBI_INIT )
+			{
+				delete m_IncomingGarenaUser;
+				m_IncomingGarenaUser = m_Game->m_GHost->m_GCBIProtocol->RECEIVE_GCBI_INIT( Packet->GetData( ) );
+				//CONSOLE_Print( "[GCBI] Garena user detected; userid=" + UTIL_ToString( m_IncomingGarenaUser->GetUserID( ) ) + ", roomid=" + UTIL_ToString( m_IncomingGarenaUser->GetRoomID( ) ) + ", experience=" + UTIL_ToString( m_IncomingGarenaUser->GetUserExp( ) ) + ", country=" + m_IncomingGarenaUser->GetCountryCode( ) );
+			}
+		}
+
 		delete Packet;
 	}
 }
@@ -186,18 +219,20 @@ void CPotentialPlayer :: Send( BYTEARRAY data )
 
 CGamePlayer :: CGamePlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket, unsigned char nPID, string nJoinedRealm, string nName, BYTEARRAY nInternalIP, bool nReserved ) : CPotentialPlayer( nProtocol, nGame, nSocket ),
 m_PID( nPID ), m_Name( nName ), m_InternalIP( nInternalIP ), m_JoinedRealm( nJoinedRealm ), m_TotalPacketsSent( 0 ), m_TotalPacketsReceived( 0 ), m_LeftCode( PLAYERLEAVE_LOBBY ), m_LoginAttempts( 0 ), m_SyncCounter( 0 ), m_JoinTime( GetTime( ) ),
-m_LastMapPartSent( 0 ), m_LastMapPartAcked( 0 ), m_StartedDownloadingTicks( 0 ), m_FinishedLoadingTicks( 0 ), m_StartedLaggingTicks( 0 ), m_StatsSentTime( 0 ), m_StatsDotASentTime( 0 ), m_LastGProxyWaitNoticeSentTime( 0 ), m_Score( -100000.0 ),
-m_LoggedIn( false ), m_Spoofed( false ), m_Reserved( nReserved ), m_WhoisShouldBeSent( false ), m_WhoisSent( false ), m_DownloadAllowed( false ), m_DownloadStarted( false ), m_DownloadFinished( false ), m_FinishedLoading( false ), m_Lagging( false ),
-m_DropVote( false ), m_KickVote( false ), m_Muted( false ), m_LeftMessageSent( false ), m_GProxy( false ), m_GProxyDisconnectNoticeSent( false ), m_GProxyReconnectKey( rand( ) ), m_LastGProxyAckTime( 0 )
+m_LastMapPartSent( 0 ), m_LastMapPartAcked( 0 ), m_StartedDownloadingTicks( 0 ), m_FinishedLoadingTicks( 0 ), m_StartedLaggingTicks( 0 ), m_StatsSentTime( 0 ), m_StatsDotASentTime( 0 ), m_LastGProxyWaitNoticeSentTime( 0 ), m_Score( -100000.0 ), m_WinPerc( 0.0 ), m_LeavePerc( 0.0 ), m_Games( 0 ),
+m_LoggedIn( false ), m_Spoofed( false ), m_PasswordProt( 0 ), m_Registered( false ), m_Reserved( nReserved ), m_WhoisShouldBeSent( false ), m_WhoisSent( false ), m_DownloadAllowed( false ), m_DownloadStarted( false ), m_DownloadFinished( false ), m_FinishedLoading( false ), m_Lagging( false ),
+m_DropVote( false ), m_KickVote( false ), m_Muted( false ), m_LeftMessageSent( false ), m_GProxy( false ), m_GProxyDisconnectNoticeSent( false ), m_GProxyReconnectKey( rand( ) ), m_LastGProxyAckTime( 0 ), m_Autoban( false ), m_Locked( false ), m_ForfeitVote( false ), m_DrawVote( false ), m_TimeActive( 0 ), m_UsedPause( false ), m_PauseTried( 0 ), m_CLetter( "X?" ), m_Country( "unknown" ), m_Cookies( 0 ), m_Count( 0 ), m_Silence( false ), m_ForcedGproxy( false ), m_HasLeft( false ),
+m_AFKMarked( false ), m_SafeDrop( false ), m_FeedLevel( 0 ), m_VKTimes( 0 ), m_HighPingTimes( 0 ), m_AnnounceTime( GetTime( ) )
 {
 
 }
 
 CGamePlayer :: CGamePlayer( CPotentialPlayer *potential, unsigned char nPID, string nJoinedRealm, string nName, BYTEARRAY nInternalIP, bool nReserved ) : CPotentialPlayer( potential->m_Protocol, potential->m_Game, potential->GetSocket( ) ),
 m_PID( nPID ), m_Name( nName ), m_InternalIP( nInternalIP ), m_JoinedRealm( nJoinedRealm ), m_TotalPacketsSent( 0 ), m_TotalPacketsReceived( 1 ), m_LeftCode( PLAYERLEAVE_LOBBY ), m_LoginAttempts( 0 ), m_SyncCounter( 0 ), m_JoinTime( GetTime( ) ),
-m_LastMapPartSent( 0 ), m_LastMapPartAcked( 0 ), m_StartedDownloadingTicks( 0 ), m_FinishedLoadingTicks( 0 ), m_StartedLaggingTicks( 0 ), m_StatsSentTime( 0 ), m_StatsDotASentTime( 0 ), m_LastGProxyWaitNoticeSentTime( 0 ), m_Score( -100000.0 ),
-m_LoggedIn( false ), m_Spoofed( false ), m_Reserved( nReserved ), m_WhoisShouldBeSent( false ), m_WhoisSent( false ), m_DownloadAllowed( false ), m_DownloadStarted( false ), m_DownloadFinished( false ), m_FinishedLoading( false ), m_Lagging( false ),
-m_DropVote( false ), m_KickVote( false ), m_Muted( false ), m_LeftMessageSent( false ), m_GProxy( false ), m_GProxyDisconnectNoticeSent( false ), m_GProxyReconnectKey( rand( ) ), m_LastGProxyAckTime( 0 )
+m_LastMapPartSent( 0 ), m_LastMapPartAcked( 0 ), m_StartedDownloadingTicks( 0 ), m_FinishedLoadingTicks( 0 ), m_StartedLaggingTicks( 0 ), m_StatsSentTime( 0 ), m_StatsDotASentTime( 0 ), m_LastGProxyWaitNoticeSentTime( 0 ), m_Score( -100000.0 ), m_WinPerc( 0.0 ), m_LeavePerc( 0.0 ), m_Games( 0 ),
+m_LoggedIn( false ), m_Spoofed( false ), m_PasswordProt( 0 ), m_Registered( false ), m_Reserved( nReserved ), m_WhoisShouldBeSent( false ), m_WhoisSent( false ), m_DownloadAllowed( false ), m_DownloadStarted( false ), m_DownloadFinished( false ), m_FinishedLoading( false ), m_Lagging( false ),
+m_DropVote( false ), m_KickVote( false ), m_Muted( false ), m_LeftMessageSent( false ), m_GProxy( false ), m_GProxyDisconnectNoticeSent( false ), m_GProxyReconnectKey( rand( ) ), m_LastGProxyAckTime( 0 ), m_Autoban( false ), m_Locked( false ), m_ForfeitVote( false ), m_DrawVote( false ), m_TimeActive( 0 ), m_UsedPause( false ), m_PauseTried( 0 ), m_CLetter( "??" ), m_Country( "unknown" ), m_Cookies( 0 ), m_Count( 0 ), m_Silence( false ), m_ForcedGproxy( false ), m_HasLeft( false ),
+m_AFKMarked( false ), m_SafeDrop( false ), m_FeedLevel( 0 ), m_VKTimes( 0 ), m_HighPingTimes( 0 ), m_AnnounceTime( GetTime( ) )
 {
 	// todotodo: properly copy queued packets to the new player, this just discards them
 	// this isn't a big problem because official Warcraft III clients don't send any packets after the join request until they receive a response
@@ -251,6 +286,43 @@ uint32_t CGamePlayer :: GetPing( bool LCPing )
 		return AvgPing;
 }
 
+bool CGamePlayer :: GetIsIgnoring( string username )
+{
+	transform( username.begin( ), username.end( ), username.begin( ), (int(*)(int))tolower );
+
+	for( vector<string> :: iterator i = m_IgnoreList.begin( ); i != m_IgnoreList.end( ); ++i )
+	{
+		if( (*i) == username )
+			return true;
+	}
+
+	return false;
+}
+
+void CGamePlayer :: Ignore( string username )
+{
+	if( GetIsIgnoring( username ) ) return;
+	transform( username.begin( ), username.end( ), username.begin( ), (int(*)(int))tolower );
+
+	m_IgnoreList.push_back( username );
+}
+
+void CGamePlayer :: UnIgnore( string username )
+{
+	transform( username.begin( ), username.end( ), username.begin( ), (int(*)(int))tolower );
+
+	for( vector<string> :: iterator i = m_IgnoreList.begin( ); i != m_IgnoreList.end( ); )
+	{
+		if( (*i) == username )
+		{
+			m_IgnoreList.erase( i );
+			continue;
+		}
+
+		++i;
+	}
+}
+
 bool CGamePlayer :: Update( void *fd )
 {
 	// wait 4 seconds after joining before sending the /whois or /w
@@ -286,6 +358,41 @@ bool CGamePlayer :: Update( void *fd )
 
 	if( m_Socket && GetTime( ) - m_Socket->GetLastRecv( ) >= 30 )
 		m_Game->EventPlayerDisconnectTimedOut( this );
+
+	// make sure we're not waiting too long for the first MAPSIZE packet
+
+/*    	if( m_ConnectionState == 1 && GetTicks( ) - m_ConnectionTime > 5000 && !m_Game->GetGameLoaded() && !m_Game->GetGameLoading() )
+	{
+		CONSOLE_Print( "[DENY] Kicking player: MAPSIZE not received within five seconds" );
+		m_DeleteMe = true;
+        	SetLeftReason( "MAPSIZE not received within five seconds" );
+        	SetLeftCode( PLAYERLEAVE_LOBBY );
+        	m_Game->OpenSlot( m_Game->GetSIDFromPID( GetPID( ) ), false );
+    	}
+*/
+	// disconnect if the player is downloading too slowly
+
+	if( m_DownloadStarted && !m_DownloadFinished && !m_Game->GetGameLoaded() && !m_Game->GetGameLoading() && GetLastMapPartSent( ) > 0 )
+	{
+		uint32_t downloadingTime = GetTicks( ) - m_StartedDownloadingTicks;
+
+		if( downloadingTime > 8000 && GetLastMapPartAcked( ) / downloadingTime < 10 ) // GetLastMapPartAcked( ) / downloadingTime is B/ms, approximately KB/sec
+		{
+			CONSOLE_Print( "[DENY] Kicking player: download speed too low" );
+			m_DeleteMe = true;
+	                SetLeftReason( "download speed too low" );
+            		SetLeftCode( PLAYERLEAVE_LOBBY );
+       			m_Game->OpenSlot( m_Game->GetSIDFromPID( GetPID( ) ), false );
+	        }
+	}
+
+	// unmute player
+	if( GetMuted( ) && m_MutedAuto && GetTicks( ) - m_MutedTicks > 30000  )
+	{
+		SetMuted( false );
+		m_Game->SendChat( m_PID, "[PeaceMaker] " + m_Name + " has been automatically unmuted." );
+		m_MuteMessages.clear( );
+	}
 
 	// GProxy++ acks
 
@@ -348,7 +455,7 @@ void CGamePlayer :: ExtractPackets( )
 
 	while( Bytes.size( ) >= 4 )
 	{
-		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT )
+		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT || Bytes[0] == GCBI_HEADER_CONSTANT )
 		{
 			// bytes 2 and 3 contain the length of the packet
 
@@ -451,8 +558,115 @@ void CGamePlayer :: ProcessPackets( )
 				ChatPlayer = m_Protocol->RECEIVE_W3GS_CHAT_TO_HOST( Packet->GetData( ) );
 
 				if( ChatPlayer )
-					m_Game->EventPlayerChatToHost( this, ChatPlayer );
+				{
+					// determine if we should auto-mute this player
+					if( ChatPlayer->GetType( ) == CIncomingChatPlayer :: CTH_MESSAGE || ChatPlayer->GetType( ) == CIncomingChatPlayer :: CTH_MESSAGEEXTRA )
+					{
+						uint32_t Level;
+                				for( vector<CBNET *> :: iterator i = m_Game->m_GHost->m_BNETs.begin( ); i != m_Game->m_GHost->m_BNETs.end( ); ++i )
+                				{
+                				        if( (*i)->GetServer( ) == m_JoinedRealm )
+				                        {
+								Level = (*i)->IsLevel( m_Name );
+							}
+						}
+						if( Level <= 1 )
+						{
+							m_MuteMessages.push_back( GetTicks( ) );
 
+							if( m_MuteMessages.size( ) > 7 )
+								m_MuteMessages.erase( m_MuteMessages.begin( ) );
+
+							uint32_t RecentCount = 0;
+							for( unsigned int i = 0; i < m_MuteMessages.size( ); ++i )
+							{
+								if( GetTicks( ) - m_MuteMessages[i] < 7000 )
+								{
+									RecentCount++;
+								}
+							}
+
+							if( m_Game->m_GHost->m_AutoMuteSpammer && RecentCount >= 7 )
+							{
+								m_Count++;
+                                                                if(  m_Count == 1 )
+                                                                {
+        	                                                        SetMuted( true );
+	                                                                m_MutedAuto = true;
+                                                                        m_Game->SendChat( m_PID, "[PeaceMaker] Please do not spam, next time you will get a penality point!" );
+									m_MuteMessages.clear( );
+                                                                        m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically muted for spamming." );
+                                                                }
+                                                                if( m_Count == 2 )
+                                                                {
+	                                                                m_Game->SendAllChat( "Use '!ignore "+m_Name+"' to ignore "+m_Name+", he seems to be a spammer." );
+                                                                        m_Game->SendChat( m_PID, "[PeaceMaker] Please do not spam, on the next mute you will be banned!" );
+                                                                        SetMuted( true );
+									m_Game->m_Pairedpenps.push_back( Pairedpenp( string(), m_Game->m_GHost->m_DB->Threadedpenp( m_Name, "Spam" , "PeaceMaker", 1, "add" ) ) );
+                                                                        m_MutedAuto = true;
+                                                                        m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically muted for flaming." );
+                                                                }
+                                                                if( m_Count == 3 )
+                                                                {
+									m_Game->m_PairedBanAdds.push_back( PairedBanAdd( string(), m_Game->m_GHost->m_DB->ThreadedBanAdd( m_JoinedRealm, m_Name, GetExternalIPString( ), m_Game->m_GameName, "PeaceMaker", "Spam", 172800, "" ) ) );
+                                                                        SetMuted( true );
+                                                                        m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically permanently muted for spamming." );
+
+                                                                }
+
+
+							}
+
+							//now check for flamers
+							if( m_Game->m_GHost->FlameCheck( ChatPlayer->GetMessage( ) ) )
+							{
+								m_FlameMessages.push_back( GetTicks( ) );
+
+								if( m_FlameMessages.size( ) > 10 )
+									m_FlameMessages.erase( m_FlameMessages.begin( ) );
+
+								RecentCount = 0;
+
+								for( unsigned int i = 0; i < m_FlameMessages.size( ); ++i )
+								{
+									if( GetTicks( ) - m_FlameMessages[i] < 120000 )
+										RecentCount++;
+								}
+
+								if( RecentCount == 1 )
+								{
+									m_Game->SendChat( m_PID, "[PeaceMaker] Please do not insult or flame, on the next bad word you will be muted!" );
+								}
+
+								if( RecentCount == 2 )
+        	                                                {
+                	                                                m_Game->SendChat( m_PID, "[PeaceMaker] Please do not insult or flame, on the next bad word you will get a penality point!" );
+                		                                        SetMuted( true );
+        	                	                                m_MutedAuto = true;
+	                                	                        m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically muted for flaming." );
+	                                                        }
+
+	                                                        if( RecentCount == 3 )
+        	                                                {
+                	                                                m_Game->SendChat( m_PID, "Please do not insult or flame, on the next bad word you will get banned!" );
+                        	                                        SetMuted( true );
+									m_Game->m_Pairedpenps.push_back( Pairedpenp( string(), m_Game->m_GHost->m_DB->Threadedpenp( m_Name, "Flame/Insult" , "PeaceMaker", 1, "add" ) ) );
+                                        	                        m_MutedAuto = true;
+                                                	                m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically muted for flaming." );
+	                                                        }
+
+	                                                        if( RecentCount == 4 )
+        	                                                {
+									m_Game->m_PairedBanAdds.push_back( PairedBanAdd( string(), m_Game->m_GHost->m_DB->ThreadedBanAdd( m_JoinedRealm, m_Name, GetExternalIPString( ), m_Game->m_GameName, "PeaceMaker", "Flame/Insult", 172800, "" ) ) );
+                        	                                        SetMuted( true );
+                                	                                m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically permanently muted for flaming." );
+
+	                                                        }
+							}
+						}
+					}
+					m_Game->EventPlayerChatToHost( this, ChatPlayer );
+				}
 				delete ChatPlayer;
 				ChatPlayer = NULL;
 				break;
@@ -517,7 +731,7 @@ void CGamePlayer :: ProcessPackets( )
 				{
 					m_GProxy = true;
 					m_Socket->PutBytes( m_Game->m_GHost->m_GPSProtocol->SEND_GPSS_INIT( m_Game->m_GHost->m_ReconnectPort, m_PID, m_GProxyReconnectKey, m_Game->GetGProxyEmptyActions( ) ) );
-					CONSOLE_Print( "[GAME: " + m_Game->GetGameName( ) + "] player [" + m_Name + "] is using GProxy++" );
+					//CONSOLE_Print( "[GAME: " + m_Game->GetGameName( ) + "] player [" + m_Name + "] is using GProxy++" );
 				}
 				else
 				{

@@ -52,29 +52,64 @@ bool CGHostDB :: Commit( )
 	return true;
 }
 
-uint32_t CGHostDB :: AdminCount( string server )
+uint32_t CGHostDB :: RegAdd( string user, string server, string mail, string password, string type )
 {
-	return 0;
+        return 0;
 }
 
-bool CGHostDB :: AdminCheck( string server, string user )
+string CGHostDB :: StatsSystem( string user, string input, uint32_t one, string type )
 {
-	return false;
+        return "";
 }
 
-bool CGHostDB :: AdminAdd( string server, string user )
+uint32_t CGHostDB :: PWCheck(  string user )
 {
-	return false;
+        return false;
 }
 
-bool CGHostDB :: AdminRemove( string server, string user )
+uint32_t CGHostDB :: PassCheck(  string user, string pass, uint32_t st )
 {
-	return false;
+        return 0;
 }
 
-vector<string> CGHostDB :: AdminList( string server )
+uint32_t CGHostDB :: pm( string user, string listener, uint32_t status, string message, string type )
 {
-	return vector<string>( );
+        return 0;
+}
+
+uint32_t CGHostDB :: StoreLog( uint32_t chatid, string game, vector<string> admin )
+{
+        return 0;
+}
+
+uint32_t CGHostDB :: gs( uint32_t chatid, string gn, uint32_t st, uint32_t gametype )
+{
+        return 0;
+}
+
+uint32_t CGHostDB :: penp( string name, string reason, string admin, uint32_t amount, string type )
+{
+        return 0;
+}
+
+vector<string> CGHostDB :: PList( string server )
+{
+        return vector<string>( );
+}
+
+vector<string> CGHostDB :: FlameList( )
+{
+        return vector<string>( );
+}
+
+vector<string> CGHostDB :: AnnounceList( )
+{
+        return vector<string>( );
+}
+
+vector<string> CGHostDB :: DCountryList( )
+{
+        return vector<string>( );
 }
 
 uint32_t CGHostDB :: BanCount( string server )
@@ -87,14 +122,29 @@ CDBBan *CGHostDB :: BanCheck( string server, string user, string ip )
 	return NULL;
 }
 
-bool CGHostDB :: BanAdd( string server, string user, string ip, string gamename, string admin, string reason )
+string CGHostDB :: BanCheck2( string server, string user, string type )
+{
+        return "";
+}
+
+string CGHostDB :: BanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
 {
 	return false;
+}
+
+bool CGHostDB :: PUp( string name, uint32_t level, string realm, string user )
+{
+        return false;
 }
 
 bool CGHostDB :: BanRemove( string server, string user )
 {
 	return false;
+}
+
+bool CGHostDB :: TBRemove( string server )
+{
+        return false;
 }
 
 bool CGHostDB :: BanRemove( string user )
@@ -107,7 +157,17 @@ vector<CDBBan *> CGHostDB :: BanList( string server )
 	return vector<CDBBan *>( );
 }
 
-uint32_t CGHostDB :: GameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver )
+vector<string> CGHostDB :: CommandList( )
+{
+	return vector<string>( );
+}
+
+bool CGHostDB :: Clean( )
+{
+        return false;
+}
+
+uint32_t CGHostDB :: GameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype )
 {
 	return 0;
 }
@@ -132,12 +192,22 @@ CDBGamePlayerSummary *CGHostDB :: GamePlayerSummaryCheck( string name )
 	return NULL;
 }
 
+CDBStatsPlayerSummary *CGHostDB :: StatsPlayerSummaryCheck( string name )
+{
+        return NULL;
+}
+
+CDBInboxSummary *CGHostDB :: InboxSummaryCheck( string name )
+{
+        return NULL;
+}
+
 uint32_t CGHostDB :: DotAGameAdd( uint32_t gameid, uint32_t winner, uint32_t min, uint32_t sec )
 {
 	return 0;
 }
 
-uint32_t CGHostDB :: DotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills )
+uint32_t CGHostDB :: DotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string spell1, string spell2, string spell3, string spell4, string spell5, string spell6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills, uint32_t level )
 {
 	return 0;
 }
@@ -152,14 +222,9 @@ CDBDotAPlayerSummary *CGHostDB :: DotAPlayerSummaryCheck( string name )
 	return NULL;
 }
 
-string CGHostDB :: FromCheck( uint32_t ip )
+string CGHostDB :: FromCheck( string ip )
 {
 	return "??";
-}
-
-bool CGHostDB :: FromAdd( uint32_t ip1, uint32_t ip2, string country )
-{
-	return false;
 }
 
 bool CGHostDB :: DownloadAdd( string map, uint32_t mapsize, string name, string ip, uint32_t spoofed, string spoofedrealm, uint32_t downloadtime )
@@ -187,39 +252,74 @@ bool CGHostDB :: W3MMDVarAdd( uint32_t gameid, map<VarP,string> var_strings )
 	return false;
 }
 
-string CGHostDB :: QuerySystem( uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two )
-{
-        return "";
-}
-
 void CGHostDB :: CreateThread( CBaseCallable *callable )
 {
 	callable->SetReady( true );
 }
 
-CCallableAdminCount *CGHostDB :: ThreadedAdminCount( string server )
+CCallableFromCheck *CGHostDB :: ThreadedFromCheck( string ip )
 {
-	return NULL;
+        return NULL;
 }
 
-CCallableAdminCheck *CGHostDB :: ThreadedAdminCheck( string server, string user )
+CCallableRegAdd *CGHostDB :: ThreadedRegAdd( string user, string server, string mail, string password, string type )
 {
-	return NULL;
+        return NULL;
 }
 
-CCallableAdminAdd *CGHostDB :: ThreadedAdminAdd( string server, string user )
+CCallableStatsSystem *CGHostDB :: ThreadedStatsSystem( string user, string input, uint32_t one, string type )
 {
-	return NULL;
+        return NULL;
 }
 
-CCallableAdminRemove *CGHostDB :: ThreadedAdminRemove( string server, string user )
+CCallablePWCheck *CGHostDB :: ThreadedPWCheck( string user )
 {
-	return NULL;
+        return NULL;
 }
 
-CCallableAdminList *CGHostDB :: ThreadedAdminList( string server )
+CCallablePassCheck *CGHostDB :: ThreadedPassCheck( string user, string pass, uint32_t st )
 {
-	return NULL;
+        return NULL;
+}
+
+CCallablepm *CGHostDB :: Threadedpm( string user, string listener, uint32_t status, string message, string type )
+{
+        return NULL;
+}
+
+CCallablePList *CGHostDB :: ThreadedPList( string server )
+{
+        return NULL;
+}
+
+CCallableFlameList *CGHostDB :: ThreadedFlameList( )
+{
+        return NULL;
+}
+
+CCallableAnnounceList *CGHostDB :: ThreadedAnnounceList( )
+{
+        return NULL;
+}
+
+CCallableDCountryList *CGHostDB :: ThreadedDCountryList( )
+{
+        return NULL;
+}
+
+CCallableStoreLog *CGHostDB :: ThreadedStoreLog( uint32_t chatid, string game, vector<string> admin )
+{
+        return NULL;
+}
+
+CCallablegs *CGHostDB :: Threadedgs( uint32_t chatid, string gn, uint32_t st, uint32_t gametype )
+{
+        return NULL;
+}
+
+CCallablepenp *CGHostDB :: Threadedpenp( string name, string reason, string admin, uint32_t amount, string type )
+{
+        return NULL;
 }
 
 CCallableBanCount *CGHostDB :: ThreadedBanCount( string server )
@@ -232,9 +332,19 @@ CCallableBanCheck *CGHostDB :: ThreadedBanCheck( string server, string user, str
 	return NULL;
 }
 
-CCallableBanAdd *CGHostDB :: ThreadedBanAdd( string server, string user, string ip, string gamename, string admin, string reason )
+CCallableBanCheck2 *CGHostDB :: ThreadedBanCheck2( string server, string user, string type )
+{
+        return NULL;
+}
+
+CCallableBanAdd *CGHostDB :: ThreadedBanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
 {
 	return NULL;
+}
+
+CCallablePUp *CGHostDB :: ThreadedPUp( string name, uint32_t level, string realm, string user )
+{
+        return NULL;
 }
 
 CCallableBanRemove *CGHostDB :: ThreadedBanRemove( string server, string user )
@@ -252,7 +362,22 @@ CCallableBanList *CGHostDB :: ThreadedBanList( string server )
 	return NULL;
 }
 
-CCallableGameAdd *CGHostDB :: ThreadedGameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver )
+CCallableTBRemove *CGHostDB :: ThreadedTBRemove( string server )
+{
+        return NULL;
+}
+
+CCallableCommandList *CGHostDB :: ThreadedCommandList( )
+{
+	return NULL;
+}
+
+CCallableClean *CGHostDB :: ThreadedClean( )
+{
+        return NULL;
+}
+
+CCallableGameAdd *CGHostDB :: ThreadedGameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype, vector<string> lobbylog, vector<string> gamelog )
 {
 	return NULL;
 }
@@ -272,12 +397,22 @@ CCallableGamePlayerSummaryCheck *CGHostDB :: ThreadedGamePlayerSummaryCheck( str
 	return NULL;
 }
 
+CCallableStatsPlayerSummaryCheck *CGHostDB :: ThreadedStatsPlayerSummaryCheck( string name )
+{
+        return NULL;
+}
+
+CCallableInboxSummaryCheck *CGHostDB :: ThreadedInboxSummaryCheck( string name )
+{
+        return NULL;
+}
+
 CCallableDotAGameAdd *CGHostDB :: ThreadedDotAGameAdd( uint32_t gameid, uint32_t winner, uint32_t min, uint32_t sec )
 {
 	return NULL;
 }
 
-CCallableDotAPlayerAdd *CGHostDB :: ThreadedDotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills )
+CCallableDotAPlayerAdd *CGHostDB :: ThreadedDotAPlayerAdd( uint32_t gameid, uint32_t colour, uint32_t kills, uint32_t deaths, uint32_t creepkills, uint32_t creepdenies, uint32_t assists, uint32_t gold, uint32_t neutralkills, string item1, string item2, string item3, string item4, string item5, string item6, string spell1, string spell2, string spell3, string spell4, string spell5, string spell6, string hero, uint32_t newcolour, uint32_t towerkills, uint32_t raxkills, uint32_t courierkills, uint32_t level )
 {
 	return NULL;
 }
@@ -317,11 +452,6 @@ CCallableW3MMDVarAdd *CGHostDB :: ThreadedW3MMDVarAdd( uint32_t gameid, map<VarP
 	return NULL;
 }
 
-CCallableQuerySystem *CGHostDB :: ThreadedQuerySystem( uint32_t type, uint32_t subtype, string string_one, string string_two, uint32_t int_one, uint32_t int_two )
-{
-        return NULL;
-}
-
 //
 // Callables
 //
@@ -337,27 +467,67 @@ void CBaseCallable :: Close( )
 	m_Ready = true;
 }
 
-CCallableAdminCount :: ~CCallableAdminCount( )
+CCallableFromCheck :: ~CCallableFromCheck( )
 {
 
 }
 
-CCallableAdminCheck :: ~CCallableAdminCheck( )
+CCallableRegAdd :: ~CCallableRegAdd( )
 {
 
 }
 
-CCallableAdminAdd :: ~CCallableAdminAdd( )
+CCallableStatsSystem :: ~CCallableStatsSystem( )
 {
 
 }
 
-CCallableAdminRemove :: ~CCallableAdminRemove( )
+CCallablePWCheck :: ~CCallablePWCheck( )
 {
 
 }
 
-CCallableAdminList :: ~CCallableAdminList( )
+CCallablepm :: ~CCallablepm( )
+{
+
+}
+
+CCallablePassCheck :: ~CCallablePassCheck( )
+{
+
+}
+
+CCallablePList :: ~CCallablePList( )
+{
+
+}
+
+CCallableFlameList :: ~CCallableFlameList( )
+{
+
+}
+
+CCallableAnnounceList :: ~CCallableAnnounceList( )
+{
+
+}
+
+CCallableDCountryList :: ~CCallableDCountryList( )
+{
+
+}
+
+CCallableStoreLog :: ~CCallableStoreLog( )
+{
+
+}
+
+CCallablegs :: ~CCallablegs( )
+{
+
+}
+
+CCallablepenp :: ~CCallablepenp( )
 {
 
 }
@@ -372,7 +542,17 @@ CCallableBanCheck :: ~CCallableBanCheck( )
 	delete m_Result;
 }
 
+CCallableBanCheck2 :: ~CCallableBanCheck2( )
+{
+
+}
+
 CCallableBanAdd :: ~CCallableBanAdd( )
+{
+
+}
+
+CCallablePUp :: ~CCallablePUp( )
 {
 
 }
@@ -385,6 +565,21 @@ CCallableBanRemove :: ~CCallableBanRemove( )
 CCallableBanList :: ~CCallableBanList( )
 {
 	// don't delete anything in m_Result here, it's the caller's responsibility
+}
+
+CCallableTBRemove :: ~CCallableTBRemove( )
+{
+        // don't delete anything in m_Result here, it's the caller's responsibility
+}
+
+CCallableCommandList :: ~CCallableCommandList( )
+{
+	// don't delete anything in m_Result here, it's the caller's responsibility
+}
+
+CCallableClean :: ~CCallableClean( )
+{
+
 }
 
 CCallableGameAdd :: ~CCallableGameAdd( )
@@ -405,6 +600,16 @@ CCallableGamePlayerAdd :: ~CCallableGamePlayerAdd( )
 CCallableGamePlayerSummaryCheck :: ~CCallableGamePlayerSummaryCheck( )
 {
 	delete m_Result;
+}
+
+CCallableStatsPlayerSummaryCheck :: ~CCallableStatsPlayerSummaryCheck( )
+{
+        delete m_Result;
+}
+
+CCallableInboxSummaryCheck :: ~CCallableInboxSummaryCheck( )
+{
+        delete m_Result;
 }
 
 CCallableDotAGameAdd :: ~CCallableDotAGameAdd( )
@@ -442,16 +647,11 @@ CCallableW3MMDVarAdd :: ~CCallableW3MMDVarAdd( )
 
 }
 
-CCallableQuerySystem :: ~CCallableQuerySystem( )
-{
-
-}
-
 //
 // CDBBan
 //
 
-CDBBan :: CDBBan( string nServer, string nName, string nIP, string nDate, string nGameName, string nAdmin, string nReason ) : m_Server( nServer ), m_Name( nName ), m_IP( nIP ), m_Date( nDate ), m_GameName( nGameName ), m_Admin( nAdmin ), m_Reason( nReason )
+CDBBan :: CDBBan( string nServer, string nName, string nIP, string nDate, string nGameName, string nAdmin, string nReason, string nExpireDate, string nMonths, string nDays, string nHours, string nMinutes ) : m_Server( nServer ), m_Name( nName ), m_IP( nIP ), m_Date( nDate ), m_GameName( nGameName ), m_Admin( nAdmin ), m_Reason( nReason ), m_ExpireDate( nExpireDate ), m_Months( nMonths ), m_Days( nDays ), m_Hours( nHours ), m_Minutes( nMinutes )
 {
 
 }
@@ -506,6 +706,35 @@ CDBGamePlayerSummary :: ~CDBGamePlayerSummary( )
 }
 
 //
+// CDBStatsPlayerSummary
+//
+
+CDBStatsPlayerSummary :: CDBStatsPlayerSummary( uint32_t nID, string nPlayer, string nPlayerlower, double nScore, uint32_t nGames, uint32_t nWins, uint32_t nLosses, uint32_t nDraw, uint32_t nKills, uint32_t nDeaths, uint32_t nAssists, uint32_t nCreeps, uint32_t nDenies, uint32_t nNeutrals, uint32_t nTowers, uint32_t nRax, uint32_t nStreak, uint32_t nMaxstreak, uint32_t nLosingstreak, uint32_t nMaxlosingstreak, uint32_t nZerodeaths, string nRealm, uint32_t nLeaves, uint32_t nALLCount, uint32_t nRankCount, uint32_t nForcedGproxy )
+    : m_ID( nID ), m_Player( nPlayer ), m_Playerlower( nPlayerlower ), m_Score( nScore ), m_Games( nGames ), m_Wins( nWins ), m_Losses( nLosses ), m_Draw( nDraw ), m_Kills( nKills ), m_Deaths( nDeaths ), m_Assists( nAssists ), m_Creeps( nCreeps ), m_Denies( nDenies ), m_Neutrals( nNeutrals ), m_Towers( nTowers ), m_Rax( nRax ), m_Streak( nStreak ), m_Maxstreak( nMaxstreak ), m_Losingstreak( nLosingstreak ), m_Maxlosingstreak( nMaxlosingstreak ), m_Zerodeaths( nZerodeaths ), m_Realm( nRealm ), m_Leaves( nLeaves ), m_ALLCount( nALLCount ), m_RankCount( nRankCount ), m_ForcedGproxy( nForcedGproxy )
+{
+
+}
+
+CDBStatsPlayerSummary :: ~CDBStatsPlayerSummary( )
+{
+
+}
+
+//
+// CDBInbox
+//
+
+CDBInboxSummary :: CDBInboxSummary( string nUser, string nMessage ) : m_User( nUser ), m_Message( nMessage )
+{
+
+}
+
+CDBInboxSummary :: ~CDBInboxSummary( )
+{
+
+}
+
+//
 // CDBDotAGame
 //
 
@@ -523,13 +752,14 @@ CDBDotAGame :: ~CDBDotAGame( )
 // CDBDotAPlayer
 //
 
-CDBDotAPlayer :: CDBDotAPlayer( ) : m_ID( 0 ), m_GameID( 0 ), m_Colour( 0 ), m_Kills( 0 ), m_Deaths( 0 ), m_CreepKills( 0 ), m_CreepDenies( 0 ), m_Assists( 0 ), m_Gold( 0 ), m_NeutralKills( 0 ), m_NewColour( 0 ), m_TowerKills( 0 ), m_RaxKills( 0 ), m_CourierKills( 0 )
+CDBDotAPlayer :: CDBDotAPlayer( ) : m_ID( 0 ), m_GameID( 0 ), m_Colour( 0 ), m_Kills( 0 ), m_Deaths( 0 ), m_CreepKills( 0 ), m_CreepDenies( 0 ), m_Assists( 0 ), m_Gold( 0 ), m_NeutralKills( 0 ), m_NewColour( 0 ), m_TowerKills( 0 ), m_RaxKills( 0 ), m_CourierKills( 0 ), m_Level( 0 )
 {
 
 }
 
-CDBDotAPlayer :: CDBDotAPlayer( uint32_t nID, uint32_t nGameID, uint32_t nColour, uint32_t nKills, uint32_t nDeaths, uint32_t nCreepKills, uint32_t nCreepDenies, uint32_t nAssists, uint32_t nGold, uint32_t nNeutralKills, string nItem1, string nItem2, string nItem3, string nItem4, string nItem5, string nItem6, string nHero, uint32_t nNewColour, uint32_t nTowerKills, uint32_t nRaxKills, uint32_t nCourierKills )
-    : m_ID( nID ), m_GameID( nGameID ), m_Colour( nColour ), m_Kills( nKills ), m_Deaths( nDeaths ), m_CreepKills( nCreepKills ), m_CreepDenies( nCreepDenies ), m_Assists( nAssists ), m_Gold( nGold ), m_NeutralKills( nNeutralKills ), m_Hero( nHero ), m_NewColour( nNewColour ), m_TowerKills( nTowerKills ), m_RaxKills( nRaxKills ), m_CourierKills( nCourierKills )
+
+CDBDotAPlayer :: CDBDotAPlayer( uint32_t nID, uint32_t nGameID, uint32_t nColour, uint32_t nKills, uint32_t nDeaths, uint32_t nCreepKills, uint32_t nCreepDenies, uint32_t nAssists, uint32_t nGold, uint32_t nNeutralKills, string nItem1, string nItem2, string nItem3, string nItem4, string nItem5, string nItem6, string nSpell1, string nSpell2, string nSpell3, string nSpell4, string nSpell5, string nSpell6, string nHero, uint32_t nNewColour, uint32_t nTowerKills, uint32_t nRaxKills, uint32_t nCourierKills, uint32_t nLevel )
+    : m_ID( nID ), m_GameID( nGameID ), m_Colour( nColour ), m_Kills( nKills ), m_Deaths( nDeaths ), m_CreepKills( nCreepKills ), m_CreepDenies( nCreepDenies ), m_Assists( nAssists ), m_Gold( nGold ), m_NeutralKills( nNeutralKills ), m_Hero( nHero ), m_NewColour( nNewColour ), m_TowerKills( nTowerKills ), m_RaxKills( nRaxKills ), m_CourierKills( nCourierKills ), m_Level( nLevel )
 {
 	m_Items[0] = nItem1;
 	m_Items[1] = nItem2;
@@ -537,6 +767,14 @@ CDBDotAPlayer :: CDBDotAPlayer( uint32_t nID, uint32_t nGameID, uint32_t nColour
 	m_Items[3] = nItem4;
 	m_Items[4] = nItem5;
 	m_Items[5] = nItem6;
+
+	m_Spells[0] = nSpell1;
+        m_Spells[1] = nSpell2;
+        m_Spells[2] = nSpell3;
+        m_Spells[3] = nSpell4;
+        m_Spells[4] = nSpell5;
+        m_Spells[5] = nSpell6;
+
 }
 
 CDBDotAPlayer :: ~CDBDotAPlayer( )
@@ -558,11 +796,26 @@ void CDBDotAPlayer :: SetItem( unsigned int i, string item )
 		m_Items[i] = item;
 }
 
+string CDBDotAPlayer :: GetSpell( unsigned int i )
+{
+        if( i < 6 )
+                return m_Spells[i];
+
+        return string( );
+}
+
+void CDBDotAPlayer :: SetSpell( unsigned int i, string spell )
+{
+        if( i < 6 )
+                m_Spells[i] = spell;
+}
+
+
 //
 // CDBDotAPlayerSummary
 //
 
-CDBDotAPlayerSummary :: CDBDotAPlayerSummary( string nServer, string nName, uint32_t nTotalGames, uint32_t nTotalWins, uint32_t nTotalLosses, uint32_t nTotalKills, uint32_t nTotalDeaths, uint32_t nTotalCreepKills, uint32_t nTotalCreepDenies, uint32_t nTotalAssists, uint32_t nTotalNeutralKills, uint32_t nTotalTowerKills, uint32_t nTotalRaxKills, uint32_t nTotalDraws ) : m_Server( nServer ), m_Name( nName ), m_TotalGames( nTotalGames ), m_TotalWins( nTotalWins ), m_TotalLosses( nTotalLosses ), m_TotalKills( nTotalKills ), m_TotalDeaths( nTotalDeaths ), m_TotalCreepKills( nTotalCreepKills ), m_TotalCreepDenies( nTotalCreepDenies ), m_TotalAssists( nTotalAssists ), m_TotalNeutralKills( nTotalNeutralKills ), m_TotalTowerKills( nTotalTowerKills ), m_TotalRaxKills( nTotalRaxKills ), m_TotalDraws( nTotalDraws )
+CDBDotAPlayerSummary :: CDBDotAPlayerSummary( string nServer, string nName, uint32_t nTotalGames, uint32_t nTotalWins, uint32_t nTotalLosses, uint32_t nTotalKills, uint32_t nTotalDeaths, uint32_t nTotalCreepKills, uint32_t nTotalCreepDenies, uint32_t nTotalAssists, uint32_t nTotalNeutralKills, uint32_t nTotalTowerKills, uint32_t nTotalRaxKills, uint32_t nTotalCourierKills ) : m_Server( nServer ), m_Name( nName ), m_TotalGames( nTotalGames ), m_TotalWins( nTotalWins ), m_TotalLosses( nTotalLosses ), m_TotalKills( nTotalKills ), m_TotalDeaths( nTotalDeaths ), m_TotalCreepKills( nTotalCreepKills ), m_TotalCreepDenies( nTotalCreepDenies ), m_TotalAssists( nTotalAssists ), m_TotalNeutralKills( nTotalNeutralKills ), m_TotalTowerKills( nTotalTowerKills ), m_TotalRaxKills( nTotalRaxKills ), m_TotalCourierKills( nTotalCourierKills )
 {
 
 }

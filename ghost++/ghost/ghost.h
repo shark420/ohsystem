@@ -31,6 +31,7 @@ class CUDPSocket;
 class CTCPServer;
 class CTCPSocket;
 class CGPSProtocol;
+class CGCBIProtocol;
 class CCRC32;
 class CSHA1;
 class CBNET;
@@ -42,7 +43,11 @@ class CLanguage;
 class CMap;
 class CSaveGame;
 class CConfig;
+class CCallableCommandList;
 class CCallableGameUpdate;
+class CCallableFlameList;
+class CCallableAnnounceList;
+class CCallableDCountryList;
 
 class CGHost
 {
@@ -51,6 +56,7 @@ public:
 	CTCPServer *m_ReconnectSocket;			// listening socket for GProxy++ reliable reconnects
 	vector<CTCPSocket *> m_ReconnectSockets;// vector of sockets attempting to reconnect (connected but not identified yet)
 	CGPSProtocol *m_GPSProtocol;
+	CGCBIProtocol *m_GCBIProtocol;
 	CCRC32 *m_CRC;							// for calculating CRC's
 	CSHA1 *m_SHA;							// for calculating SHA1's
 	vector<CBNET *> m_BNETs;				// all our battle.net connections (there can be more than one)
@@ -60,6 +66,7 @@ public:
 	CGHostDB *m_DB;							// database
 	CGHostDB *m_DBLocal;					// local database (for temporary data)
 	vector<CBaseCallable *> m_Callables;	// vector of orphaned callables waiting to die
+	boost::mutex m_CallablesMutex;
 	vector<BYTEARRAY> m_LocalAddresses;		// vector of local IP addresses
 	CLanguage *m_Language;					// language
 	CMap *m_Map;							// the currently loaded map
@@ -75,13 +82,42 @@ public:
 	string m_AutoHostGameName;				// the base game name to auto host with
 	string m_AutoHostOwner;
 	string m_AutoHostServer;
+	uint32_t m_AutoHostGameType;
+        uint32_t m_MinVIPGames;
+        uint32_t m_RegVIPGames;
+	bool m_OHBalance;
+        bool m_HighGame;
+        uint32_t m_MinLimit;
+	bool m_ObserverFake;
+	uint32_t m_MinFF;
+	bool m_NoGarena;
+	bool m_CheckIPRange;
+        bool m_DenieProxy;
+	bool m_LiveGames;
+        uint32_t m_MinPlayerAutoEnd;
+        uint32_t m_MaxAllowedSpread;
+        bool m_EarlyEnd;
 	uint32_t m_AutoHostMaximumGames;		// maximum number of games to auto host
 	uint32_t m_AutoHostAutoStartPlayers;	// when using auto hosting auto start the game when this many players have joined
-	uint32_t m_LastAutoHostTime; // GetTime when the last auto host was attempted
-	uint32_t m_LastGameUpdateTime; // GetTime when the gamelist was last updated
-	CCallableGameUpdate *m_CallableGameUpdate;// threaded database game update in progress	
+	uint32_t m_LastAutoHostTime;			// GetTime when the last auto host was attempted
 	bool m_AutoHostMatchMaking;
- 	double m_AutoHostMinimumScore;
+	uint32_t m_LastCommandListTime;			// GetTime when last refreshed command list
+	vector<string> m_ColoredNames;
+	vector<string> m_Modes;
+	CCallableFlameList *m_CallableFlameList;
+	uint32_t m_LastFlameListUpdate;
+	vector<string> m_Flames;
+        CCallableAnnounceList *m_CallableAnnounceList;
+        uint32_t m_LastAnnounceListUpdate;
+	uint32_t m_AnnounceLines;
+        vector<string> m_Announces;
+        CCallableDCountryList *m_CallableDCountryList;
+        uint32_t m_LastDCountryUpdate;
+        vector<string> m_DCountries;
+	CCallableCommandList *m_CallableCommandList;			// threaded database command list in progress
+	uint32_t m_LastGameUpdateTime;			// GetTime when the gamelist was last updated
+	CCallableGameUpdate *m_CallableGameUpdate;// threaded database game update in progress
+	double m_AutoHostMinimumScore;
 	double m_AutoHostMaximumScore;
 	bool m_AllGamesFinished;				// if all games finished (used when exiting nicely)
 	uint32_t m_AllGamesFinishedTime;		// GetTime when all games finished (used when exiting nicely)
@@ -96,6 +132,10 @@ public:
 	uint32_t m_MaxGames;					// config value: maximum number of games in progress
 	char m_CommandTrigger;					// config value: the command trigger inside games
 	string m_MapCFGPath;					// config value: map cfg path
+	string m_GameLogFilePath;
+	string m_ColoredNamePath;
+        bool m_GameLogging;
+        uint32_t m_GameLoggingID;
 	string m_SaveGamePath;					// config value: savegame path
 	string m_MapPath;						// config value: map path
 	bool m_SaveReplays;						// config value: save replays
@@ -137,11 +177,15 @@ public:
 	bool m_TCPNoDelay;						// config value: use Nagle's algorithm or not
 	uint32_t m_MatchMakingMethod;			// config value: the matchmaking method
 	uint32_t m_MapGameType;                 // config value: the MapGameType overwrite (aka: refresh hack)
-        uint32_t m_FinishedGames;
-        uint32_t m_CheckForFinishedGames;
-	bool m_OHUpdateStats;
+	uint32_t m_AutoMuteSpammer;				// config value: auto mute spammers?
 	bool m_GameIDReplays;					// config value: save replays with database game id or not
-        vector<string> m_ColoredNames;
+	uint32_t m_FinishedGames;
+	uint32_t m_CheckForFinishedGames;
+	uint32_t m_MinimumLeaverKills;
+	uint32_t m_MinimumLeaverDeaths;
+	uint32_t m_MinimumLeaverAssists;
+	bool m_DeathsByLeaverReduction;
+	uint32_t m_BotID;
 
 	CGHost( CConfig *CFG );
 	~CGHost( );
@@ -169,9 +213,12 @@ public:
 	void ReloadConfigs( );
 	void SetConfigs( CConfig *CFG );
 	void ExtractScripts( );
-	void LoadIPToCountryData( );
-	void CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper );
-        void LoadColoredNames( );
+	void CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, uint32_t gameType, bool whisper );
+        void SaveHostCounter();
+        void LoadHostCounter();
+	bool FlameCheck( string message );
+	void GetDeniedCountries( );
+	void LoadDatas( );
 };
 
 #endif

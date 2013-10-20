@@ -44,7 +44,7 @@ public:
 	string ErrorBanningUser( string server, string victim );
 	string UserIsAnAdmin( string server, string user );
 	string UserIsNotAnAdmin( string server, string user );
-	string UserWasBannedOnByBecause( string server, string victim, string date, string admin, string reason );
+	string UserWasBannedOnByBecause( string server, string victim, string date, string admin, string reason, string expire, string remain );
 	string UserIsNotBanned( string server, string victim );
 	string ThereAreNoAdmins( string server );
 	string ThereIsAdmin( string server );
@@ -94,7 +94,7 @@ public:
 	string SettingLatencyToMaximum( string max );
 	string SettingLatencyTo( string latency );
 	string KickingPlayersWithPingsGreaterThan( string total, string ping );
-	string HasPlayedGamesWithThisBot( string user, string firstgame, string lastgame, string totalgames, string avgloadingtime, string avgstay );
+	string HasPlayedGamesWithThisBot( string user, string score, string games, string winperc, string streak );
 	string HasntPlayedGamesWithThisBot( string user );
 	string AutokickingPlayerForExcessivePing( string victim, string ping );
 	string SpoofCheckAcceptedFor( string server, string user );
@@ -107,7 +107,7 @@ public:
 	string ShortestLoadByPlayer( string user, string loadingtime );
 	string LongestLoadByPlayer( string user, string loadingtime );
 	string YourLoadingTimeWas( string loadingtime );
-	string HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string totaldraws, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills );
+	string HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills );
 	string HasntPlayedDotAGamesWithThisBot( string user );
 	string WasKickedForReservedPlayer( string reserved );
 	string WasKickedForOwnerPlayer( string owner );

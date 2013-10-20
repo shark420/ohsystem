@@ -364,8 +364,8 @@ BYTEARRAY CGameProtocol :: SEND_W3GS_PLAYERINFO( unsigned char PID, string name,
 
 	if( !name.empty( ) && name.size( ) <= 15 && externalIP.size( ) == 4 && internalIP.size( ) == 4 )
 	{
-		if( !coloredname.empty( ) && coloredname.size( ) <= 15 )
-			name = coloredname;
+		if( !coloredname.empty( ) )
+	        	name = coloredname;
 
 		packet.push_back( W3GS_HEADER_CONSTANT );							// W3GS header constant
 		packet.push_back( W3GS_PLAYERINFO );								// W3GS_PLAYERINFO
