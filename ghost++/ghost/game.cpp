@@ -3113,45 +3113,55 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 	{
 		if( Level > 2 )
 		{
-//			if( m_Slots[11].GetSlotStatus( ) == SLOTSTATUS_CLOSED )
-//			{
+			if( m_Slots[11].GetSlotStatus( ) != SLOTSTATUS_OCCUPIED )
+			{
 				unsigned char oldsid = GetSIDFromPID( player->GetPID( ) );
 				SwapSlots( oldsid, 11 );
 				OpenSlot( oldsid, true );
 				m_AutoStartPlayers = 11;
 				SendAllChat( "Player [" + player->GetName( ) + "] will observe the game." );
 				SendAllChat( "Set autostart automatically to 11 players." );
-//			}
-//			else
-//				SendChat( player, "Error. There is already a gameobserver." );
+			}
+			else
+				SendChat( player, "Error. There is already a gameobserver." );
 		}
 		else
 			SendChat( player, "Error. You require at least to be a safelisted member to have access to this command" );
 	}
-/*
+
 	//
 	// !UNOB
 	//
         else if( Command == "unob" || Command == "ubobs" || Command == "unobserve" )
         {
-                if( Level > 2 )
+		unsigned char SID = GetSIDFromPID( player->GetPID( ) );
+                if( Level > 2 && SID == 11 )
                 {
-//                      if( m_Slots[11].GetSlotStatus( ) == SLOTSTATUS_CLOSED )
-//                      {
-                                unsigned char oldsid = GetSIDFromPID( player->GetPID( ) );
-                                SwapSlots( oldsid, 11 );
-                                OpenSlot( oldsid, true );
-                                m_AutoStartPlayers = 11;
-                                SendAllChat( "Player [" + player->GetName( ) + "] will observe the game." );
-                                SendAllChat( "Set autostart automatically to 11 players." );
-//                      }
-//                      else
-//                              SendChat( player, "Error. There is already a gameobserver." );
+			int32_t newslot = -1;
+			int c = 0;
+		        for( vector<CGameSlot> :: iterator i = m_Slots.begin( ); i != m_Slots.end( ); ++i )
+		        {
+                		if( (*i).GetSlotStatus( ) == SLOTSTATUS_OPEN )
+                        	{
+					newslot = c;
+					break;
+				}
+				c++;
+        		}
+
+			if( newslot == -1 )
+				newslot = m_LatestSlot;
+
+                        SwapSlots( newslot, 11 );
+                        CloseSlot( 11, true );
+                        m_AutoStartPlayers = 10;
+                        SendAllChat( "Player [" + player->GetName( ) + "] will no longer observe the game." );
+	                SendAllChat( "Set autostart automatically to 10 players." );
                 }
                 else
-                        SendChat( player, "Error. You require at least to be a safelisted member to have access to this command" );
+                        SendChat( player, "Error. You require at least to be a safelisted member to have access to this command." );
         }
-*/
+
         //
         // !PW	!PASS	!PASSWORD
         //

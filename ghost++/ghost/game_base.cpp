@@ -2835,6 +2835,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 
 	Player->SetSpoofedRealm( JoinedRealm );
 
+	m_LatestSlot = Player->GetPID();
+
 	// check leaveperc
 	if( Player->GetLeavePerc( ) >= 60 )
 		SendAllChat( "User " + Player->GetName( ) + " got a huge leaver percentage of " + UTIL_ToString( Player->GetLeavePerc( ), 2 ) + "%");
