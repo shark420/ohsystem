@@ -70,7 +70,7 @@ CBaseGame :: CBaseGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16
 	m_SendGameLoaded = false;
 	m_LastPingWarn = GetTime( );
 	m_ModeVoted = false;
-	//gGameFile = UTIL_AddPathSeperator( "/home/ghostfiles/" ) + "game_"+UTIL_ToString( m_GHost->m_BotID )+".txt";
+	m_Leavers = 0;
 
 	if( m_GHost->m_SaveReplays && !m_SaveGame )
 		m_Replay = new CReplay( );
@@ -1929,7 +1929,7 @@ void CBaseGame :: SendWelcomeMessage( CGamePlayer *player )
 
 		SendChat( player, " " );
 		SendChat( player, " " );
-		SendChat( player, " " );
+		SendChat( player, " OH-System                                      http://ohsystem.net/" );
 		SendChat( player, "GHost++                                         http://www.codelain.com/" );
 		SendChat( player, "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" );
 		SendChat( player, "     Game Name:                 " + m_GameName );
@@ -2043,6 +2043,7 @@ void CBaseGame :: EventPlayerDeleted( CGamePlayer *player )
 		m_LogData = m_LogData + "3" + "\t" + "bgm" + "\t" + player->GetName() + "\t" + "-" + "\t" + "-" + "\t" + "-" + "\t" + MinString + ":" + SecString + "\t" + player->GetName() + " " + player->GetLeftReason() + "\n";
 		SendAllChat( player->GetName( ) + " " + player->GetLeftReason( ) + "." );
                 GAME_Print( 2, MinString, SecString, player->GetName(), "", player->GetLeftReason( ) );
+		m_Leavers++;
 	}
 	if( !m_GameLoaded && !m_GameLoading )
 	{

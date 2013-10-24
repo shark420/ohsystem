@@ -2979,8 +2979,8 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 	//
 	if( m_GameLoaded && m_ForfeitTime == 0 && ( Command == "ff" || Command == "forfeit" ) && !m_SoftGameOver )
 	{
-		if( GetTime( ) - m_GameLoadedTime <= m_GHost->m_MinFF*60 )
-			SendChat( player, "[INFO] You may FF after [20] minutes, ["+UTIL_ToString( m_GHost->m_MinFF - ( GetTime( ) - m_GameLoadedTime ) )+"] minutes remaining." );
+		if( GetTime( ) - m_GameLoadedTime <= ( m_GHost->m_MinFF*60 + 200*m_Leavers ) )
+			SendChat( player, "[INFO] You may FF after [20] minutes, ["+UTIL_ToString( m_GHost->m_MinFF - m_Leavers*200 - ( GetTime( ) - m_GameLoadedTime ) )+"] minutes remaining." );
 		else
 		{
 			bool ChangedVote = true;
@@ -3126,7 +3126,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 				SendChat( player, "Error. There is already a gameobserver." );
 		}
 		else
-			SendChat( player, "Error. You require at least to be a safelisted member to have access to this command" );
+			SendChat( player, "Error. You require at least to be a safelisted member to have access to this command." );
 	}
 
 	//
