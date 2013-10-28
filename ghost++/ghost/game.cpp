@@ -2913,7 +2913,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 					if( !m_GameLoading && !m_GameLoaded )
 						OpenSlot( GetSIDFromPID( Victim->GetPID( ) ), false );
 
-					CONSOLE_Print( "[GAME: " + m_GameName + "] votekick against player [" + m_KickVotePlayer + "] passed with " + UTIL_ToString( Votes ) + "/" + UTIL_ToString( GetNumHumanPlayers( ) ) + " votes" );
+					CONSOLE_Print( "[GAME: " + m_GameName + "] votekick against player [" + m_KickVotePlayer + "] passed with [" + UTIL_ToString( Votes ) + "/" + UTIL_ToString( VotesNeeded ) + "] votes." );
 					SendAllChat( m_GHost->m_Language->VoteKickPassed( m_KickVotePlayer ) );
 				}
 				else

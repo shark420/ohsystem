@@ -5713,33 +5713,20 @@ void CBaseGame :: StartCountDown( bool force )
 			}
 
 			if( !StillDownloading.empty( ) )
+			{
 				SendAllChat( m_GHost->m_Language->PlayersStillDownloading( StillDownloading ) );
+				return;
+			}
 
 			// check if everyone is spoof checked
 
-			string NotSpoofChecked;
-
-			if( m_GHost->m_RequireSpoofChecks )
-			{
-                                for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
-				{
-					if( !(*i)->GetSpoofed( ) )
-					{
-						if( NotSpoofChecked.empty( ) )
-							NotSpoofChecked = (*i)->GetName( );
-						else
-							NotSpoofChecked += ", " + (*i)->GetName( );
-					}
-				}
-
-				if( !NotSpoofChecked.empty( ) )
-					SendAllChat( m_GHost->m_Language->PlayersNotYetSpoofChecked( NotSpoofChecked ) );
-			}
-
 			// check if everyone has been pinged enough (3 times) that the autokicker would have kicked them by now
 			// see function EventPlayerPongToHost for the autokicker code
+                        // check if all password protected users typed the password
 
 			string NotPinged;
+                        string NotSpoofChecked;
+                        string NotPassword;
 
                         for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
 			{
@@ -5750,28 +5737,45 @@ void CBaseGame :: StartCountDown( bool force )
 					else
 						NotPinged += ", " + (*i)->GetName( );
 				}
-			}
 
-			if( !NotPinged.empty( ) )
-				SendAllChat( m_GHost->m_Language->PlayersNotYetPinged( NotPinged ) );
+				if( m_GHost->m_RequireSpoofChecks )
+				{
+                                        if( !(*i)->GetSpoofed( ) )
+                                        {
+                                                if( NotSpoofChecked.empty( ) )
+                                                        NotSpoofChecked = (*i)->GetName( );
+                                                else
+                                                        NotSpoofChecked += ", " + (*i)->GetName( );
+                                        }
+				}
 
-			// check if all password protected users typed the password
-
-			string NotPassword;
-
-                        for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
-                        {
                                 if( (*i)->GetPasswordProt( ) )
                                 {
                                         if( NotPassword.empty( ) )
-                                        	NotPassword = (*i)->GetName( );
-                              		else
-                		               NotPassword += ", " + (*i)->GetName( );
-         	                }
-                        }
+                                                NotPassword = (*i)->GetName( );
+                                        else
+                                               NotPassword += ", " + (*i)->GetName( );
+                                }
+
+			}
+
+			if( !NotPinged.empty( ) )
+			{
+				SendAllChat( m_GHost->m_Language->PlayersNotYetPinged( NotPinged ) );
+				return;
+			}
+
+                        if( !NotSpoofChecked.empty( ) )
+			{
+                                SendAllChat( m_GHost->m_Language->PlayersNotYetSpoofChecked( NotSpoofChecked ) );
+				return;
+			}
 
                         if( !NotPassword.empty( ) )
-	                        SendAllChat( "Players who are not yet verified: " + NotPassword );
+			{
+                                SendAllChat( "Players who are not yet verified: " + NotPassword );
+				return;
+			}
 
 			if( !m_Balanced && m_GHost->m_OHBalance )
 			{
@@ -5828,67 +5832,61 @@ void CBaseGame :: StartCountDownAuto( bool requireSpoofChecks )
 			return;
 		}
 
-		// check if everyone is spoof checked
+                // check if everyone has been pinged enough (3 times) that the autokicker would have kicked them by now
+                // see function EventPlayerPongToHost for the autokicker code
+                // check if all password protected users typed the password
 
-		string NotSpoofChecked;
-
-		if( requireSpoofChecks )
-		{
-                        for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
-			{
-				if( !(*i)->GetSpoofed( ) )
-				{
-					if( NotSpoofChecked.empty( ) )
-						NotSpoofChecked = (*i)->GetName( );
-					else
-						NotSpoofChecked += ", " + (*i)->GetName( );
-				}
-			}
-
-			if( !NotSpoofChecked.empty( ) )
-				SendAllChat( m_GHost->m_Language->PlayersNotYetSpoofChecked( NotSpoofChecked ) );
-		}
-
-		// check if everyone has been pinged enough (3 times) that the autokicker would have kicked them by now
-		// see function EventPlayerPongToHost for the autokicker code
-
-		string NotPinged;
-
-                for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
-		{
-			if( !(*i)->GetReserved( ) && (*i)->GetNumPings( ) < 3 )
-			{
-				if( NotPinged.empty( ) )
-					NotPinged = (*i)->GetName( );
-				else
-					NotPinged += ", " + (*i)->GetName( );
-			}
-		}
-
-		if( !NotPinged.empty( ) )
-		{
-			SendAllChat( m_GHost->m_Language->PlayersNotYetPingedAutoStart( NotPinged ) );
-			return;
-		}
-
-		string NotPassword;
+                string NotPinged;
+                string NotSpoofChecked;
+                string NotPassword;
 
                 for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
                 {
-                        if( (*i)->GetPasswordProt() )
+                        if( !(*i)->GetReserved( ) && (*i)->GetNumPings( ) < 3 )
                         {
-                                if( NotPassword.empty( ) )
-                                        NotPassword = (*i)->GetName( );
+                                if( NotPinged.empty( ) )
+                                        NotPinged = (*i)->GetName( );
                                 else
+                                        NotPinged += ", " + (*i)->GetName( );
+                        }
+                        if( m_GHost->m_RequireSpoofChecks )
+                        {
+                                if( !(*i)->GetSpoofed( ) )
+                                {
+                                        if( NotSpoofChecked.empty( ) )
+                                                NotSpoofChecked = (*i)->GetName( );
+                                        else
+                                                NotSpoofChecked += ", " + (*i)->GetName( );
+                                }
+                        }
+
+                        if( (*i)->GetPasswordProt( ) )
+                        {
+                                 if( NotPassword.empty( ) )
+                                        NotPassword = (*i)->GetName( );
+                                 else
                                         NotPassword += ", " + (*i)->GetName( );
                         }
                 }
 
-                if( !NotPassword.empty( ) )
+                if( !NotPinged.empty( ) )
                 {
-                        SendAllChat( "Players who didnt typed the password yet: " + NotPassword );
+                        SendAllChat( m_GHost->m_Language->PlayersNotYetPinged( NotPinged ) );
                         return;
                 }
+
+                if( !NotSpoofChecked.empty( ) )
+                {
+                        SendAllChat( m_GHost->m_Language->PlayersNotYetSpoofChecked( NotSpoofChecked ) );
+                        return;
+                }
+
+                if( !NotPassword.empty( ) )
+                {
+                        SendAllChat( "Players who are not yet verified: " + NotPassword );
+                        return;
+                }
+
 
                 if( !m_Balanced && m_GHost->m_OHBalance )
                 {
