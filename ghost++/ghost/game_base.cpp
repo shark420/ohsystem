@@ -892,7 +892,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
 	// warn all players who joined with to less games
 
 	// kick players within 15 seconds who dont have enough games
-        if( !m_CountDownStarted && ( m_GameType == 4 || ( m_GHost->m_HighGame && m_GameType == 3 ) ) )
+        if( !m_CountDownStarted && ( m_GameType == 4 || ( m_GHost->m_HighGame && m_GameType == 3 ) ) && !m_GameLoading && !m_GameLoaded )
         {
                 for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
                 {
@@ -961,7 +961,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
         }
 
 	// kick players who didn't type the password within 20 seconds
-        if( !m_CountDownStarted )
+        if( !m_CountDownStarted && !m_GameLoading && !m_GameLoaded )
 	{
                 for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
                 {
@@ -978,7 +978,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
 
 	// kick false countries
         //Countrycheck
-        if( !m_CountDownStarted )
+        if( !m_CountDownStarted && !m_GameLoading && !m_GameLoaded )
         {
                 for( vector<CGamePlayer *> :: iterator k = m_Players.begin( ); k != m_Players.end( ); ++k )
                 {
@@ -1506,7 +1506,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 }
 
         }
-
+/*
 	if( GetTime( ) - m_LastLogDataUpdate >= 10 && m_GHost->m_LiveGames )
 	{
 
@@ -1535,7 +1535,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
 			m_LastLogDataUpdate = GetTime();
 		}
 	}
-
+*/
         // ping warning
         if( GetTime() - m_LastPingWarn >= 60 && m_GameLoaded )
         {

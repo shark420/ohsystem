@@ -592,7 +592,7 @@ bool CGame :: Update( void *fd, void *send_fd )
 		string ForfeitTeamString = "Sentinel";
 		if( m_ForfeitTeam == 1 ) ForfeitTeamString = "Scourge";
 
-		SendAllChat( "The " + ForfeitTeamString + " players have been removed from the game." );
+		SendAllChat( "The [" + ForfeitTeamString + "] players have been removed from the game." );
 		SendAllChat( "Please wait five seconds before leaving so that stats can be properly saved." );
 
 		m_ForfeitTime = 0;
