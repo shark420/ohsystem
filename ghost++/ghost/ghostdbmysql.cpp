@@ -838,7 +838,7 @@ uint32_t MySQLRegAdd( void *conn, string *error, uint32_t botid, string user, st
         string EscName = MySQLEscapeString( conn, user );
         string EscMail = MySQLEscapeString( conn, mail );
         string EscPassword = MySQLEscapeString( conn, password );
-        string QueryCheck = "SELECT `bnet_username`, `user_ppwd`, `user_email` from oh_users where LOWER(user_name) = ('" + EscName + "') or LOWER(bnet_username) = ('" + EscName + "') or user_email = ('" + EscMail + "')";
+        string QueryCheck = "SELECT `bnet_username`, `user_ppwd`, `user_email` from oh_users where user_name = '" + EscName + "' or bnet_username = '" + EscName + "' or user_email = '" + EscMail + "'";
 	bool isUser = false;
 	string Pass = "";
 	string Mail = "";
@@ -963,7 +963,7 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 	}
 	if( type == "aliascheck" )
 	{
-        	string GetIP = "SELECT `ip` FROM `oh_gameplayers` WHERE LOWER(name) = '" + EscUser + "' AND `ip` != '0' AND `ip` != '0.0.0.0' ORDER BY `id` DESC;";
+        	string GetIP = "SELECT `ip` FROM `oh_gameplayers` WHERE name = '" + EscUser + "' AND `ip` != '0' AND `ip` != '0.0.0.0' ORDER BY `id` DESC;";
         	string UserIP = "";
 	        if( mysql_real_query( (MYSQL *)conn, GetIP.c_str( ), GetIP.size( ) ) != 0 )
                 	*error = mysql_error( (MYSQL *)conn );
@@ -1018,7 +1018,7 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 
 		if( EscInput.empty( ) )
 		{
-			string Query = "DELETE FROM oh_game_offenses WHERE LOWER(player_name) = '"+EscUser+"' ORDER BY id ASC "+LimitString+";";
+			string Query = "DELETE FROM oh_game_offenses WHERE player_name = '"+EscUser+"' ORDER BY id ASC "+LimitString+";";
         	        if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
 	                        *error = mysql_error( (MYSQL *)conn );
 			else
@@ -1031,7 +1031,7 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 		}
 		else
 		{
-			string Query = "DELETE FROM oh_game_offenses WHERE LOWER(player_name) = '"+EscUser+"' AND reason LIKE '%"+EscInput+"%' ORDER BY id ASC "+LimitString+";";
+			string Query = "DELETE FROM oh_game_offenses WHERE player_name = '"+EscUser+"' AND reason LIKE '%"+EscInput+"%' ORDER BY id ASC "+LimitString+";";
                         if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
                                 *error = mysql_error( (MYSQL *)conn );
 			else
@@ -1053,7 +1053,7 @@ uint32_t MySQLPWCheck( void *conn, string *error, uint32_t botid, string user )
         transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
         string EscUser = MySQLEscapeString( conn, user );
         uint32_t IsPWUser = false;
-        string Query = "SELECT `user_ppwd` FROM oh_users WHERE LOWER(bnet_username)='" + EscUser + "' AND `user_bnet` = '2';";
+        string Query = "SELECT `user_ppwd` FROM oh_users WHERE bnet_username = '" + EscUser + "' AND `user_bnet` = '2';";
 
         if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
                 *error = mysql_error( (MYSQL *)conn );
@@ -1093,7 +1093,7 @@ uint32_t MySQLPassCheck( void *conn, string *error, uint32_t botid, string user,
 	string EscPass = MySQLEscapeString( conn, pass );
 	if( st == 0 )
 	{
-	        string Query = "SELECT `user_ppwd` FROM oh_users WHERE LOWER(bnet_username)='" + EscUser + "' AND `user_bnet` = '2';";
+	        string Query = "SELECT `user_ppwd` FROM oh_users WHERE bnet_username = '" + EscUser + "' AND `user_bnet` = '2';";
         	if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
         	{
         	        *error = mysql_error( (MYSQL *)conn );
@@ -1124,7 +1124,7 @@ uint32_t MySQLPassCheck( void *conn, string *error, uint32_t botid, string user,
 
 	if( st == 1 )
 	{
-		string Query = "UPDATE `oh_users` SET `user_ppwd` = '' WHERE LOWER(bnet_username)='" + EscUser + "' AND `user_bnet` = '2';";
+		string Query = "UPDATE `oh_users` SET `user_ppwd` = '' WHERE bnet_username = '" + EscUser + "' AND `user_bnet` = '2';";
                 if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
                 {
                         *error = mysql_error( (MYSQL *)conn );
@@ -1535,7 +1535,7 @@ string MySQLBanCheck2( void *conn, string *error, uint32_t botid, string server,
 {
         transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
         string EscUser = MySQLEscapeString( conn, user );
-	string GetIP = "SELECT `ip` FROM `oh_gameplayers` WHERE LOWER(name) = '" + EscUser + "' AND `ip` != '0' AND `ip` != '0.0.0.0' ORDER BY `id` DESC;";
+	string GetIP = "SELECT `ip` FROM `oh_gameplayers` WHERE name = '" + EscUser + "' AND `ip` != '0' AND `ip` != '0.0.0.0' ORDER BY `id` DESC;";
 	string UserIP = "";
         if( mysql_real_query( (MYSQL *)conn, GetIP.c_str( ), GetIP.size( ) ) != 0 )
                 *error = mysql_error( (MYSQL *)conn );
