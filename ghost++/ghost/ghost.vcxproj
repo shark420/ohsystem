@@ -195,7 +195,6 @@
     <ClCompile Include="ghost.cpp" />
     <ClCompile Include="ghostdb.cpp" />
     <ClCompile Include="ghostdbmysql.cpp" />
-    <ClCompile Include="ghostdbsqlite.cpp" />
     <ClCompile Include="gpsprotocol.cpp" />
     <ClCompile Include="language.cpp" />
     <ClCompile Include="map.cpp" />
@@ -204,7 +203,6 @@
     <ClCompile Include="savegame.cpp" />
     <ClCompile Include="sha1.cpp" />
     <ClCompile Include="socket.cpp" />
-    <ClCompile Include="sqlite3.c" />
     <ClCompile Include="stats.cpp" />
     <ClCompile Include="statsdota.cpp" />
     <ClCompile Include="statsw3mmd.cpp" />
@@ -229,7 +227,6 @@
     <ClInclude Include="ghost.h" />
     <ClInclude Include="ghostdb.h" />
     <ClInclude Include="ghostdbmysql.h" />
-    <ClInclude Include="ghostdbsqlite.h" />
     <ClInclude Include="gpsprotocol.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="language.h" />
@@ -241,8 +238,6 @@
     <ClInclude Include="savegame.h" />
     <ClInclude Include="sha1.h" />
     <ClInclude Include="socket.h" />
-    <ClInclude Include="sqlite3.h" />
-    <ClInclude Include="sqlite3ext.h" />
     <ClInclude Include="stats.h" />
     <ClInclude Include="statsdota.h" />
     <ClInclude Include="statsw3mmd.h" />

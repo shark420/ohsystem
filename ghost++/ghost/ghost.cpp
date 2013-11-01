@@ -378,8 +378,11 @@ CGHost :: CGHost( CConfig *CFG )
 	string DBType = CFG->GetString( "db_type", "mysql" );
 	CONSOLE_Print( "[GHOST] opening primary database" );
 
+// lets try this, ported from origin ghost++ code, thought it isnt relating anymore for this...
+#ifdef GHOST_MYSQL
 	m_DB = new CGHostDBMySQL( CFG );
-
+#endif
+        
 	// get a list of local IP addresses
 	// this list is used elsewhere to determine if a player connecting to the bot is local or not
 
@@ -1791,7 +1794,7 @@ bool CGHost :: FlameCheck( string message )
 {
 	transform( message.begin( ), message.end( ), message.begin( ), (int(*)(int))tolower );
 
-	char forbidden[] = {",.!§$%&/()={[]}*'+#-_.:,;?|"};
+	char forbidden[] = {",.!ï¿½$%&/()={[]}*'+#-_.:,;?|"};
 	char *check;
 	int len = message.length();
 	int c = 1;

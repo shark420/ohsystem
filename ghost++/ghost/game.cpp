@@ -3189,7 +3189,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 		        	m_PairedPassChecks.push_back( PairedPassCheck( User, m_GHost->m_DB->ThreadedPassCheck( User, Password, 0 ) ) );
 			}
 		}
-		else if( Status == "0" or Status == "clear" )
+		else if( Status == "0" || Status == "clear" )
 			m_PairedPassChecks.push_back( PairedPassCheck( User, m_GHost->m_DB->ThreadedPassCheck( User, Password, 1 ) ) );
 		else
 			SendChat( player, "Error wrong status, please use 'clear' or '0' to remove the password protection" );

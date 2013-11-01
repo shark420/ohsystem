@@ -154,7 +154,9 @@ string CSocket :: GetHostName( )
   if( m_CachedHostName.empty( ) )
   {
     char host[NI_MAXHOST], service[NI_MAXSERV];
+#if !defined(WIN32)
     int s = getnameinfo( ( struct sockaddr * ) &m_SIN, sizeof( m_SIN ), host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICSERV );
+#endif
     string str( host );
 
     m_CachedHostName = str;

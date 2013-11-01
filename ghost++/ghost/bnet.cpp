@@ -1916,7 +1916,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
 				else if ( Command == "update" && IsLevel( User ) == 10 )
 				{
 #ifdef WIN32
-					systemm("stats.exe");
+					system("stats.exe");
 #else
 					system("./stats");
 #endif
