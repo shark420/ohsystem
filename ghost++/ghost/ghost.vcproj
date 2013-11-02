@@ -388,6 +388,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gcbiprotocol.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\gameprotocol.cpp"
 				>
 			</File>
@@ -513,6 +517,10 @@
 				RelativePath=".\gameplayer.h"
 				>
 			</File>
+			<File
+				RelativePath=".\gcbiprotocol.h"
+				>
+			</File>                      
 			<File
 				RelativePath=".\gameprotocol.h"
 				>

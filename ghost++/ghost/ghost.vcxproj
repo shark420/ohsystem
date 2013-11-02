@@ -190,6 +190,7 @@
     <ClCompile Include="game_admin.cpp" />
     <ClCompile Include="game_base.cpp" />
     <ClCompile Include="gameplayer.cpp" />
+    <ClCompile Include="gcbiprotocol.cpp" />
     <ClCompile Include="gameprotocol.cpp" />
     <ClCompile Include="gameslot.cpp" />
     <ClCompile Include="ghost.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="game_admin.h" />
     <ClInclude Include="game_base.h" />
     <ClInclude Include="gameplayer.h" />
+    <ClInclude Include="gcbiprotocol.h" />
     <ClInclude Include="gameprotocol.h" />
     <ClInclude Include="gameslot.h" />
     <ClInclude Include="ghost.h" />
