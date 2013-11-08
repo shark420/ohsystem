@@ -2269,7 +2269,7 @@ void CBaseGame :: EventPlayerDisconnectConnectionClosed( CGamePlayer *player )
 void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinPlayer *joinPlayer )
 {
         uint32_t HostCounterID = joinPlayer->GetHostCounter( ) >> 28;
-        string JoinedRealm = "garena";
+        string JoinedRealm;
 
         for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
         {
@@ -2286,7 +2286,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         // test if player is reserved
         for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
         {
-                if( (*i)->GetServer( ) == JoinedRealm )
+                if( (*i)->GetServer( ) == JoinedRealm || JoinedRealm.empty() )
                 {
                         Level = (*i)->IsLevel( joinPlayer->GetName( ) );
                         LevelName = (*i)->GetLevelName( Level );
@@ -2586,7 +2586,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 	{
                 for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
 		{
-			if( (*i)->GetServer( ) == JoinedRealm )
+			if( (*i)->GetServer( ) == JoinedRealm || JoinedRealm.empty() )
 			{
 				CDBBan *Ban = (*i)->IsBannedName( joinPlayer->GetName( ) );
 
@@ -2650,6 +2650,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 Player->SetGarenaUser( potential->GetGarenaUser( ) );
                 potential->SetGarenaUser( NULL );
 	        Player->SetSpoofed( true );
+                Player->SetSpoofedRealm("Garena");
         }
 
 	if( m_GameNoGarena && JoinedRealm == "garena" )
@@ -2903,7 +2904,7 @@ void CBaseGame :: EventPlayerJoinedWithScore( CPotentialPlayer *potential, CInco
 
         for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
 	{
-                if( (*i)->GetServer( ) == JoinedRealm )
+                if( (*i)->GetServer( ) == JoinedRealm  || JoinedRealm.empty())
                 {
                         Level = (*i)->IsLevel( joinPlayer->GetName( ) );
                         break;
