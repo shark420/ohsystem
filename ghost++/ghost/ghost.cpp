@@ -375,6 +375,7 @@ CGHost :: CGHost( CConfig *CFG )
 	m_CallableDCountryList = NULL;
 	m_CallableCommandList = NULL;
 	m_CheckForFinishedGames = 0;
+        m_GarenaHostingOnly = false;
 	string DBType = CFG->GetString( "db_type", "mysql" );
 	CONSOLE_Print( "[GHOST] opening primary database" );
 
@@ -643,8 +644,11 @@ CGHost :: CGHost( CConfig *CFG )
 		m_AdminGame = NULL;
 
 	if( m_BNETs.empty( ) && !m_AdminGame )
+        {
 		CONSOLE_Print( "[GHOST] warning - no battle.net connections found and no admin game created" );
-
+                m_GarenaHostingOnly = true;
+        }
+        
 #ifdef GHOST_MYSQL
 	CONSOLE_Print( "[GHOST] GHost++ Version " + m_Version + " (with MySQL support)" );
 #else

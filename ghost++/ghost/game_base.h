@@ -48,6 +48,7 @@ class CCallableBanAdd;
 class CCallableBanCheck2;
 class CCallableStoreLog;
 class CCallableFromCheck;
+class CCallablePList;
 
 typedef pair<string,CCallablePWCheck *> PairedPWCheck;
 typedef pair<string,CCallablepm *> Pairedpm;
@@ -66,9 +67,7 @@ public:
 protected:
 	CTCPServer *m_Socket;							// listening socket
 	CGameProtocol *m_Protocol;						// game protocol
-//	vector<CGameSlot> m_Slots;						// vector of slots
 	vector<CPotentialPlayer *> m_Potentials;		// vector of potential players (connections that haven't sent a W3GS_REQJOIN packet yet)
-//	vector<CGamePlayer *> m_Players;				// vector of players
 	vector<CCallableScoreCheck *> m_ScoreChecks;
         vector<PairedPWCheck> m_PairedPWChecks;				// vector for checking if a player joined with a password
 	vector<Pairedpm> m_Pairedpms;
@@ -82,12 +81,11 @@ protected:
 	set<string> m_IPBlackList;						// set of IP addresses to blacklist from joining (todotodo: convert to uint32's for efficiency)
 	vector<CGameSlot> m_EnforceSlots;				// vector of slots to force players to use (used with saved games)
 	vector<PIDPlayer> m_EnforcePlayers;				// vector of pids to force players to use (used with saved games)
-//	CMap *m_Map;									// map data
+        CCallablePList *m_CallablePList;                // threaded database permission list in progress
 	CSaveGame *m_SaveGame;							// savegame data (this is a pointer to global data)
 	CReplay *m_Replay;								// replay
 	bool m_Exiting;									// set to true and this class will be deleted next update
 	bool m_Saving;									// if we're currently saving game data to the database
-//	uint16_t m_HostPort;							// the port to host games on
 	unsigned char m_GameState;						// game state, public or private
 	unsigned char m_VirtualHostPID;					// virtual host's PID
 	unsigned char m_FakePlayerPID;					// the fake player's PID (if present)
@@ -103,12 +101,9 @@ protected:
 	string m_KickVotePlayer;						// the player to be kicked with the currently running kick vote
 	string m_HCLCommandString;						// the "HostBot Command Library" command string, used to pass a limited amount of data to specially designed maps
 	uint32_t m_RandomSeed;							// the random seed sent to the Warcraft III clients
-        //uint32_t m_HostCounter;                                                 // a unique game number
-	//uint32_t m_EntryKey;							// random entry key for LAN, used to prove that a player is actually joining from LAN
 	uint32_t m_Latency;								// the number of ms to wait between sending action packets (we queue any received during this time)
 	uint32_t m_SyncLimit;							// the maximum number of packets a player can fall out of sync before starting the lag screen
 	uint32_t m_SyncCounter;							// the number of actions sent so far (for determining if anyone is lagging)
-	//uint32_t m_GameTicks;							// ingame ticks
 	uint32_t m_CreationTime;						// GetTime when the game was created
 	uint32_t m_LastPingTime;						// GetTime when the last ping was sent
 	uint32_t m_LastRefreshTime;						// GetTime when the last game refresh was sent
@@ -142,8 +137,6 @@ protected:
 	bool m_MuteAll;									// if we should stop forwarding ingame chat messages targeted for all players or not
 	bool m_MuteLobby;								// if we should stop forwarding lobby chat messages
 	bool m_CountDownStarted;						// if the game start countdown has started or not
-	//bool m_GameLoading;								// if the game is currently loading or not
-	//bool m_GameLoaded;								// if the game has loaded or not
 	bool m_LoadInGame;								// if the load-in-game feature is enabled or not
 	bool m_Lagging;									// if the lag screen is active or not
 	bool m_AutoSave;								// if we should auto save the game before someone disconnects
@@ -170,7 +163,9 @@ protected:
 	bool m_ModeVoted;
 	uint32_t m_LatestSlot;
 	uint32_t m_Leavers;
-
+        uint32_t m_LastPermissionRefresh;
+        vector<string> m_GarenaPermissions;
+        
 public:
 	CBaseGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16_t nHostPort, unsigned char nGameState, string nGameName, string nOwnerName, string nCreatorName, string nCreatorServer, uint32_t nGameType );
 	virtual ~CBaseGame( );
@@ -334,9 +329,6 @@ public:
 	virtual void CreateFakePlayer( );
 	virtual void DeleteFakePlayer( );
 	virtual bool is_digits( const std::string &str );
-//*** CUSTOM ***//
-//       uint32_t m_HostCounter;                                                 // a unique game number
-//*** Win Calculations, late for balance ***//
 	double m_ScourgeWinPoints;						 // scourge value to calculate the winperc
 	double m_SentinelWinPoints;						 // sentinel value to calculate the winperc
 	double m_TotalWinPoints;						 // total value to calculate the winperc

@@ -68,10 +68,15 @@ CBaseGame :: CBaseGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16
 	m_LimitCountries = false;
 	m_DenieCountries = false;
 	m_SendGameLoaded = false;
-	m_LastPingWarn = GetTime( );
+	m_LastPingWarn = GetTime();
 	m_ModeVoted = false;
 	m_Leavers = 0;
-
+        if( m_GHost->m_GarenaHostingOnly )
+        {
+               m_CallablePList = m_GHost->m_DB->ThreadedPList( "Garena" );
+               m_LastPermissionRefresh = GetTime();
+        }
+        
 	if( m_GHost->m_SaveReplays && !m_SaveGame )
 		m_Replay = new CReplay( );
 
@@ -234,8 +239,11 @@ CBaseGame :: ~CBaseGame( )
 
 	for( vector<PairedLogUpdate> :: iterator i = m_PairedLogUpdates.begin( ); i != m_PairedLogUpdates.end( ); ++i )
                 m_GHost->m_Callables.push_back( i->second );
-
-	while( !m_Actions.empty( ) )
+        
+        if( m_CallablePList )
+                m_GHost->m_Callables.push_back( m_CallablePList );
+	
+        while( !m_Actions.empty( ) )
 	{
 		delete m_Actions.front( );
 		m_Actions.pop( );
@@ -1558,6 +1566,21 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 }
                 m_LastPingWarn = GetTime( );
         }
+        
+        if( !m_CallablePList && GetTime( ) - m_LastPermissinRefresh >= 300 && m_GHost->m_GarenaHostingOnly )
+	{
+		m_CallablePList = m_GHost->m_DB->ThreadedPList( "Garena" );
+		m_LastAdminRefreshTime = GetTime( );
+	}
+
+        if( m_CallablePList && m_CallablePList->GetReady( ) )
+        {
+                m_GarenaPermissions = m_CallablePList->GetResult( );
+                m_GHost->m_DB->RecoverCallable( m_CallablePList );
+                delete m_CallablePList;
+                m_CallablePList = NULL;
+                m_LastPermissionRefresh = GetTime( );
+        }
 
 	return m_Exiting;
 }
@@ -1761,7 +1784,7 @@ void CBaseGame :: SendFakePlayerInfo( CGamePlayer *player )
 	IP.push_back( 0 );
 	IP.push_back( 0 );
 	IP.push_back( 0 );
-	Send( player, m_Protocol->SEND_W3GS_PLAYERINFO( m_FakePlayerPID, "|cFFFF0000CheV", IP, IP, string( ) ) );
+	Send( player, m_Protocol->SEND_W3GS_PLAYERINFO( m_FakePlayerPID, "Observer", IP, IP, string( ) ) );
 }
 
 void CBaseGame :: SendAllActions( )
@@ -2294,6 +2317,49 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 }
         }
 
+        if( m_GHost->m_GarenaHostingOnly )
+        {      
+            name = joinPlayer->GetName();
+            transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+            for( vector<string> :: iterator i = m_Permissions.begin( ); i != m_Permissions.end( ); ++i )
+            {
+		string username;
+		string lev;
+		stringstream SS;
+		SS << *i;
+		SS >> username;
+		SS >> lev;
+
+		if( username == name )
+                {
+                        uint32_t level = UTIL_ToUint32(lev);
+                        Level = level;
+                        if( level == 0 )
+                                LevelName = "Member";
+                        else if( level == 1 )
+                                LevelName = "Vouched";
+                        else if( level == 2 )
+                                LevelName = "Reserved";
+                        else if( level == 3 )
+                                LevelName = "Safelisted";
+                        else if( level == 4 )
+                                LevelName = "Website Moderator";
+                        else if( level == 5 )
+                                LevelName = "Simple Bot Moderator";
+                        else if( level == 6 )
+                                LevelName = "Full Bot Moderator";
+                        else if( level == 7 )
+                                LevelName = "Global Moderator";
+                        else if( level == 8 )
+                                LevelName = "Hoster";
+                        else if( level == 9 )
+                                LevelName = "Admin";
+                        else if( level == 10 )
+                                LevelName = "Root Admin";
+                }
+            }
+        }
+        
         bool Reserved = IsReserved( joinPlayer->GetName( ) ) || Level > 1 || IsOwner( joinPlayer->GetName( ) );
 
 	// check if player has only digits
