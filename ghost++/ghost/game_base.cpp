@@ -1567,10 +1567,10 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 m_LastPingWarn = GetTime( );
         }
         
-        if( !m_CallablePList && GetTime( ) - m_LastPermissinRefresh >= 300 && m_GHost->m_GarenaHostingOnly )
+        if( !m_CallablePList && GetTime( ) - m_LastPermissionRefresh >= 300 && m_GHost->m_GarenaHostingOnly )
 	{
 		m_CallablePList = m_GHost->m_DB->ThreadedPList( "Garena" );
-		m_LastAdminRefreshTime = GetTime( );
+		m_LastPermissionRefresh = GetTime( );
 	}
 
         if( m_CallablePList && m_CallablePList->GetReady( ) )
@@ -2318,10 +2318,10 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         }
 
         if( m_GHost->m_GarenaHostingOnly )
-        {      
-            name = joinPlayer->GetName();
+        {
+            string name = joinPlayer->GetName();
             transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
-            for( vector<string> :: iterator i = m_Permissions.begin( ); i != m_Permissions.end( ); ++i )
+            for( vector<string> :: iterator i = m_GarenaPermissions.begin( ); i != m_GarenaPermissions.end( ); ++i )
             {
 		string username;
 		string lev;
@@ -2332,7 +2332,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
 
 		if( username == name )
                 {
-                        uint32_t level = UTIL_ToUint32(lev);
+                        uint32_t level = UTIL_ToUInt32(lev);
                         Level = level;
                         if( level == 0 )
                                 LevelName = "Member";
@@ -3437,6 +3437,7 @@ bool CBaseGame :: EventPlayerAction( CGamePlayer *player, CIncomingAction *actio
 		delete action;
 		return false;
 	}
+
  if( !action->GetAction( )->empty( ) )
   {
     BYTEARRAY *ActionData = action->GetAction( );

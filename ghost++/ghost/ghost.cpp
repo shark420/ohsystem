@@ -1802,7 +1802,7 @@ bool CGHost :: FlameCheck( string message )
 	char *check;
 	int len = message.length();
 	int c = 1;
-
+/*
 	for( std::string::iterator i=message.begin( );i!=message.end( );)
 	{
   		check=forbidden;
@@ -1831,7 +1831,7 @@ bool CGHost :: FlameCheck( string message )
 		}
 		i++;
 	}
-
+*/
 	return false;
 }
 

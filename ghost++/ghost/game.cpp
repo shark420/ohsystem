@@ -2615,9 +2615,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 		}
                 else if( Matches == 1 )
                 {
-                        if( LastMatch->GetName( ) == "0x4772696566" )
-                                SendChat( player, "Who cares the stats? :)" );
-                        else if( player->GetSpoofed( ) && Level >= 8 )
+                        if( player->GetSpoofed( ) && Level >= 8 )
                                 m_PairedGSChecks.push_back( PairedGSCheck( string( ), m_GHost->m_DB->ThreadedStatsPlayerSummaryCheck( LastMatch->GetName( ) ) ) );
                         else
                                 m_PairedGSChecks.push_back( PairedGSCheck( User, m_GHost->m_DB->ThreadedStatsPlayerSummaryCheck( LastMatch->GetName( ) ) ) );
@@ -2650,9 +2648,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 		}
 		else if( Matches == 1 )
 		{
-                        if( LastMatch->GetName( ) == "0x4772696566" )
-                                SendChat( player, "Who cares the stats? :)" );
-                        else if( player->GetSpoofed( ) && Level >= 8 )
+                        if( player->GetSpoofed( ) && Level >= 8 )
                                 m_PairedRankChecks.push_back( PairedRankCheck( string( ), m_GHost->m_DB->ThreadedStatsPlayerSummaryCheck( LastMatch->GetName( ) ) ) );
                         else
                                 m_PairedRankChecks.push_back( PairedRankCheck( User, m_GHost->m_DB->ThreadedStatsPlayerSummaryCheck( LastMatch->GetName( ) ) ) );
@@ -2686,9 +2682,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 		}
 		else if( Matches == 1 )
 		{
-			if( LastMatch->GetName( ) == "0x4772696566" )
-				SendChat( player, "Who cares the stats? :)" );
-                        else if( player->GetSpoofed( ) && Level >= 8 )
+			if( player->GetSpoofed( ) && Level >= 8 )
                                 m_PairedSChecks.push_back( PairedSCheck( string( ), m_GHost->m_DB->ThreadedStatsPlayerSummaryCheck( LastMatch->GetName( ) ) ) );
                         else
                                 m_PairedSChecks.push_back( PairedSCheck( User, m_GHost->m_DB->ThreadedStatsPlayerSummaryCheck( LastMatch->GetName( ) ) ) );

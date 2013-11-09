@@ -820,6 +820,7 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 								}
 							}
 						}
+/*
         if( !m_Game->m_PlayerUpdate && m_Game->m_LogData != "")
         {
                 unsigned int Players = 0;
@@ -838,6 +839,7 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
                 }
                 m_Game->m_PlayerUpdate = true;
         }
+*/
 						i += 12 + Data.size( ) + Key.size( );
 					}
 					else
