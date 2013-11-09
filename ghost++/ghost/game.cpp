@@ -687,7 +687,7 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
 			{
 				//Weired missing autoend //recheck later
 				string Winner = ( team + 1 ) % 2 == 1 ? "Sentinel" : "Scourge";
-				SendAllChat("[AUTO-END] Too less players ingame, this game will end in fifteen seconds." );
+				SendAllChat("[AUTO-END] Too few players ingame, this game will end in fifteen seconds." );
 				SendAllChat("[AUTO-END] Winning team was set to ["+ Winner +"]" );
                                 m_Stats->SetWinner( ( team + 1 ) % 2 );
                                 //m_Stats->LockStats( );
@@ -781,7 +781,50 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 			break;
 		}
 	}
+        
+        if( m_GHost->m_GarenaHosting )
+        {
+            string name = player->GetName();
+            transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+            for( vector<string> :: iterator i = m_GarenaPermissions.begin( ); i != m_GarenaPermissions.end( ); ++i )
+            {
+		string username;
+		string lev;
+		stringstream SS;
+		SS << *i;
+		SS >> username;
+		SS >> lev;
 
+		if( username == name )
+                {
+                        uint32_t level = UTIL_ToUInt32(lev);
+                        Level = level;
+                        if( level == 0 )
+                                LevelName = "Member";
+                        else if( level == 1 )
+                                LevelName = "Vouched";
+                        else if( level == 2 )
+                                LevelName = "Reserved";
+                        else if( level == 3 )
+                                LevelName = "Safelisted";
+                        else if( level == 4 )
+                                LevelName = "Website Moderator";
+                        else if( level == 5 )
+                                LevelName = "Simple Bot Moderator";
+                        else if( level == 6 )
+                                LevelName = "Full Bot Moderator";
+                        else if( level == 7 )
+                                LevelName = "Global Moderator";
+                        else if( level == 8 )
+                                LevelName = "Hoster";
+                        else if( level == 9 )
+                                LevelName = "Admin";
+                        else if( level == 10 )
+                                LevelName = "Root Admin";
+                }
+            }
+        }
+        
 	if( player->GetSpoofed( ) && Level >= 5 )
 	{
 		CONSOLE_Print( "[GAME: " + m_GameName + "] "+ LevelName +" [" + User + "] sent command [" + Command + "] with payload [" + Payload + "]" );

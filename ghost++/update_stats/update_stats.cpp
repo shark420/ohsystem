@@ -177,7 +177,7 @@ int main( int argc, char **argv )
 	cout << "getting unscored games" << endl;
 	queue<uint32_t> UnscoredGames;
 
-	string QSelectUnscored = "SELECT `gameid` FROM `games` WHERE `stats` = '0' ORDER BY id;";
+	string QSelectUnscored = "SELECT `id` FROM `games` WHERE `stats` = '0' ORDER BY id;";
 
 	if( mysql_real_query( Connection, QSelectUnscored.c_str( ), QSelectUnscored.size( ) ) != 0 )
 	{

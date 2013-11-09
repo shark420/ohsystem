@@ -71,7 +71,7 @@ CBaseGame :: CBaseGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16
 	m_LastPingWarn = GetTime();
 	m_ModeVoted = false;
 	m_Leavers = 0;
-        if( m_GHost->m_GarenaHostingOnly )
+        if( m_GHost->m_GarenaHosting )
         {
                m_CallablePList = m_GHost->m_DB->ThreadedPList( "Garena" );
                m_LastPermissionRefresh = GetTime();
@@ -897,7 +897,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
 		}
 	}
 
-	// warn all players who joined with to less games
+	// warn all players who joined with to few games
 
 	// kick players within 15 seconds who dont have enough games
         if( !m_CountDownStarted && ( m_GameType == 4 || ( m_GHost->m_HighGame && m_GameType == 3 ) ) && !m_GameLoading && !m_GameLoaded )
@@ -920,7 +920,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                                 {
                                         if( (*i)->GetGames( ) < m_GHost->m_MinLimit  && !IsReserved( (*i)->GetName() ) )
 					{
-                                      		SendChat( (*i)->GetPID( ), "[INFO] You have to less games, you require at least 50 Games. You will be kicked in ["+UTIL_ToString( 10-( GetTime()-(*i)->GetJoinTime( ) ) )+"] seconds." );
+                                      		SendChat( (*i)->GetPID( ), "[INFO] You have to few games, you require at least 50 Games. You will be kicked in ["+UTIL_ToString( 10-( GetTime()-(*i)->GetJoinTime( ) ) )+"] seconds." );
 						(*i)->SetAnnounceTime( );
 					}
 				}
@@ -1567,7 +1567,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 m_LastPingWarn = GetTime( );
         }
         
-        if( !m_CallablePList && GetTime( ) - m_LastPermissionRefresh >= 300 && m_GHost->m_GarenaHostingOnly )
+        if( !m_CallablePList && GetTime( ) - m_LastPermissionRefresh >= 300 && m_GHost->m_GarenaHosting )
 	{
 		m_CallablePList = m_GHost->m_DB->ThreadedPList( "Garena" );
 		m_LastPermissionRefresh = GetTime( );
@@ -2317,7 +2317,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 }
         }
 
-        if( m_GHost->m_GarenaHostingOnly )
+        if( m_GHost->m_GarenaHosting )
         {
             string name = joinPlayer->GetName();
             transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
@@ -5477,7 +5477,7 @@ void CBaseGame :: OHFixedBalance( )
 
 	}
 	else
-		SendAllChat( "Error, to less slots token" );
+		SendAllChat( "Error, to few slots token" );
 }
 
 

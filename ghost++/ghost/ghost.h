@@ -186,7 +186,7 @@ public:
 	uint32_t m_MinimumLeaverAssists;
 	bool m_DeathsByLeaverReduction;
 	uint32_t m_BotID;
-        bool m_GarenaHostingOnly;
+        bool m_GarenaHosting;
 
 	CGHost( CConfig *CFG );
 	~CGHost( );
