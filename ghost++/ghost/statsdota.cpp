@@ -338,7 +338,7 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 									SideString = "bottom";
 								else
 									SideString = "unknown";
-								if( Level == "3" && m_Game->m_GHost->m_Fountainfarmwarning ) {
+								if( Level == "3" && m_Game->m_GHost->m_FountainFarmWarning ) {
 									m_Game->SendAllChat( "[PeaceMaker] "+m_Game->m_GHost->m_FountainFarmMessage( ) );
 								}
 								if( Killer ) {
