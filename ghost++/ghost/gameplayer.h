@@ -286,8 +286,8 @@ public:
 	void SetVKTimes( )												{ m_VKTimes += 1; }
 	void SetHighPingTimes( )											{ m_HighPingTimes += 1; }
 	void SetAnnounceTime( )											{ m_AnnounceTime = GetTime(); }
-        void SetLevel( )                                                                        { m_Level = nLevel; }
-        void SetLevelName( )                                                                    { m_LevelName = nLevelname; }
+        void SetLevel( uint32_t nLevel )                                                                        { m_Level = nLevel; }
+        void SetLevelName( string nLevelName )                                                                    { m_LevelName = nLevelName; }
 	string GetNameTerminated( );
 	uint32_t GetPing( bool LCPing );
 	bool GetIsIgnoring( string username );
