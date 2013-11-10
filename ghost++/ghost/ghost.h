@@ -96,7 +96,6 @@ public:
         uint32_t m_MinPlayerAutoEnd;
         uint32_t m_MaxAllowedSpread;
         bool m_EarlyEnd;
-	bool m_StatsUpdate;
 	uint32_t m_AutoHostMaximumGames;		// maximum number of games to auto host
 	uint32_t m_AutoHostAutoStartPlayers;	// when using auto hosting auto start the game when this many players have joined
 	uint32_t m_LastAutoHostTime;			// GetTime when the last auto host was attempted
@@ -186,7 +185,6 @@ public:
 	uint32_t m_MinimumLeaverAssists;
 	bool m_DeathsByLeaverReduction;
 	uint32_t m_BotID;
-        bool m_GarenaHosting;
 	bool m_StatsUpdate;
         bool m_GarenaHosting;
         bool m_MessageSystem;
