@@ -1628,8 +1628,8 @@ void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, st
 
 		string MapPath1 = m_SaveGame->GetMapPath( );
 		string MapPath2 = map->GetMapPath( );
-		transform( MapPath1.begin( ), MapPath1.end( ), MapPath1.begin( ), (int(*)(int))tolower );
-		transform( MapPath2.begin( ), MapPath2.end( ), MapPath2.begin( ), (int(*)(int))tolower );
+		transform( MapPath1.begin( ), MapPath1.end( ), MapPath1.begin( ), ::tolower );
+		transform( MapPath2.begin( ), MapPath2.end( ), MapPath2.begin( ), ::tolower );
 
 		if( MapPath1 != MapPath2 )
 		{
@@ -1805,7 +1805,7 @@ void CGHost :: LoadHostCounter()
 
 bool CGHost :: FlameCheck( string message )
 {
-	transform( message.begin( ), message.end( ), message.begin( ), (int(*)(int))tolower );
+	transform( message.begin( ), message.end( ), message.begin( ), ::tolower );
 
 	char forbidden[] = {",.!�$%&/()={[]}*'+#-_.:,;?|"};
 	char *check;

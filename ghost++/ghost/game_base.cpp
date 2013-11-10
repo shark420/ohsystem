@@ -2322,7 +2322,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         if( m_GHost->m_GarenaHosting )
         {
             string name = joinPlayer->GetName();
-            transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+            transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
             for( vector<string> :: iterator i = m_GarenaPermissions.begin( ); i != m_GarenaPermissions.end( ); ++i )
             {
                 string username;
@@ -2365,7 +2365,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         // check if the new player's name is empty or too long
  
         string LowerName = joinPlayer->GetName( );
-        transform( LowerName.begin( ), LowerName.end( ), LowerName.begin( ), (int(*)(int))tolower );
+        transform( LowerName.begin( ), LowerName.end( ), LowerName.begin( ), ::tolower );
  
         if( joinPlayer->GetName( ).empty( ) || joinPlayer->GetName( ).size( ) > 15 || LowerName.find( " " ) != string::npos || LowerName.find( "|" ) != string::npos )
         {
@@ -3877,7 +3877,7 @@ void CBaseGame :: EventPlayerChatToHost( CGamePlayer *player, CIncomingChatPlaye
                                 else
                                         Command = Message.substr( 1 );
  
-                                transform( Command.begin( ), Command.end( ), Command.begin( ), (int(*)(int))tolower );
+                                transform( Command.begin( ), Command.end( ), Command.begin( ), ::tolower );
  
                                 // don't allow EventPlayerBotCommand to veto a previous instruction to set Relay to false
                                 // so if Relay is already false (e.g. because the player is muted) then it cannot be forced back to true here
@@ -4477,7 +4477,7 @@ CGamePlayer *CBaseGame :: GetPlayerFromSID( unsigned char SID )
 CGamePlayer *CBaseGame :: GetPlayerFromName( string name, bool sensitive )
 {
         if( !sensitive )
-                transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+                transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
  
         for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
         {
@@ -4486,7 +4486,7 @@ CGamePlayer *CBaseGame :: GetPlayerFromName( string name, bool sensitive )
                         string TestName = (*i)->GetName( );
  
                         if( !sensitive )
-                                transform( TestName.begin( ), TestName.end( ), TestName.begin( ), (int(*)(int))tolower );
+                                transform( TestName.begin( ), TestName.end( ), TestName.begin( ), ::tolower );
  
                         if( TestName == name )
                                 return *i;
@@ -4498,7 +4498,7 @@ CGamePlayer *CBaseGame :: GetPlayerFromName( string name, bool sensitive )
  
 uint32_t CBaseGame :: GetPlayerFromNamePartial( string name, CGamePlayer **player )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
         uint32_t Matches = 0;
         *player = NULL;
  
@@ -4509,7 +4509,7 @@ uint32_t CBaseGame :: GetPlayerFromNamePartial( string name, CGamePlayer **playe
                 if( !(*i)->GetLeftMessageSent( ) )
                 {
                         string TestName = (*i)->GetName( );
-                        transform( TestName.begin( ), TestName.end( ), TestName.begin( ), (int(*)(int))tolower );
+                        transform( TestName.begin( ), TestName.end( ), TestName.begin( ), ::tolower );
  
                         if( TestName.find( name ) != string :: npos )
                         {
@@ -5658,7 +5658,7 @@ void CBaseGame :: AddToSpoofed( string server, string name, bool sendMessage )
  
 void CBaseGame :: AddToReserved( string name )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
  
         // check that the user is not already reserved
  
@@ -5675,7 +5675,7 @@ void CBaseGame :: AddToReserved( string name )
         for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
         {
                 string NameLower = (*i)->GetName( );
-                transform( NameLower.begin( ), NameLower.end( ), NameLower.begin( ), (int(*)(int))tolower );
+                transform( NameLower.begin( ), NameLower.end( ), NameLower.begin( ), ::tolower );
  
                 if( NameLower == name )
                         (*i)->SetReserved( true );
@@ -5685,14 +5685,14 @@ void CBaseGame :: AddToReserved( string name )
 bool CBaseGame :: IsOwner( string name )
 {
         string OwnerLower = m_OwnerName;
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
-        transform( OwnerLower.begin( ), OwnerLower.end( ), OwnerLower.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
+        transform( OwnerLower.begin( ), OwnerLower.end( ), OwnerLower.begin( ), ::tolower );
         return name == OwnerLower;
 }
  
 bool CBaseGame :: IsReserved( string name )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
  
         for( vector<string> :: iterator i = m_Reserved.begin( ); i != m_Reserved.end( ); ++i )
         {
@@ -6306,7 +6306,7 @@ void CBaseGame :: AnnounceEvent( uint32_t RandomNumber )
  
 string CBaseGame :: GetColoredName( string defaultname )
 {
-        transform( defaultname.begin( ), defaultname.end( ), defaultname.begin( ), (int(*)(int))tolower );
+        transform( defaultname.begin( ), defaultname.end( ), defaultname.begin( ), ::tolower );
         for( vector<string> :: iterator i = m_GHost->m_ColoredNames.begin( ); i != m_GHost->m_ColoredNames.end( ); )
         {
                 string listdefaultname;

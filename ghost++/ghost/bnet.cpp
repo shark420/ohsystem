@@ -61,7 +61,7 @@ CBNET :: CBNET( CGHost *nGHost, string nServer, string nServerAlias, string nBNL
         m_Server = nServer;
         string LowerServer = m_Server;
         m_AdminLog = vector<string>();
-        transform( LowerServer.begin( ), LowerServer.end( ), LowerServer.begin( ), (int(*)(int))tolower );
+        transform( LowerServer.begin( ), LowerServer.end( ), LowerServer.begin( ), ::tolower );
         m_GHost->m_CheckForFinishedGames = GetTime();
         if( !nServerAlias.empty( ) )
                 m_ServerAlias = nServerAlias;
@@ -1200,7 +1200,7 @@ void CBNET :: ProcessPackets( )
                                         // try to figure out if the user might be using the wrong logon type since too many people are confused by this
  
                                         string Server = m_Server;
-                                        transform( Server.begin( ), Server.end( ), Server.begin( ), (int(*)(int))tolower );
+                                        transform( Server.begin( ), Server.end( ), Server.begin( ), ::tolower );
  
                                         if( m_PasswordHashType == "pvpgn" && ( Server == "useast.battle.net" || Server == "uswest.battle.net" || Server == "asia.battle.net" || Server == "europe.battle.net" ) )
                                                 CONSOLE_Print( "[BNET: " + m_ServerAlias + "] it looks like you're trying to connect to a battle.net server using a pvpgn logon type, check your config file's \"battle.net custom data\" section" );
@@ -1393,7 +1393,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                         else
                                 Command = Message.substr( 1 );
  
-                        transform( Command.begin( ), Command.end( ), Command.begin( ), (int(*)(int))tolower );
+                        transform( Command.begin( ), Command.end( ), Command.begin( ), ::tolower );
  
                         if( IsLevel( User ) >= 5 || ForceRoot )
                         {
@@ -1426,7 +1426,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                         else
                                                 RCONCommand = Payload.substr( 1 );
  
-                                        transform( RCONCommand.begin( ), RCONCommand.end( ), RCONCommand.begin( ), (int(*)(int))tolower );
+                                        transform( RCONCommand.begin( ), RCONCommand.end( ), RCONCommand.begin( ), ::tolower );
  
                                         //
                                         // !MUTE
@@ -2171,7 +2171,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                                                 CONSOLE_Print( "[TEMPBAN] bad input #3 to the autohost command" );
                                                         else
                                                         {
-                                                                transform( Suffix.begin( ), Suffix.end( ), Suffix.begin( ), (int(*)(int))tolower );
+                                                                transform( Suffix.begin( ), Suffix.end( ), Suffix.begin( ), ::tolower );
  
                                                                 // handle suffix
                                                                 // valid suffix is: hour, h, week, w, day, d, month, m
@@ -2842,7 +2842,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                                 {
                                                         path MapCFGPath( m_GHost->m_MapCFGPath );
                                                         string Pattern = Payload;
-                                                        transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), (int(*)(int))tolower );
+                                                        transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), ::tolower );
  
                                                         if( !exists( MapCFGPath ) )
                                                         {
@@ -2859,8 +2859,8 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                                                 {
                                                                         string FileName = i->path( ).filename( ).string( );
                                                                         string Stem = i->path( ).stem( ).string( );
-                                                                        transform( FileName.begin( ), FileName.end( ), FileName.begin( ), (int(*)(int))tolower );
-                                                                        transform( Stem.begin( ), Stem.end( ), Stem.begin( ), (int(*)(int))tolower );
+                                                                        transform( FileName.begin( ), FileName.end( ), FileName.begin( ), ::tolower );
+                                                                        transform( Stem.begin( ), Stem.end( ), Stem.begin( ), ::tolower );
  
                                                                         if( !is_directory( i->status( ) ) && i->path( ).extension( ) == ".cfg" && FileName.find( Pattern ) != string :: npos )
                                                                         {
@@ -2954,7 +2954,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                                 {
                                                         path MapPath( m_GHost->m_MapPath );
                                                         string Pattern = Payload;
-                                                        transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), (int(*)(int))tolower );
+                                                        transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), ::tolower );
  
                                                         if( !exists( MapPath ) )
                                                         {
@@ -2971,8 +2971,8 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                                                 {
                                                                         string FileName = i->path( ).filename( ).string( );
                                                                         string Stem = i->path( ).stem( ).string( );
-                                                                        transform( FileName.begin( ), FileName.end( ), FileName.begin( ), (int(*)(int))tolower );
-                                                                        transform( Stem.begin( ), Stem.end( ), Stem.begin( ), (int(*)(int))tolower );
+                                                                        transform( FileName.begin( ), FileName.end( ), FileName.begin( ), ::tolower );
+                                                                        transform( Stem.begin( ), Stem.end( ), Stem.begin( ), ::tolower );
  
                                                                         if( !is_directory( i->status( ) ) && FileName.find( Pattern ) != string :: npos )
                                                                         {
@@ -4017,7 +4017,7 @@ void CBNET :: UnqueueGameRefreshes( )
  
 uint32_t CBNET :: IsLevel( string name )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
  
         for( vector<string> :: iterator i = m_Permissions.begin( ); i != m_Permissions.end( ); ++i )
         {
@@ -4045,7 +4045,7 @@ string CBNET :: GetLevelName( uint32_t level )
 
 CDBBan *CBNET :: IsBannedName( string name )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
  
         // todotodo: optimize this - maybe use a map?
  
@@ -4060,7 +4060,7 @@ CDBBan *CBNET :: IsBannedName( string name )
  
 CDBBan *CBNET :: IsBannedIP( string ip )
 {
-        transform( ip.begin( ), ip.end( ), ip.begin( ), (int(*)(int))tolower ); //transform in case it's a hostname
+        transform( ip.begin( ), ip.end( ), ip.begin( ), ::tolower ); //transform in case it's a hostname
         for( vector<CDBBan *> :: iterator i = m_Bans.begin( ); i != m_Bans.end( ); ++i )
         {
                 if( (*i)->GetIP( )[0] == ':' )
@@ -4090,13 +4090,13 @@ CDBBan *CBNET :: IsBannedIP( string ip )
  
 void CBNET :: AddBan( string name, string ip, string gamename, string admin, string reason )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
         m_Bans.push_back( new CDBBan( m_Server, name, ip, "NA", gamename, admin, reason, string(), string(), string(), string(), string() ) );
 }
  
 void CBNET :: RemoveBan( string name )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
  
         for( vector<CDBBan *> :: iterator i = m_Bans.begin( ); i != m_Bans.end( ); )
         {

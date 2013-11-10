@@ -689,7 +689,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 				{
 					path MapCFGPath( m_GHost->m_MapCFGPath );
 					string Pattern = Payload;
-					transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), (int(*)(int))tolower );
+					transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), ::tolower );
 
 					if( !exists( MapCFGPath ) )
 					{
@@ -706,8 +706,8 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 						{
 							string FileName = i->path( ).filename( ).string( );
 							string Stem = i->path( ).stem( ).string( );
-							transform( FileName.begin( ), FileName.end( ), FileName.begin( ), (int(*)(int))tolower );
-							transform( Stem.begin( ), Stem.end( ), Stem.begin( ), (int(*)(int))tolower );
+							transform( FileName.begin( ), FileName.end( ), FileName.begin( ), ::tolower );
+							transform( Stem.begin( ), Stem.end( ), Stem.begin( ), ::tolower );
 
 							if( !is_directory( i->status( ) ) && i->path( ).extension( ) == ".cfg" && FileName.find( Pattern ) != string :: npos )
 							{
@@ -800,7 +800,7 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 				{
 					path MapPath( m_GHost->m_MapPath );
 					string Pattern = Payload;
-					transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), (int(*)(int))tolower );
+					transform( Pattern.begin( ), Pattern.end( ), Pattern.begin( ), ::tolower );
 
 					if( !exists( MapPath ) )
 					{
@@ -817,8 +817,8 @@ bool CAdminGame :: EventPlayerBotCommand( CGamePlayer *player, string command, s
 						{
 							string FileName = i->path( ).filename( ).string( );
 							string Stem = i->path( ).stem( ).string( );
-							transform( FileName.begin( ), FileName.end( ), FileName.begin( ), (int(*)(int))tolower );
-							transform( Stem.begin( ), Stem.end( ), Stem.begin( ), (int(*)(int))tolower );
+							transform( FileName.begin( ), FileName.end( ), FileName.begin( ), ::tolower );
+							transform( Stem.begin( ), Stem.end( ), Stem.begin( ), ::tolower );
 
 							if( !is_directory( i->status( ) ) && FileName.find( Pattern ) != string :: npos )
 							{

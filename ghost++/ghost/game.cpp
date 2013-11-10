@@ -1119,7 +1119,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                         if( m_GameLoaded )
                                         {
                                                 string VictimLower = Victim;
-                                                transform( VictimLower.begin( ), VictimLower.end( ), VictimLower.begin( ), (int(*)(int))tolower );
+                                                transform( VictimLower.begin( ), VictimLower.end( ), VictimLower.begin( ), ::tolower );
                                                 uint32_t Matches = 0;
                                                 CDBBan *LastMatch = NULL;
  
@@ -1129,7 +1129,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                                 for( vector<CDBBan *> :: iterator i = m_DBBans.begin( ); i != m_DBBans.end( ); ++i )
                                                 {
                                                         string TestName = (*i)->GetName( );
-                                                        transform( TestName.begin( ), TestName.end( ), TestName.begin( ), (int(*)(int))tolower );
+                                                        transform( TestName.begin( ), TestName.end( ), TestName.begin( ), ::tolower );
  
                                                         if( TestName.find( VictimLower ) != string :: npos )
                                                         {
@@ -1214,7 +1214,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                            // handle suffix
                                            // valid suffix is: hour, h, week, w, day, d, month, m
                                            bool ValidSuffix = false;
-                                           transform( Suffix.begin( ), Suffix.end( ), Suffix.begin( ), (int(*)(int))tolower );
+                                           transform( Suffix.begin( ), Suffix.end( ), Suffix.begin( ), ::tolower );
  
                                            if (Suffix == "hour" || Suffix == "hours" || Suffix == "h")
                                            {
@@ -1254,7 +1254,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                                    if( m_GameLoaded )
                                                    {
                                                            string VictimLower = Victim;
-                                                           transform( VictimLower.begin( ), VictimLower.end( ), VictimLower.begin( ), (int(*)(int))tolower );
+                                                           transform( VictimLower.begin( ), VictimLower.end( ), VictimLower.begin( ), ::tolower );
                                                            uint32_t Matches = 0;
                                                            CDBBan *LastMatch = NULL;
                                                            // try to match each player with the passed string (e.g. "Varlock" would be matched with "lock")
@@ -1263,7 +1263,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                                            for( vector<CDBBan *> :: iterator i = m_DBBans.begin( ); i != m_DBBans.end( ); i++ )
                                                            {
                                                                    string TestName = (*i)->GetName( );
-                                                                   transform( TestName.begin( ), TestName.end( ), TestName.begin( ), (int(*)(int))tolower );
+                                                                   transform( TestName.begin( ), TestName.end( ), TestName.begin( ), ::tolower );
  
                                                                    if( TestName.find( VictimLower ) != string :: npos )
                                                                    {
@@ -1674,7 +1674,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                                 if( Start != string :: npos )
                                                         Race = Race.substr( Start );
  
-                                                transform( Race.begin( ), Race.end( ), Race.begin( ), (int(*)(int))tolower );
+                                                transform( Race.begin( ), Race.end( ), Race.begin( ), ::tolower );
                                                 unsigned char SID = (unsigned char)( Slot - 1 );
  
                                                 if( !( m_Map->GetMapOptions( ) & MAPOPT_FIXEDPLAYERSETTINGS ) && !( m_Map->GetMapFlags( ) & MAPFLAG_RANDOMRACES ) && SID < m_Slots.size( ) )
@@ -3621,7 +3621,7 @@ bool CGame :: IsAutoBanned( string name )
  
 bool CGame :: CustomVoteKickReason( string reason )
 {
-        transform( reason.begin( ), reason.end( ), reason.begin( ), (int(*)(int))tolower );
+        transform( reason.begin( ), reason.end( ), reason.begin( ), ::tolower );
         //Votekick reasons: maphack, fountainfarm, feeding, flaming, game ruin
         if( reason.find( "maphack" ) != string::npos || reason.find( "fountainfarm" ) != string::npos || reason.find( "feeding" ) != string::npos || reason.find( "flaming" ) != string::npos || reason.find( "gameruin" ) != string::npos )
                 return true;
@@ -3655,7 +3655,7 @@ string CGame :: GetRuleTags( )
 
 string CGame :: GetRule( string tag )
 {
-    transform( tag.begin( ), tag.end( ), tag.begin( ), (int(*)(int))tolower );
+    transform( tag.begin( ), tag.end( ), tag.begin( ), ::tolower );
     uint32_t saver = 0;
     for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i != m_GHost->m_Rules.end( ); i++ )
     {

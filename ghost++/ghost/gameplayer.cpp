@@ -256,7 +256,7 @@ string CGamePlayer :: GetNameTerminated( )
 	// this is useful because it allows you to print the player's name in a longer message which doesn't colour all the subsequent text
 
 	string LowerName = m_Name;
-	transform( LowerName.begin( ), LowerName.end( ), LowerName.begin( ), (int(*)(int))tolower );
+	transform( LowerName.begin( ), LowerName.end( ), LowerName.begin( ), ::tolower );
 	string :: size_type Start = LowerName.find( "|c" );
 	string :: size_type End = LowerName.find( "|r" );
 
@@ -288,7 +288,7 @@ uint32_t CGamePlayer :: GetPing( bool LCPing )
 
 bool CGamePlayer :: GetIsIgnoring( string username )
 {
-	transform( username.begin( ), username.end( ), username.begin( ), (int(*)(int))tolower );
+	transform( username.begin( ), username.end( ), username.begin( ), ::tolower );
 
 	for( vector<string> :: iterator i = m_IgnoreList.begin( ); i != m_IgnoreList.end( ); ++i )
 	{
@@ -302,14 +302,14 @@ bool CGamePlayer :: GetIsIgnoring( string username )
 void CGamePlayer :: Ignore( string username )
 {
 	if( GetIsIgnoring( username ) ) return;
-	transform( username.begin( ), username.end( ), username.begin( ), (int(*)(int))tolower );
+	transform( username.begin( ), username.end( ), username.begin( ), ::tolower );
 
 	m_IgnoreList.push_back( username );
 }
 
 void CGamePlayer :: UnIgnore( string username )
 {
-	transform( username.begin( ), username.end( ), username.begin( ), (int(*)(int))tolower );
+	transform( username.begin( ), username.end( ), username.begin( ), ::tolower );
 
 	for( vector<string> :: iterator i = m_IgnoreList.begin( ); i != m_IgnoreList.end( ); )
 	{

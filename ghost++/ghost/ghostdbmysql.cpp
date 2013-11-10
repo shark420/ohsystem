@@ -808,8 +808,8 @@ string MySQLFromCheck( void *conn, string *error, uint32_t botid, string ip )
 uint32_t MySQLRegAdd( void *conn, string *error, uint32_t botid, string user, string server, string mail, string password, string type )
 {
         uint32_t RowID = 0;
-        transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
-        transform( mail.begin( ), mail.end( ), mail.begin( ), (int(*)(int))tolower );
+        transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
+        transform( mail.begin( ), mail.end( ), mail.begin( ), ::tolower );
         string EscServer = MySQLEscapeString( conn, server );
         string EscName = MySQLEscapeString( conn, user );
         string EscMail = MySQLEscapeString( conn, mail );
@@ -877,7 +877,7 @@ uint32_t MySQLRegAdd( void *conn, string *error, uint32_t botid, string user, st
 
 string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user, string input, uint32_t one, string type )
 {
-	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
+	transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
 	string EscUser = MySQLEscapeString( conn, user );
 	string EscInput = MySQLEscapeString( conn, input );
 
@@ -1026,7 +1026,7 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 
 uint32_t MySQLPWCheck( void *conn, string *error, uint32_t botid, string user )
 {
-        transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
+        transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
         string EscUser = MySQLEscapeString( conn, user );
         uint32_t IsPWUser = false;
         string Query = "SELECT `user_ppwd` FROM oh_users WHERE bnet_username = '" + EscUser + "' AND `user_bnet` = '2';";
@@ -1063,8 +1063,8 @@ uint32_t MySQLPWCheck( void *conn, string *error, uint32_t botid, string user )
 
 uint32_t MySQLPassCheck( void *conn, string *error, uint32_t botid, string user, string pass, uint32_t st )
 {
-        transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
-	transform( pass.begin( ), pass.end( ), pass.begin( ), (int(*)(int))tolower );
+        transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
+	transform( pass.begin( ), pass.end( ), pass.begin( ), ::tolower );
         string EscUser = MySQLEscapeString( conn, user );
 	string EscPass = MySQLEscapeString( conn, pass );
 	if( st == 0 )
@@ -1115,8 +1115,8 @@ uint32_t MySQLPassCheck( void *conn, string *error, uint32_t botid, string user,
 uint32_t MySQLpm( void *conn, string *error, uint32_t botid, string user, string listener, uint32_t status, string message, string type )
 {
 
-        transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
-        transform( listener.begin( ), listener.end( ), listener.begin( ), (int(*)(int))tolower );
+        transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
+        transform( listener.begin( ), listener.end( ), listener.begin( ), ::tolower );
         string EscUser = MySQLEscapeString( conn, user );
         string EscListener = MySQLEscapeString( conn, listener );
         string EscMessage = MySQLEscapeString( conn, message );
@@ -1375,7 +1375,7 @@ uint32_t MySQLgs( void *conn, string *error, uint32_t botid, uint32_t chatid, st
 uint32_t MySQLpenp( void *conn, string *error, uint32_t botid, string name, string reason, string admin, uint32_t amount, string type )
 {
         uint32_t Result = 0;
-	transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+	transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
 	string EscName = MySQLEscapeString( conn, name );
         string EscReason = MySQLEscapeString( conn, reason );
         string EscAdmin = MySQLEscapeString( conn, admin );
@@ -1471,7 +1471,7 @@ uint32_t MySQLBanCount( void *conn, string *error, uint32_t botid, string server
 
 CDBBan *MySQLBanCheck( void *conn, string *error, uint32_t botid, string server, string user, string ip )
 {
-	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
+	transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
 	string EscServer = MySQLEscapeString( conn, server );
 	string EscUser = MySQLEscapeString( conn, user );
 	string EscIP = MySQLEscapeString( conn, ip );
@@ -1509,7 +1509,7 @@ CDBBan *MySQLBanCheck( void *conn, string *error, uint32_t botid, string server,
 
 string MySQLBanCheck2( void *conn, string *error, uint32_t botid, string server, string user, string type )
 {
-        transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
+        transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
         string EscUser = MySQLEscapeString( conn, user );
 	string GetIP = "SELECT `ip` FROM `oh_gameplayers` WHERE name = '" + EscUser + "' AND `ip` != '0' AND `ip` != '0.0.0.0' ORDER BY `id` DESC;";
 	string UserIP = "";
@@ -1578,7 +1578,7 @@ string MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, st
 	string EscAdmin = MySQLEscapeString( conn, admin );
 	string EscReason = MySQLEscapeString( conn, reason );
 	string EscCountry = MySQLEscapeString( conn, country );
-	transform( EscUser.begin( ), EscUser.end( ), EscUser.begin( ), (int(*)(int))tolower );
+	transform( EscUser.begin( ), EscUser.end( ), EscUser.begin( ), ::tolower );
 
 	bool alreadybanned = false;
 	uint32_t currentbantime = 0;
@@ -1735,8 +1735,8 @@ string MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, st
 bool MySQLPUp( void *conn, string *error, uint32_t botid, string name, uint32_t level, string realm, string user )
 {
 	bool Success = false;
-        transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
-	transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
+	transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
 	string EscName = MySQLEscapeString( conn, name );
         string EscRealm = MySQLEscapeString( conn, realm );
         string EscUser = MySQLEscapeString( conn, user );
@@ -1777,7 +1777,7 @@ bool MySQLPUp( void *conn, string *error, uint32_t botid, string name, uint32_t 
 
 bool MySQLBanRemove( void *conn, string *error, uint32_t botid, string server, string user )
 {
-	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
+	transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
 	string EscServer = MySQLEscapeString( conn, server );
 	string EscUser = MySQLEscapeString( conn, user );
 	bool Success = false;
@@ -1793,7 +1793,7 @@ bool MySQLBanRemove( void *conn, string *error, uint32_t botid, string server, s
 
 bool MySQLBanRemove( void *conn, string *error, uint32_t botid, string user )
 {
-	transform( user.begin( ), user.end( ), user.begin( ), (int(*)(int))tolower );
+	transform( user.begin( ), user.end( ), user.begin( ), ::tolower );
 	string EscUser = MySQLEscapeString( conn, user );
 	bool Success = false;
 	string Query = "DELETE FROM oh_bans WHERE name='" + EscUser + "' ORDER BY id ASC LIMIT 1";
@@ -1990,7 +1990,7 @@ string MySQLGameUpdate( void *conn, string *error, uint32_t botid, string map, s
 uint32_t MySQLGamePlayerAdd( void *conn, string *error, uint32_t botid, uint32_t gameid, string name, string ip, uint32_t spoofed, string spoofedrealm, uint32_t reserved, uint32_t loadingtime, uint32_t left, string leftreason, uint32_t team, uint32_t colour )
 {
 	string EscNameUP = MySQLEscapeString( conn, name );
-	//transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+	//transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
 	uint32_t RowID = 0;
 	string EscName = MySQLEscapeString( conn, name );
 	string EscIP = MySQLEscapeString( conn, ip );
@@ -2010,7 +2010,7 @@ uint32_t MySQLGamePlayerAdd( void *conn, string *error, uint32_t botid, uint32_t
 
 CDBGamePlayerSummary *MySQLGamePlayerSummaryCheck( void *conn, string *error, uint32_t botid, string name )
 {
-	transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+	transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
 	string EscName = MySQLEscapeString( conn, name );
 	CDBGamePlayerSummary *GamePlayerSummary = NULL;
 	string Query = "SELECT MIN(DATE(datetime)), MAX(DATE(datetime)), COUNT(*), MIN(loadingtime), AVG(loadingtime), MAX(loadingtime), MIN(`left`/duration)*100, AVG(`left`/duration)*100, MAX(`left`/duration)*100, MIN(duration), AVG(duration), MAX(duration) FROM oh_gameplayers LEFT JOIN oh_games ON oh_games.id=gameid WHERE name LIKE '" + EscName + "'";
@@ -2055,7 +2055,7 @@ CDBGamePlayerSummary *MySQLGamePlayerSummaryCheck( void *conn, string *error, ui
 
 CDBStatsPlayerSummary *MySQLStatsPlayerSummaryCheck( void *conn, string *error, uint32_t botid, string name )
 {
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
         string EscName = MySQLEscapeString( conn, name );
         CDBStatsPlayerSummary *StatsPlayerSummary = NULL;
 
@@ -2144,7 +2144,7 @@ CDBStatsPlayerSummary *MySQLStatsPlayerSummaryCheck( void *conn, string *error, 
 CDBInboxSummary *MySQLInboxSummaryCheck( void *conn, string *error, uint32_t botid, string name )
 {
 	string Res = string();
-        transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+        transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
         string EscName = MySQLEscapeString( conn, name );
 	CDBInboxSummary *InboxSummary = NULL;
         string Query = "SELECT `id`, `m_from`, `m_message`, `m_read` FROM `oh_pm` WHERE `m_read` = '0' AND `m_to` = '" + EscName + "';";
@@ -2232,7 +2232,7 @@ uint32_t MySQLDotAPlayerAdd( void *conn, string *error, uint32_t botid, uint32_t
 
 CDBDotAPlayerSummary *MySQLDotAPlayerSummaryCheck( void *conn, string *error, uint32_t botid, string name )
 {
-	transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+	transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
 	string EscName = MySQLEscapeString( conn, name );
 	CDBDotAPlayerSummary *DotAPlayerSummary = NULL;
 	string Query = "SELECT COUNT(oh_dotaplayers.id), SUM(kills), SUM(deaths), SUM(creepkills), SUM(creepdenies), SUM(assists), SUM(neutralkills), SUM(towerkills), SUM(raxkills), SUM(courierkills) FROM oh_gameplayers LEFT JOIN oh_games ON oh_games.id=oh_gameplayers.gameid LEFT JOIN oh_dotaplayers ON oh_dotaplayers.gameid=oh_games.id AND oh_dotaplayers.colour=oh_gameplayers.colour WHERE name LIKE '" + EscName + "'";
@@ -2351,7 +2351,7 @@ bool MySQLDownloadAdd( void *conn, string *error, uint32_t botid, string map, ui
 
 double MySQLScoreCheck( void *conn, string *error, uint32_t botid, string category, string name, string server )
 {
-	transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+	transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
 	string EscCategory = MySQLEscapeString( conn, category );
 	string EscName = MySQLEscapeString( conn, name );
 	string EscServer = MySQLEscapeString( conn, server );
@@ -2384,7 +2384,7 @@ double MySQLScoreCheck( void *conn, string *error, uint32_t botid, string catego
 
 uint32_t MySQLW3MMDPlayerAdd( void *conn, string *error, uint32_t botid, string category, uint32_t gameid, uint32_t pid, string name, string flag, uint32_t leaver, uint32_t practicing )
 {
-	transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
+	transform( name.begin( ), name.end( ), name.begin( ), ::tolower );
 	uint32_t RowID = 0;
 	string EscCategory = MySQLEscapeString( conn, category );
 	string EscName = MySQLEscapeString( conn, name );
