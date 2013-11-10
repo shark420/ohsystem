@@ -71,6 +71,7 @@ CBaseGame :: CBaseGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16
         m_LastPingWarn = GetTime();
         m_ModeVoted = false;
         m_Leavers = 0;
+        m_CallablePList = NULL;
         if( m_GHost->m_GarenaHosting )
         {
                m_CallablePList = m_GHost->m_DB->ThreadedPList( "Garena" );
@@ -1580,7 +1581,6 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 m_GHost->m_DB->RecoverCallable( m_CallablePList );
                 delete m_CallablePList;
                 m_CallablePList = NULL;
-                m_LastPermissionRefresh = GetTime( );
         }
  
         return m_Exiting;
