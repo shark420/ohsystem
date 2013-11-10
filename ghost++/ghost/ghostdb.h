@@ -48,7 +48,6 @@ class CCallableBanRemove;
 class CCallableBanList;
 class CCallableTBRemove;
 class CCallableCommandList;
-class CCallableClean;
 class CCallableGameAdd;
 class CCallableGamePlayerAdd;
 class CCallableGamePlayerSummaryCheck;
@@ -114,7 +113,6 @@ public:
 	virtual bool BanRemove( string user );
 	virtual vector<CDBBan *> BanList( string server );
 	virtual vector<string> CommandList( );
-	virtual bool Clean( );
 	virtual uint32_t GameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype );
 	virtual string GameUpdate( string map, string gamename, string ownername, string creatorname, uint32_t players, string usernames, uint32_t slotsTotal, uint32_t totalGames, uint32_t totalPlayers, bool add );
 	virtual uint32_t GamePlayerAdd( uint32_t gameid, string name, string ip, uint32_t spoofed, string spoofedrealm, uint32_t reserved, uint32_t loadingtime, uint32_t left, string leftreason, uint32_t team, uint32_t colour );
@@ -159,7 +157,6 @@ public:
 	virtual CCallableBanList *ThreadedBanList( string server );
         virtual CCallableTBRemove *ThreadedTBRemove( string server );
 	virtual CCallableCommandList *ThreadedCommandList( );
-	virtual CCallableClean *ThreadedClean( );
 	virtual CCallableGameAdd *ThreadedGameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype, vector<string> lobbylog, vector<string> gamelog );
 	virtual CCallableGameUpdate *ThreadedGameUpdate( string map, string gamename, string ownername, string creatorname, uint32_t players, string usernames, uint32_t slotsTotal, uint32_t totalGames, uint32_t totalPlayers, bool add );
 	virtual CCallableGamePlayerAdd *ThreadedGamePlayerAdd( uint32_t gameid, string name, string ip, uint32_t spoofed, string spoofedrealm, uint32_t reserved, uint32_t loadingtime, uint32_t left, string leftreason, uint32_t team, uint32_t colour );
@@ -585,19 +582,6 @@ public:
 
 	virtual vector<string> GetResult( )				{ return m_Result; }
 	virtual void SetResult( vector<string> nResult )	{ m_Result = nResult; }
-};
-
-class CCallableClean : virtual public CBaseCallable
-{
-protected:
-        bool m_Result;
-
-public:
-        CCallableClean( ) : CBaseCallable( ), m_Result( false ) { }
-        virtual ~CCallableClean( );
-
-        virtual bool GetResult( )                               { return m_Result; }
-        virtual void SetResult( bool nResult )  { m_Result = nResult; }
 };
 
 class CCallableGameAdd : virtual public CBaseCallable

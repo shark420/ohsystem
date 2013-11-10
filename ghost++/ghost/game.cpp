@@ -3633,7 +3633,7 @@ string CGame :: GetRuleTags( )
 {
     string Tags;
     uint32_t saver = 0;
-    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_GHost->m_Rules.end( ); i++ )
+    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i != m_GHost->m_Rules.end( ); i++ )
     {
         string tag;
         stringstream SS;
@@ -3657,7 +3657,7 @@ string CGame :: GetRule( string tag )
 {
     transform( tag.begin( ), tag.end( ), tag.begin( ), (int(*)(int))tolower );
     uint32_t saver = 0;
-    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_GHost->m_Rules.end( ); i++ )
+    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i != m_GHost->m_Rules.end( ); i++ )
     {
         string rtag;
         string rule;

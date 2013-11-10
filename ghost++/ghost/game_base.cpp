@@ -2314,7 +2314,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 {
                         Level = (*i)->IsLevel( joinPlayer->GetName( ) );
                         if( Level != 0 )
-                                LevelName = m_GHost->m_Ranks[Level-1]
+                                LevelName = m_GHost->m_Ranks[Level-1];
                         break;
                 }
         }

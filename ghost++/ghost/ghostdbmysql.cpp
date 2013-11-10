@@ -516,20 +516,6 @@ CCallableCommandList *CGHostDBMySQL :: ThreadedCommandList( )
 	return Callable;
 }
 
-CCallableClean *CGHostDBMySQL :: ThreadedClean( )
-{
-        void *Connection = GetIdleConnection( );
-
-        if( !Connection )
-                ++m_NumConnections;
-
-        CCallableClean *Callable = new CMySQLCallableClean( Connection, m_BotID, m_Server, m_Database, m_User, m_Password, m_Port );
-        CreateThread( Callable );
-        ++m_OutstandingCallables;
-        m_Name.push_back( "clean" );
-        return Callable;
-}
-
 CCallableGameAdd *CGHostDBMySQL :: ThreadedGameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype, vector<string> lobbylog, vector<string> gamelog )
 {
 	void *Connection = GetIdleConnection( );
@@ -779,16 +765,6 @@ vector<string> MySQLFetchRow( MYSQL_RES *res )
 //
 // global helper functions
 //
-bool MySQLClean( void *conn, string *error, uint32_t botid )
-{
-        // clean up
-        string CleanQuery= "TRUNCATE TABLE oh_game_status WHERE botid = '" + UTIL_ToString( botid ) +"'; TRUNCATE TABLE oh_game_log WHERE botid = '" + UTIL_ToString( botid ) +"';";
-        if( mysql_real_query( (MYSQL *)conn, CleanQuery.c_str( ), CleanQuery.size( ) ) != 0 )
-                *error = mysql_error( (MYSQL *)conn );
-        else
-                CONSOLE_Print( "Truncated oh_games_stats & oh_game_log table" );
-
-}
 
 string MySQLFromCheck( void *conn, string *error, uint32_t botid, string ip )
 {
@@ -2764,16 +2740,6 @@ void CMySQLCallableCommandList :: operator( )( )
 		m_Result = MySQLCommandList( m_Connection, &m_Error, m_SQLBotID );
 
 	Close( );
-}
-
-void CMySQLCallableClean :: operator( )( )
-{
-        Init( );
-
-        if( m_Error.empty( ) )
-                m_Result = MySQLClean( m_Connection, &m_Error, m_SQLBotID );
-
-        Close( );
 }
 
 void CMySQLCallableGameAdd :: operator( )( )

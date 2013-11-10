@@ -1882,8 +1882,9 @@ void CGHost :: LoadRules( )
 
 void CGHost :: LoadRanks( )
 {
+    string File = "ranks.txt";
     ifstream in;
-    in.open( "ranks.txt".c_str() );
+    in.open( File.c_str() );
     if( !in.fail( ) )
     {
             // don't print more than 8 lines

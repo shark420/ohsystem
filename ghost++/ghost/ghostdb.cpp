@@ -162,11 +162,6 @@ vector<string> CGHostDB :: CommandList( )
 	return vector<string>( );
 }
 
-bool CGHostDB :: Clean( )
-{
-        return false;
-}
-
 uint32_t CGHostDB :: GameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype )
 {
 	return 0;
@@ -372,11 +367,6 @@ CCallableCommandList *CGHostDB :: ThreadedCommandList( )
 	return NULL;
 }
 
-CCallableClean *CGHostDB :: ThreadedClean( )
-{
-        return NULL;
-}
-
 CCallableGameAdd *CGHostDB :: ThreadedGameAdd( string server, string map, string gamename, string ownername, uint32_t duration, uint32_t gamestate, string creatorname, string creatorserver, uint32_t gametype, vector<string> lobbylog, vector<string> gamelog )
 {
 	return NULL;
@@ -575,11 +565,6 @@ CCallableTBRemove :: ~CCallableTBRemove( )
 CCallableCommandList :: ~CCallableCommandList( )
 {
 	// don't delete anything in m_Result here, it's the caller's responsibility
-}
-
-CCallableClean :: ~CCallableClean( )
-{
-
 }
 
 CCallableGameAdd :: ~CCallableGameAdd( )

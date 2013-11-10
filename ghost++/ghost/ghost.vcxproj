@@ -74,7 +74,7 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release MySQL|Win32'">false</LinkIncremental>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug MySQL|Win32'">C:\Dokumente und Einstellungen\Administrator\Eigene Dateien\Downloads\boost_1_46_1\boost_1_46_1;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Dokumente und Einstellungen\Administrator\Eigene Dateien\Downloads\boost_1_46_1\boost_1_46_1;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release MySQL|Win32'">C:\Dokumente und Einstellungen\Administrator\Eigene Dateien\Downloads\boost_1_46_1\boost_1_46_1;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release MySQL|Win32'">C:\libraries\boost_1_54_0;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Dokumente und Einstellungen\Administrator\Eigene Dateien\Downloads\boost_1_46_1\boost_1_46_1;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
