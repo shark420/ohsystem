@@ -339,7 +339,7 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 								else
 									SideString = "unknown";
 								if( Level == "3" && m_Game->m_GHost->m_FountainFarmWarning ) {
-									m_Game->SendAllChat( "[PeaceMaker] "+m_Game->m_GHost->m_FountainFarmMessage( ) );
+									m_Game->SendAllChat( "[PeaceMaker] "+m_Game->m_GHost->m_FountainFarmMessage );
 								}
 								if( Killer ) {
 									m_Game->GAME_Print( 19, MinString, SecString, Killer->GetName( ), AllianceString, SideString+" "+Level );
