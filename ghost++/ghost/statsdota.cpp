@@ -338,9 +338,8 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 									SideString = "bottom";
 								else
 									SideString = "unknown";
-								if( Level == "3" ) {
-									m_Game->SendAllChat( "[PeaceMaker] Remind: Any kind or at least an attempt of fountainfarm is banable." );
-									m_Game->SendAllChat( "[PeaceMaker] You can check the rules on chevelle1.net." );
+								if( Level == "3" && m_Game->m_GHost->m_Fountainfarmwarning ) {
+									m_Game->SendAllChat( "[PeaceMaker] "+m_Game->m_GHost->m_FountainFarmMessage( ) );
 								}
 								if( Killer ) {
 									m_Game->GAME_Print( 19, MinString, SecString, Killer->GetName( ), AllianceString, SideString+" "+Level );

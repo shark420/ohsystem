@@ -1410,7 +1410,7 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_GameLogging = CFG->GetInt( "game_logging", 0 ) == 0 ? false : true;
 	m_GameLoggingID = CFG->GetInt( "game_loggingid", 1 );
 	m_GameLogFilePath = UTIL_AddPathSeperator( CFG->GetString( "game_logpath", string( ) ) );
-	m_ColoredNamePath = UTIL_AddPathSeperator( CFG->GetString( "oh_coloredname", "/home/ghostfiles/" ) );
+	m_ColoredNamePath = UTIL_AddPathSeperator( CFG->GetString( "oh_coloredname", string( ) ) );
 	m_SaveGamePath = UTIL_AddPathSeperator( CFG->GetString( "bot_savegamepath", string( ) ) );
 	m_MapPath = UTIL_AddPathSeperator( CFG->GetString( "bot_mappath", string( ) ) );
 	m_SaveReplays = CFG->GetInt( "bot_savereplays", 0 ) == 0 ? false : true;
@@ -1491,6 +1491,8 @@ void CGHost :: SetConfigs( CConfig *CFG )
         m_BetSystem = CFG->GetInt("oh_general_betsystem", 1 ) == 0 ? false : true;
         m_AccountProtection = CFG->GetInt("oh_general_accountprotection", 1 ) == 0 ? false : true;
         m_Announce = CFG->GetInt("oh_announce", 0 ) == 0 ? false : true;
+        m_FountainFarmWarning = CFG->GetInt("oh_fountainfarm_warning", 0 ) == 0 ? false : true;
+        m_FountainFarmMessage = CFG->GetString("oh_fountainfarm_message", "Remind: Any kind or at least an attempt of fountainfarm is banable." );
 	//m_VoteingModes = CFG->GetInt( "oh_modevoting", 0 ) == 0 ? false : true;
 }
 

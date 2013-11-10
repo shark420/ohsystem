@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B77E1E52-C1FB-4226-B05B-9E70433BB95E}</ProjectGuid>
+    <ProjectGuid>{1D4CDD9D-7CED-4838-9424-ED792BD777A2}</ProjectGuid>
     <RootNamespace>update_stats</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>

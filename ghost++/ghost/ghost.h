@@ -194,6 +194,8 @@ public:
         vector<string> m_Rules;
         vector<string> m_Ranks;
         bool m_Announce;
+        bool m_FountainFarmWarning;
+        string m_FountainFarmMessage;
         
 	CGHost( CConfig *CFG );
 	~CGHost( );
