@@ -3633,18 +3633,18 @@ string CGame :: GetRuleTags( )
 {
     string Tags;
     uint32_t saver = 0;
-    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_Ghost->m_Rules.end( ); i++ )
+    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_GHost->m_Rules.end( ); i++ )
     {
         string tag;
         stringstream SS;
         SS << *i;
         SS >> tag;
         if( Tags.empty())
-            Tags = tags;
+            Tags = tag;
         else
-            Tags += ", " + tags;
+            Tags += ", " + tag;
         ++saver;
-        if( saved > 10 )
+        if( saver > 10 )
         {
             CONSOLE_Print( "There to many rules, stopping after 10.");
             break;
@@ -3657,7 +3657,7 @@ string CGame :: GetRule( string tag )
 {
     transform( tag.begin( ), tag.end( ), tag.begin( ), (int(*)(int))tolower );
     uint32_t saver = 0;
-    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_Ghost->m_Rules.end( ); i++ )
+    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_GHost->m_Rules.end( ); i++ )
     {
         string rtag;
         string rule;
@@ -3682,7 +3682,7 @@ string CGame :: GetRule( string tag )
                 return "Error. Bad input for the rule command, please contact the bot owner with the exact command to fix this";
         }
         ++saver;
-        if( saved > 10 )
+        if( saver > 10 )
         {
             CONSOLE_Print( "There to many rules, stopping after 10.");
             return "Error, hit to many rules, please report this to the bot owner.";
