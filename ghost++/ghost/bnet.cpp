@@ -1362,8 +1362,9 @@ void CBNET :: ProcessChatEvent( CIncomingChatEvent *chatEvent )
         }
  
         else if( Event == CBNETProtocol :: EID_JOIN ) {
-                m_Pairedpms.push_back( Pairedpm( User, m_GHost->m_DB->Threadedpm( User, string(), 0, string(), "join" ) ) );
-                CONSOLE_Print( "[BNET: " + m_ServerAlias + "] user [" + User + "] joined channel " + m_CurrentChannel );
+            if( m_GHost->m_MessageSystem )
+                        m_Pairedpms.push_back( Pairedpm( User, m_GHost->m_DB->Threadedpm( User, string(), 0, string(), "join" ) ) );
+            CONSOLE_Print( "[BNET: " + m_ServerAlias + "] user [" + User + "] joined channel " + m_CurrentChannel );
         }
         else if( Event == CBNETProtocol :: EID_ERROR )
                 CONSOLE_Print( "[ERROR: " + m_ServerAlias + "] " + Message );
@@ -3502,8 +3503,10 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
  
                                 //
                                 // !RCONPW
+                                // This command is normally used in a relation to a modified GProxy.
+                                // GProxy will be added soon to the SVN
                                 //
-                                else if( Command == "rconpw" )
+                                else if( Command == "rconpw" && m_AccountProtection )
                                 {
                                                 m_PairedPassChecks.push_back( PairedPassCheck( User, m_GHost->m_DB->ThreadedPassCheck( User, Payload, 0 ) ) );
                                 }
@@ -3577,7 +3580,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                 //
                                 // !PM
                                 //
-                                else if( ( Command == "pm" || Command == "mail" ) && !Payload.empty( ) )
+                                else if( ( Command == "pm" || Command == "mail" ) && !Payload.empty( ) && m_MessageSystem )
                                 {
                                         CDBBan *Ban = IsBannedName( User );
  
@@ -3621,7 +3624,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                 //
                                 // !INBOX
                                 //
-                                else if( ( Command == "i" || Command == "inbox" ) && Payload.empty( ) )
+                                else if( ( Command == "i" || Command == "inbox" ) && Payload.empty( ) && m_GHost->m_MessageSystem )
                                 {
                                         m_PairedINChecks.push_back( PairedINCheck( User, m_GHost->m_DB->ThreadedInboxSummaryCheck( User ) ) );
                                 }
@@ -3705,7 +3708,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                 //
                                 // !POINTS      !P
                                 //
-                                else if( Command == "points" || Command == "p" )
+                                else if( ( Command == "points" || Command == "p" ) && m_GHost->m_BetSystem )
                                 {
                                         string StatsUser = User;
  

@@ -187,7 +187,13 @@ public:
 	bool m_DeathsByLeaverReduction;
 	uint32_t m_BotID;
         bool m_GarenaHosting;
-
+	bool m_StatsUpdate;
+        bool m_GarenaHosting;
+        bool m_MessageSystem;
+        bool m_FunCommands;
+        bool m_BetSystem;
+        bool m_AccountProtection;
+        
 	CGHost( CConfig *CFG );
 	~CGHost( );
 

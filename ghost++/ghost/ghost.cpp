@@ -1473,7 +1473,7 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_NoGarena = CFG->GetInt( "oh_nogarena", 0 ) == 0 ? false : true;
 	m_CheckIPRange = CFG->GetInt( "oh_checkiprangeonjoin", 0 ) == 0 ? false : true;
 	m_DenieProxy = CFG->GetInt( "oh_proxykick", 0 ) == 0 ? false : true;
-	m_LiveGames = CFG->GetInt( "oh_livegames", 0 ) == 0 ? false : true;
+	m_LiveGames = CFG->GetInt( "oh__general_livegames", 1 ) == 0 ? false : true;
         m_MinFF = CFG->GetInt( "oh_minff", 20 );
         m_MinimumLeaverKills = CFG->GetInt( "antifarm_minkills", 3 );
         m_MinimumLeaverDeaths = CFG->GetInt( "antifarm_mindeaths", 3 );
@@ -1482,8 +1482,12 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_MinPlayerAutoEnd = CFG->GetInt( "autoend_minplayer", 2 );
 	m_MaxAllowedSpread = CFG->GetInt( "autoend_maxspread", 2 );
 	m_EarlyEnd = CFG->GetInt( "autoend_earlyend", 1 ) == 0 ? false : true;
-	m_StatsUpdate = CFG->GetInt( "oh_updatestats", 0 ) == 0 ? false : true;
-        m_GarenaHosting = CFG->GetInt("oh_garenahosting", 0 ) == 0 ? false : true;
+	m_StatsUpdate = CFG->GetInt( "oh_general_updatestats", 1 ) == 0 ? false : true;
+        m_GarenaHosting = CFG->GetInt("oh_general_garenahosting", 0 ) == 0 ? false : true;
+        m_MessageSystem = CFG->GetInt("oh_general_messagesystem", 1 ) == 0 ? false : true;
+        m_FunCommands = CFG->GetInt("oh_general_funcommands", 1 ) == 0 ? false : true;
+        m_BetSystem = CFG->GetInt("oh_general_betsystem", 1 ) == 0 ? false : true;
+        m_AccountProtection = CFG->GetInt("oh_general_accountprotection", 1 ) == 0 ? false : true;
 	//m_VoteingModes = CFG->GetInt( "oh_modevoting", 0 ) == 0 ? false : true;
 }
 

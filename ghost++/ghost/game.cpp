@@ -1093,7 +1093,7 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
                                 //
                                 //setcookies
                                 //
-                                else if( Command == "setcookies" && Level >= 9 )
+                                else if( Command == "setcookies" && Level >= 9 && m_GHost->m_FunCommands)
                                 {
                                         if( Payload.empty( ) )
                                         {
@@ -3201,7 +3201,7 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
         // !PW  !PASS   !PASSWORD
         //
  
-        else if( Command == "pw" || Command == "pass" || Command == "password" )
+        else if( ( Command == "pw" || Command == "pass" || Command == "password" ) && m_GHost->m_AccountProtection )
         {
                 string Status;
                 string Password;
@@ -3235,13 +3235,13 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
         //
         // !I   !INBOX
         //
-        else if( ( Command == "i" || Command == "inbox" ) && Payload.empty( ) )
+        else if( ( Command == "i" || Command == "inbox" ) && Payload.empty( ) && m_GHost->m_MessageSystem )
                 m_PairedINChecks.push_back( PairedINCheck( User, m_GHost->m_DB->ThreadedInboxSummaryCheck( User ) ) );
  
         //
         // !PM
         //
-        else if( Command == "pm" && !Payload.empty( ) )
+        else if( Command == "pm" && !Payload.empty( ) && m_GHost->m_MessageSystem )
         {
                 string UserTo;
                 string Message;
@@ -3291,7 +3291,7 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
         //
         // !POINTS      !P
         //
-        else if( Command == "points" || Command == "p" || Command == "pts" )
+        else if( ( Command == "points" || Command == "p" || Command == "pts" ) && m_GHost->m_BetSystem )
         {
                 string StatsUser = User;
  
@@ -3307,7 +3307,7 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
         //
         // !BET !B
         //
-        else if( ( Command == "bet" || Command == "b" ) && m_GameLoaded && !m_GameLoading )
+        else if( ( Command == "bet" || Command == "b" ) && m_GameLoaded && !m_GameLoading && m_GHost->m_BetSystem )
         {
                 if( !Payload.find_first_not_of( "1234567890" ) == string :: npos )
                 {
@@ -3439,7 +3439,7 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
         // !SLAP
         //
  
-        else if( Command == "slap" && !Payload.empty( ) )
+        else if( Command == "slap" && !Payload.empty( ) && m_GHost->m_FunCommands )
         {
                 CGamePlayer *LastMatch = NULL;
                 uint32_t Matches = GetPlayerFromNamePartial( Payload , &LastMatch );
@@ -3522,7 +3522,7 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
         //
         // !EAT
         //
-        else if( Command == "eat" && Payload.empty( ) )
+        else if( Command == "eat" && Payload.empty( ) && m_GHost->m_FunCommands )
         {
                 if( player->GetCookies( ) != 0 )
                 {

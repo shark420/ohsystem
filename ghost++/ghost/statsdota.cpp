@@ -820,8 +820,8 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 								}
 							}
 						}
-/*
-        if( !m_Game->m_PlayerUpdate && m_Game->m_LogData != "")
+
+        if( !m_Game->m_PlayerUpdate && m_Game->m_LogData != "" && m_Game->m_GHost->m_LiveGames )
         {
                 unsigned int Players = 0;
                 for( unsigned int i = 0; i < 12; ++i )
@@ -839,7 +839,7 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
                 }
                 m_Game->m_PlayerUpdate = true;
         }
-*/
+
 						i += 12 + Data.size( ) + Key.size( );
 					}
 					else
@@ -856,6 +856,8 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 	}
 
 	// set winner if any win conditions have been met
+        // that is actually from ENT bot sources and not complete binded into this bot
+        // Todo: Add conditions option into the header
 	if( m_Winner == 0 )
 	{
 		if( m_KillLimit != 0 )

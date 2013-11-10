@@ -1515,7 +1515,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 }
  
         }
-/*
+
         if( GetTime( ) - m_LastLogDataUpdate >= 10 && m_GHost->m_LiveGames )
         {
  
@@ -1544,7 +1544,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                         m_LastLogDataUpdate = GetTime();
                 }
         }
-*/
+        
         // ping warning
         if( GetTime() - m_LastPingWarn >= 60 && m_GameLoaded )
         {
@@ -2695,16 +2695,18 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         CGamePlayer *Player = new CGamePlayer( potential, m_SaveGame ? EnforcePID : GetNewPID( ), JoinedRealm, joinPlayer->GetName( ), joinPlayer->GetInternalIP( ), Reserved );
  
         // check if this is a protected account
-        m_PairedPWChecks.push_back( PairedPWCheck( joinPlayer->GetName( ), m_GHost->m_DB->ThreadedPWCheck( joinPlayer->GetName( ) ) ) );
+        if( m_GHost->m_AccountProtection )
+                m_PairedPWChecks.push_back( PairedPWCheck( joinPlayer->GetName( ), m_GHost->m_DB->ThreadedPWCheck( joinPlayer->GetName( ) ) ) );
  
         // check if the user has a new message
-        m_Pairedpms.push_back( Pairedpm( joinPlayer->GetName( ), m_GHost->m_DB->Threadedpm( joinPlayer->GetName( ), string(), 0, string(), "join" ) ) );
+        if( m_GHost->m_MessageSystem ) 
+                m_Pairedpms.push_back( Pairedpm( joinPlayer->GetName( ), m_GHost->m_DB->Threadedpm( joinPlayer->GetName( ), string(), 0, string(), "join" ) ) );
  
         // check win perc
          m_PairedWPChecks.push_back( PairedWPCheck( joinPlayer->GetName( ), m_GHost->m_DB->ThreadedStatsPlayerSummaryCheck( joinPlayer->GetName( ) ) ) );
  
         // cookie for reserved players
-        if( Level >= 3 )
+        if( Level >= 3 && m_GHost->m_FunCommands)
                 Player->SetCookie( 3 );
  
         // consider LAN players to have already spoof checked since they can't
