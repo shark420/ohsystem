@@ -4037,32 +4037,12 @@ uint32_t CBNET :: IsLevel( string name )
  
 string CBNET :: GetLevelName( uint32_t level )
 {
-        if( level == 0 )
-                return "Member";
-        else if( level == 1 )
-                return "Vouched";
-        else if( level == 2 )
-                return "Reserved";
-        else if( level == 3 )
-                return "Safelisted";
-        else if( level == 4 )
-                return "Website Moderator";
-        else if( level == 5 )
-                return "Simple Bot Moderator";
-        else if( level == 6 )
-                return "Full Bot Moderator";
-        else if( level == 7 )
-                return "Global Moderator";
-        else if( level == 8 )
-                return "Hoster";
-        else if( level == 9 )
-                return "Admin";
-        else if( level == 10 )
-                return "Root Admin";
- 
+    if( level != 0 )
+        return m_GHost->m_Ranks[level-1];
+    else
         return "unknown";
 }
- 
+
 CDBBan *CBNET :: IsBannedName( string name )
 {
         transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );

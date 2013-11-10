@@ -1446,6 +1446,8 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_VoteKickPercentage = CFG->GetInt( "bot_votekickpercentage", 100 );
 	LoadHostCounter();
 	LoadDatas();
+        LoadRules();
+        LoadRanks();
 	if( m_VoteKickPercentage > 100 )
 	{
 		m_VoteKickPercentage = 100;
@@ -1875,4 +1877,29 @@ void CGHost :: LoadRules( )
     }
     else
 	CONSOLE_Print( "Unable to open rules.txt" );
+}
+
+void CGHost :: LoadRanks( )
+{
+    ifstream in;
+    in.open( "ranks.txt".c_str() );
+    if( !in.fail( ) )
+    {
+            // don't print more than 8 lines
+            uint32_t Count = 0;
+            string Line;
+            while( !in.eof( ) && Count < 10 )
+            {
+                    getline( in, Line );
+                    if( Line.empty( ) )
+                    {
+                            if( !in.eof( ) )
+                                m_Ranks.push_back("Missing Rank on: "+UTIL_ToString(Count));
+                    }
+                    else
+                        m_Ranks.push_back(Line);
+                    ++Count;
+            }
+            in.close( );
+    }
 }

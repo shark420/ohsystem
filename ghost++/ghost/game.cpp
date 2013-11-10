@@ -762,67 +762,17 @@ bool CGame :: EventPlayerAction( CGamePlayer *player, CIncomingAction *action )
  
 bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string payload )
 {
-bool HideCommand = CBaseGame :: EventPlayerBotCommand( player, command, payload );
+        bool HideCommand = CBaseGame :: EventPlayerBotCommand( player, command, payload );
  
-// todotodo: don't be lazy
- 
-string User = player->GetName( );
-string Command = command;
-string Payload = payload;
- 
-uint32_t Level = 0;
-string LevelName;
-for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
-        {
-                if( (*i)->GetServer( ) == player->GetSpoofedRealm( ) )
-                {
-                        Level = (*i)->IsLevel( player->GetName( ) );
-                        LevelName = (*i)->GetLevelName( Level );
-                        break;
-                }
-        }
-        if( m_GHost->m_GarenaHosting )
-        {
-                string name = player->GetName();
-                transform( name.begin( ), name.end( ), name.begin( ), (int(*)(int))tolower );
-                for( vector<string> :: iterator i = m_GarenaPermissions.begin( ); i != m_GarenaPermissions.end( ); ++i )
-                {
-                string username;
-                string lev;
-                stringstream SS;
-                SS << *i;
-                SS >> username;
-                SS >> lev;
-         
-                if( username == name )
-                {
-                                uint32_t level = UTIL_ToUInt32(lev);
-                                Level = level;
-                                if( level == 0 )
-                                LevelName = "Level 1 User";
-                                else if( level == 1 )
-                                LevelName = "Level 2 User";
-                                else if( level == 2 )
-                                LevelName = "Level 3 User";
-                                else if( level == 3 )
-                                LevelName = "Safelisted User";
-                                else if( level == 4 )
-                                LevelName = "Devoted User";
-                                else if( level == 5 )
-                                LevelName = "Bot Moderator";
-                                else if( level == 6 )
-                                LevelName = "Full Bot Moderator";
-                                else if( level == 7 )
-                                LevelName = "Global Bot Moderator";
-                                else if( level == 8 )
-                                LevelName = "Owner";
-                                else if( level == 9 )
-                                LevelName = "Admin";
-                                else if( level == 10 )
-                                LevelName = "Root Admin";
-                }
-        }
-}
+        // todotodo: don't be lazy
+
+        string User = player->GetName( );
+        string Command = command;
+        string Payload = payload;
+
+        uint32_t Level = player->GetLevel();
+        string LevelName = player->GetLevelName();
+        
         if( player->GetSpoofed( ) && Level >= 5 )
         {
                 CONSOLE_Print( "[GAME: " + m_GameName + "] "+ LevelName +" [" + User + "] sent command [" + Command + "] with payload [" + Payload + "]" );
@@ -1354,17 +1304,8 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
                                                                    SendAllChat( m_GHost->m_Language->UnableToBanNoMatchesFound( Victim ) );
                                                            else if( Matches == 1 )
                                                 {
-                                                                   uint32_t VictimLevel = 0;
-                                                                   string VictimLevelName;
-                                                                   for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
-                                                                   {
-                                                                           if( (*i)->GetServer( ) == LastMatch->GetSpoofedRealm( ) )
-                                                                           {
-                                                                                   VictimLevel = (*i)->IsLevel( LastMatch->GetName( ) );
-                                                                                   VictimLevelName = (*i)->GetLevelName( VictimLevel );
-                                                                                   break;
-                                                                           }
-                                                                   }
+                                                                   uint32_t VictimLevel = LastMatch->GetLevel();
+                                                                   string VictimLevelName = LastMatch->GetLevelName();
                                                                    if( Level >= 7 || ( Level == 5 ||  Level == 6 ) && ( ( Suffix == "hour" || Suffix == "hours" || Suffix == "h" ) || ( ( Suffix == "days" || Suffix == "d" || Suffix == "day" ) && Amount <= 5 ) ) )
                                                                             m_PairedBanAdds.push_back( PairedBanAdd( User, m_GHost->m_DB->ThreadedBanAdd( LastMatch->GetJoinedRealm( ), LastMatch->GetName( ), LastMatch->GetExternalIPString( ), m_GameName, User, Reason, BanTime, LastMatch->GetCLetter( ) ) ) );
                                                                    else
@@ -1979,17 +1920,8 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
                                         SendAllChat( m_GHost->m_Language->UnableToKickNoMatchesFound( Payload ) );
                                 else if( Matches == 1 )
                                 {
-                                        uint32_t VictimLevel = 0;
-                                        string VictimLevelName;
-                                        for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
-                                        {
-                                                if( (*i)->GetServer( ) == LastMatch->GetSpoofedRealm( ) )
-                                                {
-                                                        VictimLevel = (*i)->IsLevel( LastMatch->GetName( ) );
-                                                        VictimLevelName = (*i)->GetLevelName( VictimLevel );
-                                                        break;
-                                                }
-                                        }
+                                        uint32_t VictimLevel = LastMatch->GetLevel();
+                                        string VictimLevelName = LastMatch->GetLevelName();
                                         if( VictimLevel <= 1 || Level >= 9 )
                                         {
                                                 LastMatch->SetDeleteMe( true );
@@ -2094,17 +2026,8 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
                                                 SendAllChat( m_GHost->m_Language->UnableToMuteNoMatchesFound( Payload ) );
                                         else if( Matches == 1 )
                                         {
-                                                uint32_t VictimLevel = 0;
-                                                string VictimLevelName;
-                                                for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
-                                                {
-                                                        if( (*i)->GetServer( ) == LastMatch->GetSpoofedRealm( ) )
-                                                        {
-                                                                VictimLevel = (*i)->IsLevel( LastMatch->GetName( ) );
-                                                                VictimLevelName = (*i)->GetLevelName( VictimLevel );
-                                                                break;
-                                                        }
-                                                }
+                                                uint32_t VictimLevel = LastMatch->GetLevel();
+                                                string VictimLevelName = LastMatch->GetLevelName();
                                                 if( VictimLevel <= 1 || Level >= 9 )
                                                 {
                                                         SendAllChat( m_GHost->m_Language->MutedPlayer( LastMatch->GetName( ), User ) );

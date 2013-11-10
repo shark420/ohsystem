@@ -194,6 +194,7 @@ public:
         bool m_BetSystem;
         bool m_AccountProtection;
         vector<string> m_Rules;
+        vector<string> m_Ranks;
         
 	CGHost( CConfig *CFG );
 	~CGHost( );
@@ -228,6 +229,7 @@ public:
 	void GetDeniedCountries( );
 	void LoadDatas( );
         void LoadRules( );
+        void LoadRanks( );
 };
 
 #endif

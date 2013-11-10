@@ -1,0 +1,10 @@
+Vouched
+Reserved
+Safelisted
+Premium Member
+Simple Bot Moderator
+Full Bot Moderator
+Global Moderator
+Advanced Moderator
+Administrator
+Root Administrator

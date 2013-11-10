@@ -222,7 +222,7 @@ m_PID( nPID ), m_Name( nName ), m_InternalIP( nInternalIP ), m_JoinedRealm( nJoi
 m_LastMapPartSent( 0 ), m_LastMapPartAcked( 0 ), m_StartedDownloadingTicks( 0 ), m_FinishedLoadingTicks( 0 ), m_StartedLaggingTicks( 0 ), m_StatsSentTime( 0 ), m_StatsDotASentTime( 0 ), m_LastGProxyWaitNoticeSentTime( 0 ), m_Score( -100000.0 ), m_WinPerc( 0.0 ), m_LeavePerc( 0.0 ), m_Games( 0 ),
 m_LoggedIn( false ), m_Spoofed( false ), m_PasswordProt( 0 ), m_Registered( false ), m_Reserved( nReserved ), m_WhoisShouldBeSent( false ), m_WhoisSent( false ), m_DownloadAllowed( false ), m_DownloadStarted( false ), m_DownloadFinished( false ), m_FinishedLoading( false ), m_Lagging( false ),
 m_DropVote( false ), m_KickVote( false ), m_Muted( false ), m_LeftMessageSent( false ), m_GProxy( false ), m_GProxyDisconnectNoticeSent( false ), m_GProxyReconnectKey( rand( ) ), m_LastGProxyAckTime( 0 ), m_Autoban( false ), m_Locked( false ), m_ForfeitVote( false ), m_DrawVote( false ), m_TimeActive( 0 ), m_UsedPause( false ), m_PauseTried( 0 ), m_CLetter( "X?" ), m_Country( "unknown" ), m_Cookies( 0 ), m_Count( 0 ), m_Silence( false ), m_ForcedGproxy( false ), m_HasLeft( false ),
-m_AFKMarked( false ), m_SafeDrop( false ), m_FeedLevel( 0 ), m_VKTimes( 0 ), m_HighPingTimes( 0 ), m_AnnounceTime( GetTime( ) )
+m_AFKMarked( false ), m_SafeDrop( false ), m_FeedLevel( 0 ), m_VKTimes( 0 ), m_HighPingTimes( 0 ), m_AnnounceTime( GetTime( ) ), m_Level( 0 ), m_LevelName( "unknown" )
 {
 
 }
@@ -232,7 +232,7 @@ m_PID( nPID ), m_Name( nName ), m_InternalIP( nInternalIP ), m_JoinedRealm( nJoi
 m_LastMapPartSent( 0 ), m_LastMapPartAcked( 0 ), m_StartedDownloadingTicks( 0 ), m_FinishedLoadingTicks( 0 ), m_StartedLaggingTicks( 0 ), m_StatsSentTime( 0 ), m_StatsDotASentTime( 0 ), m_LastGProxyWaitNoticeSentTime( 0 ), m_Score( -100000.0 ), m_WinPerc( 0.0 ), m_LeavePerc( 0.0 ), m_Games( 0 ),
 m_LoggedIn( false ), m_Spoofed( false ), m_PasswordProt( 0 ), m_Registered( false ), m_Reserved( nReserved ), m_WhoisShouldBeSent( false ), m_WhoisSent( false ), m_DownloadAllowed( false ), m_DownloadStarted( false ), m_DownloadFinished( false ), m_FinishedLoading( false ), m_Lagging( false ),
 m_DropVote( false ), m_KickVote( false ), m_Muted( false ), m_LeftMessageSent( false ), m_GProxy( false ), m_GProxyDisconnectNoticeSent( false ), m_GProxyReconnectKey( rand( ) ), m_LastGProxyAckTime( 0 ), m_Autoban( false ), m_Locked( false ), m_ForfeitVote( false ), m_DrawVote( false ), m_TimeActive( 0 ), m_UsedPause( false ), m_PauseTried( 0 ), m_CLetter( "??" ), m_Country( "unknown" ), m_Cookies( 0 ), m_Count( 0 ), m_Silence( false ), m_ForcedGproxy( false ), m_HasLeft( false ),
-m_AFKMarked( false ), m_SafeDrop( false ), m_FeedLevel( 0 ), m_VKTimes( 0 ), m_HighPingTimes( 0 ), m_AnnounceTime( GetTime( ) )
+m_AFKMarked( false ), m_SafeDrop( false ), m_FeedLevel( 0 ), m_VKTimes( 0 ), m_HighPingTimes( 0 ), m_AnnounceTime( GetTime( ) ), m_Level( 0 ), m_LevelName( "unknown" )
 {
 	// todotodo: properly copy queued packets to the new player, this just discards them
 	// this isn't a big problem because official Warcraft III clients don't send any packets after the join request until they receive a response
@@ -268,7 +268,7 @@ string CGamePlayer :: GetNameTerminated( )
 
 uint32_t CGamePlayer :: GetPing( bool LCPing )
 {
-	// just average all the pings in the vector, nothing fancy
+	// just average all the pings in the vector, nothing fancy 
 
 	if( m_Pings.empty( ) )
 		return 0;

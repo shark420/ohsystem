@@ -2313,7 +2313,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 if( (*i)->GetServer( ) == JoinedRealm || JoinedRealm.empty() )
                 {
                         Level = (*i)->IsLevel( joinPlayer->GetName( ) );
-                        LevelName = (*i)->GetLevelName( Level );
+                        if( Level != 0 )
+                                LevelName = m_GHost->m_Ranks[Level-1]
                         break;
                 }
         }
@@ -2335,28 +2336,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 {
                         uint32_t level = UTIL_ToUInt32(lev);
                         Level = level;
-                        if( level == 0 )
-                                LevelName = "Member";
-                        else if( level == 1 )
-                                LevelName = "Vouched";
-                        else if( level == 2 )
-                                LevelName = "Reserved";
-                        else if( level == 3 )
-                                LevelName = "Safelisted";
-                        else if( level == 4 )
-                                LevelName = "Website Moderator";
-                        else if( level == 5 )
-                                LevelName = "Simple Bot Moderator";
-                        else if( level == 6 )
-                                LevelName = "Full Bot Moderator";
-                        else if( level == 7 )
-                                LevelName = "Global Moderator";
-                        else if( level == 8 )
-                                LevelName = "Hoster";
-                        else if( level == 9 )
-                                LevelName = "Admin";
-                        else if( level == 10 )
-                                LevelName = "Root Admin";
+                        if( Level != 0 )
+                                LevelName = m_GHost->m_Ranks[Level-1];
                 }
             }
         }
@@ -2709,6 +2690,10 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         if( Level >= 3 && m_GHost->m_FunCommands)
                 Player->SetCookie( 3 );
  
+        // set level / levelName
+         Player->SetLevel( Level );
+         Player->SetLevelName( LevelName );
+         
         // consider LAN players to have already spoof checked since they can't
         // since so many people have trouble with this feature we now use the JoinedRealm to determine LAN status
  
@@ -2721,7 +2706,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 Player->SetSpoofedRealm("Garena");
         }
  
-        if( m_GameNoGarena && JoinedRealm == "garena" )
+        if( m_GameNoGarena && JoinedRealm == "garena" && Level == 0 )
         {
                 m_Denied.push_back( joinPlayer->GetName( ) + " " + Player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                 SendAllChat( "Player ["+joinPlayer->GetName( )+"] got kicked for joining from [Garena]" );

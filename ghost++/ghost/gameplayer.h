@@ -160,6 +160,8 @@ private:
 	uint32_t m_VKTimes;
 	uint32_t m_HighPingTimes;
 	uint32_t m_AnnounceTime;
+        uint32_t m_Level;
+        string m_LevelName;
 
 public:
 	CGamePlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket, unsigned char nPID, string nJoinedRealm, string nName, BYTEARRAY nInternalIP, bool nReserved );
@@ -231,6 +233,8 @@ public:
 	uint32_t GetVKTimes( )						{ return m_VKTimes; }
 	uint32_t GetHighPingTimes( )					{ return m_HighPingTimes; }
 	uint32_t GetAnnounceTime( )					{ return m_AnnounceTime; }
+        uint32_t GetLevel( )                                            { return m_Level; }
+        string GetLevelName( )                                          { return m_LevelName; }
 
 	void SetLeftReason( string nLeftReason )										{ m_LeftReason = nLeftReason; }
 	void SetSpoofedRealm( string nSpoofedRealm )									{ m_SpoofedRealm = nSpoofedRealm; }
@@ -282,7 +286,8 @@ public:
 	void SetVKTimes( )												{ m_VKTimes += 1; }
 	void SetHighPingTimes( )											{ m_HighPingTimes += 1; }
 	void SetAnnounceTime( )											{ m_AnnounceTime = GetTime(); }
-
+        void SetLevel( )                                                                        { m_Level = nLevel; }
+        void SetLevelName( )                                                                    { m_LevelName = nLevelname; }
 	string GetNameTerminated( );
 	uint32_t GetPing( bool LCPing );
 	bool GetIsIgnoring( string username );
