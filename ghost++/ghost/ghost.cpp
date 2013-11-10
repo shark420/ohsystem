@@ -1490,6 +1490,7 @@ void CGHost :: SetConfigs( CConfig *CFG )
         m_FunCommands = CFG->GetInt("oh_general_funcommands", 1 ) == 0 ? false : true;
         m_BetSystem = CFG->GetInt("oh_general_betsystem", 1 ) == 0 ? false : true;
         m_AccountProtection = CFG->GetInt("oh_general_accountprotection", 1 ) == 0 ? false : true;
+        m_Announce = CFG->GetInt("oh_announce", 0 ) == 0 ? false : true;
 	//m_VoteingModes = CFG->GetInt( "oh_modevoting", 0 ) == 0 ? false : true;
 }
 

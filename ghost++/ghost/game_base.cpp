@@ -867,7 +867,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
         }
  
         // set announce
-        if( m_GameLoaded && GetTime() - m_LastInGameAnnounce >= 420 )
+        if( m_GameLoaded && GetTime() - m_LastInGameAnnounce >= 420 && m_GHost->m_Announce )
         {
                 AnnounceEvent( (rand()%(m_GHost->m_AnnounceLines-1))+1 );
                 m_LastInGameAnnounce = GetTime();

@@ -195,6 +195,7 @@ public:
         bool m_AccountProtection;
         vector<string> m_Rules;
         vector<string> m_Ranks;
+        bool m_Announce;
         
 	CGHost( CConfig *CFG );
 	~CGHost( );
