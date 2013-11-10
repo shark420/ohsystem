@@ -3506,7 +3506,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                 // This command is normally used in a relation to a modified GProxy.
                                 // GProxy will be added soon to the SVN
                                 //
-                                else if( Command == "rconpw" && m_AccountProtection )
+                                else if( Command == "rconpw" && m_GHost->m_AccountProtection )
                                 {
                                                 m_PairedPassChecks.push_back( PairedPassCheck( User, m_GHost->m_DB->ThreadedPassCheck( User, Payload, 0 ) ) );
                                 }
@@ -3580,7 +3580,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                 //
                                 // !PM
                                 //
-                                else if( ( Command == "pm" || Command == "mail" ) && !Payload.empty( ) && m_MessageSystem )
+                                else if( ( Command == "pm" || Command == "mail" ) && !Payload.empty( ) && m_GHost->m_MessageSystem )
                                 {
                                         CDBBan *Ban = IsBannedName( User );
  
