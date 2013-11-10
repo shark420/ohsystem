@@ -3603,32 +3603,11 @@ for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_
         {
                 if( Payload.empty( ) )
                 {
-                        SendChat( player, "You need to specify a correct reason." );
-                        SendChat( player, "Reasons: Leaving|Flaming|AFK|Spam|Fountainfarm|Gameruin|Hacking|Bugabuse" );
+                    SendChat( player, "Rule Tags: "+GetRuleTags( ) );
+                    SendChat( player, "You can see a rule by using !rule <tag>");
                 }
-                transform( Payload.begin( ), Payload.end( ), Payload.begin( ), (int(*)(int))tolower );
-                if( Payload == "leave" || Payload == "leaving" )
-                        SendChat( player, "[Leaving] Leave the game more than 3 min. before tree/throne is dead." );
-                else if( Payload == "flame" || Payload == "flameing" )
-                        SendChat( player, "[Flaming] Insult other people, using words like 'noob', 'fuck you', 'bastard', 'motherfucker', and so on. It is admins decision which words count as flaming!." );
-                else if( Payload == "afk" )
-                        SendChat( player, "[AFK] Being afk and/or not playing any more. Also moving around at fountain / in base. It is admins decision what counts as afk!." );
-                else if( Payload == "spam" || Payload == "spaming" )
-                        SendChat( player, "[Spam] Chatting very much text in very less time will be muted and banned." );
-                else if( Payload == "fountainfarm" )
-                        SendChat( player, "[FountainFarm] Kill enemies inside the fountain area (healing area). Does not invlude Zeus ulti. At the end, its admins decision what counts as fountain farm." );
-                else if( Payload == "gameruin" )
-                {
-                        SendChat( player, "[Game Ruin] Ruining the fun for other players in any way, inclusive but not exclusive item stealing, item destruction, feed on purpose, buying mass courier," );
-                        SendChat( player, "[Game Ruin] Give enemies information about team, ... At the end, its admins decision what counts as game ruining." );
-                }
-                else if( Payload == "hack" || Payload == "hacking" )
-                        SendChat( player, "[Hack] Using tools like maphack (or any other hacking tools) or abusing known bugs of the map. At the end, its admins decision what counts as bug abusing." );
                 else
-                {
-                        SendChat( player, "Error, you picked a false category, use one of the following:" );
-                        SendChat( player, "Reasons: Leaving|Flaming|AFK|Spam|FountainFarm|GameRuin|Hacking|BugAbuse" );
-                }
+                    SendChat( player, GetRule( Payload ) );
         }
  
 /*
@@ -3725,4 +3704,67 @@ bool CGame :: CustomVoteKickReason( string reason )
                 return true;
  
         return false;
+}
+
+string CGame :: GetRuleTags( )
+{
+    string Tags;
+    uint32_t saver = 0;
+    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_Ghost->m_Rules.end( ); i++ )
+    {
+        string tag;
+        stringstream SS;
+        SS << *i;
+        SS >> tag;
+        if( Tags.empty())
+            Tags = tags;
+        else
+            Tags += ", " + tags;
+        ++saver;
+        if( saved > 10 )
+        {
+            CONSOLE_Print( "There to many rules, stopping after 10.");
+            break;
+        }
+    }
+    return Tags;
+}
+
+string CGame :: GetRule( string tag )
+{
+    transform( tag.begin( ), tag.end( ), tag.begin( ), (int(*)(int))tolower );
+    uint32_t saver = 0;
+    for( vector<string> :: iterator i = m_GHost->m_Rules.begin( ); i = m_Ghost->m_Rules.end( ); i++ )
+    {
+        string rtag;
+        string rule;
+        stringstream SS;
+        SS << *i;
+        SS >> rtag;
+
+        if( !SS.fail( ) && ( rtag == tag || rtag.find( tag ) != string :: npos))
+        {
+                if( SS.eof( ) )
+                        CONSOLE_Print( "[RULE: "+rtag+"] missing input #2 (Rule)." );
+                else
+                {
+                        getline( SS, rule );
+                        string :: size_type Start = rule.find_first_not_of( " " );
+
+                        if( Start != string :: npos )
+                                rule = rule.substr( Start );
+                        
+                        return "["+rtag+"] "+rule;
+                }
+                return "Error. Bad input for the rule command, please contact the bot owner with the exact command to fix this";
+        }
+        ++saver;
+        if( saved > 10 )
+        {
+            CONSOLE_Print( "There to many rules, stopping after 10.");
+            return "Error, hit to many rules, please report this to the bot owner.";
+            break;
+        }
+    }
+    return "Error. You have probably choosen a wrong tag, please recheck the tags with '!rules'";
 }

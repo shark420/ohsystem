@@ -83,6 +83,8 @@ public:
 	virtual bool IsGameDataSaved( );
 	virtual void SaveGameData( );
 	virtual bool CustomVoteKickReason( string reason );
+        virtual string GetRule( string tag );
+        virtual string GetRuleTags( );
 };
 
 #endif

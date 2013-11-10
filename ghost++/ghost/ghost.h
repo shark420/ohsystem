@@ -193,6 +193,7 @@ public:
         bool m_FunCommands;
         bool m_BetSystem;
         bool m_AccountProtection;
+        vector<string> m_Rules;
         
 	CGHost( CConfig *CFG );
 	~CGHost( );
@@ -226,6 +227,7 @@ public:
 	bool FlameCheck( string message );
 	void GetDeniedCountries( );
 	void LoadDatas( );
+        void LoadRules( );
 };
 
 #endif

@@ -1806,7 +1806,7 @@ bool CGHost :: FlameCheck( string message )
 	char *check;
 	int len = message.length();
 	int c = 1;
-/*
+
 	for( std::string::iterator i=message.begin( );i!=message.end( );)
 	{
   		check=forbidden;
@@ -1835,7 +1835,7 @@ bool CGHost :: FlameCheck( string message )
 		}
 		i++;
 	}
-*/
+
 	return false;
 }
 
@@ -1858,4 +1858,21 @@ void CGHost :: LoadDatas( )
 		//m_Modes.push_back( Mode );
 		m_ColoredNames.push_back( CName );
 	}
+}
+
+void CGHost :: LoadRules( )
+{
+    string File = "rules.txt";
+    string line;
+    ifstream myfile(File.c_str());
+    if (myfile.is_open())
+    {
+	while ( getline (myfile,line) )
+	{
+        	m_Rules.push_back( line );
+	}
+	myfile.close();
+    }
+    else
+	CONSOLE_Print( "Unable to open rules.txt" );
 }
