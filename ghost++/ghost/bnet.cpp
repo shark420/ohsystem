@@ -474,15 +474,15 @@ bool CBNET :: Update( void *fd, void *send_fd )
                                 QueueChatCommand( "Error banning user. User ["+i->second->GetUser( )+"] is already permanently banned.", i->first, !i->first.empty( )  );
                         else if( Result == 2 )
                                 QueueChatCommand( "Error banning user. User ["+i->second->GetUser( )+"] is already banned for a longer amount.", i->first, !i->first.empty( )  );
-                        else if( Result == 3 )
+                        else if( Result >= 3 && Result <= 5 )
                         {
                                 AddBan( i->second->GetUser( ), i->second->GetIP( ), i->second->GetGameName( ), i->second->GetAdmin( ), i->second->GetReason( ) );
-                                QueueChatCommand( "Successfully banned ["+i->second->GetUser( )+"] on ["+i->second->GetServer( )+"]", i->first, !i->first.empty( ) );
-                        }
-                        else if( Result == 4 )
-                        {
-                                AddBan( i->second->GetUser( ), i->second->GetIP( ), i->second->GetGameName( ), i->second->GetAdmin( ), i->second->GetReason( ) );
-                                QueueChatCommand( "Successfully banned ["+i->second->GetUser( )+"] on ["+i->second->GetServer( )+"]", i->first, !i->first.empty( ) );
+                                if( Result == 3 )
+                                        QueueChatCommand( "Successfully banned ["+i->second->GetUser( )+"] on ["+i->second->GetServer( )+"]", i->first, !i->first.empty( ) );
+                                else if( Result == 4)
+                                        QueueChatCommand( "Successfully updated user ban: ["+i->second->GetUser( )+"] on ["+i->second->GetServer( )+"]", i->first, !i->first.empty( ) );
+                                else if( Result == 5)
+                                        QueueChatCommand( "Successfully perma banned user ["+i->second->GetUser( )+"] on ["+i->second->GetServer( )+"]", i->first, !i->first.empty( ) );
                         }
                         else
                                 QueueChatCommand( "Error, something gone wrong. Please report that to bot owner.", i->first, !i->first.empty( )  );

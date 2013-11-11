@@ -105,7 +105,7 @@ public:
 	virtual uint32_t PWCheck( string user );
 	virtual uint32_t PassCheck( string user, string pass, uint32_t st );
 	virtual uint32_t pm( string user, string listener, uint32_t status, string message, string type );
-	virtual string BanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country );
+	virtual uint32_t BanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country );
 	virtual bool PUp( string name, uint32_t level, string realm, string user );
 	virtual bool BanRemove( string server, string user );
         virtual bool TBRemove( string server );

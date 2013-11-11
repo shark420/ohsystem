@@ -1671,7 +1671,7 @@ uint32_t MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, 
                                 *error = mysql_error( (MYSQL *)conn );
                 }
 		if( bantime == 0 )
-			return "Updated User's ban ["+user+"] to a permanent ban.";
+			return 5;
 		else
 	                return 4;
 	}
