@@ -2286,7 +2286,6 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
  
         // check if the player is an admin or root admin on any connected realm for determining reserved status
         // we can't just use the spoof checked realm like in EventPlayerBotCommand because the player hasn't spoof checked yet
-        CONSOLE_Print( JoinedRealm );
         uint32_t Level = 0;
         string LevelName = "unknown";
  

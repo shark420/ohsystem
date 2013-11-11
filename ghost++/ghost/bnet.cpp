@@ -469,7 +469,7 @@ bool CBNET :: Update( void *fd, void *send_fd )
         {
                 if( i->second->GetReady( ) )
                 {
-                        string Result = i->second->GetResult( );
+                        uint32_t Result = i->second->GetResult( );
                         if( Result == 1 )
                                 QueueChatCommand( "Error banning user. User ["+i->second->GetUser( )+"] is already permanently banned.", i->first, !i->first.empty( )  );
                         else if( Result == 2 )
