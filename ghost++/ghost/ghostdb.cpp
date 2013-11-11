@@ -127,7 +127,7 @@ string CGHostDB :: BanCheck2( string server, string user, string type )
         return "";
 }
 
-string CGHostDB :: BanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
+uint32_t CGHostDB :: BanAdd( string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
 {
 	return false;
 }

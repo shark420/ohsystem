@@ -1377,7 +1377,7 @@ uint32_t MySQLpenp( void *conn, string *error, uint32_t botid, string name, stri
 
 			if( banamount != 1 )
 			{
-				string AddBan = MySQLBanAdd( (MYSQL *)conn, error, botid, "", EscName, "", "", EscAdmin, "Too many penalty points", banamount, "" );
+				uint32_t AddBan = MySQLBanAdd( (MYSQL *)conn, error, botid, "", EscName, "", "", EscAdmin, "Too many penalty points", banamount, "" );
 				return 2;
 			}
 			else
@@ -1516,7 +1516,7 @@ string MySQLBanCheck2( void *conn, string *error, uint32_t botid, string server,
 	return "fail";
 }
 
-string MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
+uint32_t MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, string user, string ip, string gamename, string admin, string reason, uint32_t bantime, string country )
 {
 	string EscServer = MySQLEscapeString( conn, server );
 	string EscUser = MySQLEscapeString( conn, user );
@@ -1542,9 +1542,9 @@ string MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, st
 			{
 				currentbantime = UTIL_ToUInt32( Row[0] );
 				if( currentbantime > 20000000 )
-	                		return "alreadypermbanned";
+	                		return 1;
 				else if ( currentbantime > bantime && bantime != 0 )
-					return "alreadybannedwithhigheramount";
+					return 2;
 			}
 
        		        mysql_free_result( Result );
@@ -1643,7 +1643,7 @@ string MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, st
         	        	*error = mysql_error( (MYSQL *)conn );
 		}
 
-		return "Successfully banned User ["+user+"] on ["+EscServer+"] for ["+EscReason+"]";
+		return 3;
 	}
 	else
 	{
@@ -1673,10 +1673,10 @@ string MySQLBanAdd( void *conn, string *error, uint32_t botid, string server, st
 		if( bantime == 0 )
 			return "Updated User's ban ["+user+"] to a permanent ban.";
 		else
-	                return "Successfully updated User's ban ["+user+"] on ["+EscServer+"] for ["+EscReason+"]";
+	                return 4;
 	}
 
-	return "failed";
+	return 0;
 }
 
 bool MySQLPUp( void *conn, string *error, uint32_t botid, string name, uint32_t level, string realm, string user )

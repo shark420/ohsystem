@@ -472,10 +472,10 @@ protected:
 	string m_Reason;
 	uint32_t m_BanTime;
 	string m_Country;
-	string m_Result;
+	uint32_t m_Result;
 
 public:
-	CCallableBanAdd( string nServer, string nUser, string nIP, string nGameName, string nAdmin, string nReason, uint32_t nBanTime, string nCountry ) : CBaseCallable( ), m_Server( nServer ), m_User( nUser ), m_IP( nIP ), m_GameName( nGameName ), m_Admin( nAdmin ), m_Reason( nReason ), m_BanTime( nBanTime ), m_Country( nCountry ), m_Result( "" ) { }
+	CCallableBanAdd( string nServer, string nUser, string nIP, string nGameName, string nAdmin, string nReason, uint32_t nBanTime, string nCountry ) : CBaseCallable( ), m_Server( nServer ), m_User( nUser ), m_IP( nIP ), m_GameName( nGameName ), m_Admin( nAdmin ), m_Reason( nReason ), m_BanTime( nBanTime ), m_Country( nCountry ), m_Result( 0 ) { }
 	virtual ~CCallableBanAdd( );
 
 	virtual string GetServer( )				{ return m_Server; }
@@ -485,8 +485,8 @@ public:
 	virtual string GetAdmin( )				{ return m_Admin; }
 	virtual string GetReason( )				{ return m_Reason; }
 	virtual uint32_t GetBanTime( )				{ return m_BanTime; }
-	virtual string GetResult( )				{ return m_Result; }
-	virtual void SetResult( string nResult )	{ m_Result = nResult; }
+	virtual uint32_t GetResult( )				{ return m_Result; }
+	virtual void SetResult( uint32_t nResult )	{ m_Result = nResult; }
 };
 
 class CCallablePUp : virtual public CBaseCallable

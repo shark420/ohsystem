@@ -495,23 +495,34 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
         {
               if( i->second->GetReady( ) )
                 {
-                        string Result = i->second->GetResult( );
+                        uint32_t Result = i->second->GetResult( );
  
-                        if( Result == "alreadypermbanned" )
+                        if( Result == 1 )
                                 SendAllChat( "Error banning user. The User ["+i->second->GetUser( )+"] is already permanent banned" );
-                        else if( Result == "alreadybannedwithhigheramount" )
+                        else if( Result == 2 )
                                 SendAllChat( "Error banning user. The User ["+i->second->GetUser( )+"] is already banned for a longer amount." );
-                        else if( !Result.empty() && Result != "failed" )
+                        else if( Result == 3 )
                         {
                                 for( vector<CBNET *> :: iterator j = m_GHost->m_BNETs.begin( ); j != m_GHost->m_BNETs.end( ); ++j )
                                 {
                                         if( (*j)->GetServer( ) == i->second->GetServer( ) )
                                                 (*j)->AddBan( i->second->GetUser( ), i->second->GetIP( ), i->second->GetGameName( ), i->second->GetAdmin( ), i->second->GetReason( ) );
                                 }
-                                SendAllChat( Result );
+                                SendAllChat( "Successfully IP-Banned ["+i->second->GetUser()+"] on ["+i->second->GetServer( )+"]" );
+                                SendAllChat( "Ban Reason: "+i->second->GetReason );
+                        }
+                        else if( Result == 4 )
+                        {
+                                for( vector<CBNET *> :: iterator j = m_GHost->m_BNETs.begin( ); j != m_GHost->m_BNETs.end( ); ++j )
+                                {
+                                        if( (*j)->GetServer( ) == i->second->GetServer( ) )
+                                                (*j)->AddBan( i->second->GetUser( ), i->second->GetIP( ), i->second->GetGameName( ), i->second->GetAdmin( ), i->second->GetReason( ) );
+                                }
+                                SendAllChat( "Successfully updated a ban for ["+i->second->GetUser()+"] on ["+i->second->GetServer( )+"]" );
+                                SendAllChat( "Ban Reason: "+i->second->GetReason );
                         }
                         else
-                                SendAllChat( "Something gone wrong, report this please to Grief-Code." );
+                                SendAllChat( "Something gone wrong, report this please to the bot owner." );
  
                         m_GHost->m_DB->RecoverCallable( i->second );
                         delete i->second;

@@ -470,17 +470,22 @@ bool CBNET :: Update( void *fd, void *send_fd )
                 if( i->second->GetReady( ) )
                 {
                         string Result = i->second->GetResult( );
-                        if( Result == "alreadypermbanned" )
-                                QueueChatCommand( "Error banning user. User ["+i->second->GetUser( )+"] is already permanently banned." );
-                        else if( Result == "alreadybannedwithhigheramount" )
-                                QueueChatCommand( "Error banning user. User ["+i->second->GetUser( )+"] is already banned for a longer amount." );
-                        else if( !Result.empty( ) && Result != "failed" )
+                        if( Result == 1 )
+                                QueueChatCommand( "Error banning user. User ["+i->second->GetUser( )+"] is already permanently banned.", i->first, !i->first.empty( )  );
+                        else if( Result == 2 )
+                                QueueChatCommand( "Error banning user. User ["+i->second->GetUser( )+"] is already banned for a longer amount.", i->first, !i->first.empty( )  );
+                        else if( Result == 3 )
                         {
                                 AddBan( i->second->GetUser( ), i->second->GetIP( ), i->second->GetGameName( ), i->second->GetAdmin( ), i->second->GetReason( ) );
-                                QueueChatCommand( m_GHost->m_Language->BannedUser( i->second->GetServer( ), i->second->GetUser( ) ), i->first, !i->first.empty( ) );
+                                QueueChatCommand( "Successfully banned ["+i->second->GetUser( )+"] on ["+i->second->GetServer( )+"]", i->first, !i->first.empty( ) );
+                        }
+                        else if( Result == 4 )
+                        {
+                                AddBan( i->second->GetUser( ), i->second->GetIP( ), i->second->GetGameName( ), i->second->GetAdmin( ), i->second->GetReason( ) );
+                                QueueChatCommand( "Successfully banned ["+i->second->GetUser( )+"] on ["+i->second->GetServer( )+"]", i->first, !i->first.empty( ) );
                         }
                         else
-                                QueueChatCommand( "Error, something gone wrong. Please report that to bot owner." );
+                                QueueChatCommand( "Error, something gone wrong. Please report that to bot owner.", i->first, !i->first.empty( )  );
  
                         m_GHost->m_DB->RecoverCallable( i->second );
                         delete i->second;
