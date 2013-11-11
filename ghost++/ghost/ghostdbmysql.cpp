@@ -203,20 +203,6 @@ void CGHostDBMySQL :: CreateThread( CBaseCallable *callable )
 	}
 }
 
-CCallableFromCheck *CGHostDBMySQL :: ThreadedFromCheck( string ip )
-{
-        void *Connection = GetIdleConnection( );
-
-        if( !Connection )
-                ++m_NumConnections;
-
-        CCallableFromCheck *Callable = new CMySQLCallableFromCheck( ip, Connection, m_BotID, m_Server, m_Database, m_User, m_Password, m_Port );
-        CreateThread( Callable );
-        ++m_OutstandingCallables;
-        m_Name.push_back( "fromcheck" );
-        return Callable;
-}
-
 CCallableRegAdd *CGHostDBMySQL :: ThreadedRegAdd( string user, string server, string mail, string password, string type )
 {
         void *Connection = GetIdleConnection( );
@@ -765,45 +751,6 @@ vector<string> MySQLFetchRow( MYSQL_RES *res )
 //
 // global helper functions
 //
-
-string MySQLFromCheck( void *conn, string *error, uint32_t botid, string ip )
-{
-	string EscIP = MySQLEscapeString( conn, ip );
-	string CountryLetter = "??";
-	string Country = "unknown";
-//	CONSOLE_Print( "Checking IP: "+EscIP);
-
-	std::string tip = EscIP;
-	const char * c = tip.c_str();
-	if( HasSpecialCharacters( c ) )
-		CONSOLE_Print( "Found special caracters on: "+EscIP );
-
-	string Query = "SELECT code, country FROM  `oh_geoip` WHERE INET_ATON('"+EscIP+"') BETWEEN ip_start_int AND ip_end_int;";
-        if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
-        {
-                *error = mysql_error( (MYSQL *)conn );
-                return "?? unknown";
-        }
-        else
-        {
-                MYSQL_RES *Result = mysql_store_result( (MYSQL *)conn );
-                if (Result)
-                {
-                        vector<string> Row = MySQLFetchRow( Result );
-                        if (Row.size( ) == 2)
-                        {
-                                CountryLetter = Row[0];
-                                Country = Row[1];
-				return CountryLetter+" "+Country;
-                        }
-                        mysql_free_result( Result );
-                }
-                else
-                        *error = mysql_error( (MYSQL *)conn );
-        }
-
-	return CountryLetter+" "+Country;
-}
 
 uint32_t MySQLRegAdd( void *conn, string *error, uint32_t botid, string user, string server, string mail, string password, string type )
 {
@@ -2515,16 +2462,6 @@ void CMySQLCallable :: Close( )
 	mysql_thread_end( );
 
 	CBaseCallable :: Close( );
-}
-
-void CMySQLCallableFromCheck :: operator( )( )
-{
-        Init( );
-
-        if( m_Error.empty( ) )
-                m_Result = MySQLFromCheck( m_Connection, &m_Error, m_SQLBotID, m_IP );
-
-        Close( );
 }
 
 void CMySQLCallableRegAdd :: operator( )( )

@@ -185,7 +185,6 @@ public:
 	// threaded database functions
 
 	virtual void CreateThread( CBaseCallable *callable );
-        virtual CCallableFromCheck *ThreadedFromCheck( string ip );
         virtual CCallableRegAdd *ThreadedRegAdd( string user, string server, string mail, string password, string type );
 	virtual CCallableStatsSystem *ThreadedStatsSystem( string user, string input, uint32_t one, string type );
         virtual CCallablePWCheck *ThreadedPWCheck( string user );
@@ -233,7 +232,6 @@ public:
 // global helper functions
 //
 
-string MySQLFromCheck( void *conn, string *error, uint32_t botid, string ip  );
 uint32_t MySQLRegAdd( void *conn, string *error, uint32_t botid, string user, string server, string mail, string password, string type );
 string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user, string input, uint32_t one, string type );
 uint32_t MySQLPWCheck( void *conn, string *error, uint32_t botid, string user );
@@ -297,16 +295,6 @@ public:
 	virtual void Close( );
 };
 
-class CMySQLCallableFromCheck : public CCallableFromCheck, public CMySQLCallable
-{
-public:
-        CMySQLCallableFromCheck( string nIP, void *nConnection, uint32_t nSQLBotID, string nSQLServer, string nSQLDatabase, string nSQLUser, string nSQLPassword, uint16_t nSQLPort ) : CBaseCallable( ), CCallableFromCheck( nIP ), CMySQLCallable( nConnection, nSQLBotID, nSQLServer, nSQLDatabase, nSQLUser, nSQLPassword, nSQLPort ) { }
-        virtual ~CMySQLCallableFromCheck( ) { }
-
-        virtual void operator( )( );
-        virtual void Init( ) { CMySQLCallable :: Init( ); }
-        virtual void Close( ) { CMySQLCallable :: Close( ); }
-};
 
 class CMySQLCallableRegAdd : public CCallableRegAdd, public CMySQLCallable
 {

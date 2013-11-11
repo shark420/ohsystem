@@ -235,9 +235,6 @@ CBaseGame :: ~CBaseGame( )
         for( vector<PairedBanAdd> :: iterator i = m_PairedBanAdds.begin( ); i != m_PairedBanAdds.end( ); ++i )
                 m_GHost->m_Callables.push_back( i->second );
  
-        for( vector<PairedFromCheck> :: iterator i = m_PairedFromChecks.begin( ); i != m_PairedFromChecks.end( ); ++i )
-                m_GHost->m_Callables.push_back( i->second );
- 
         for( vector<PairedLogUpdate> :: iterator i = m_PairedLogUpdates.begin( ); i != m_PairedLogUpdates.end( ); ++i )
                 m_GHost->m_Callables.push_back( i->second );
        
@@ -493,32 +490,7 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 else
                         ++i;
         }
- 
-        for( vector<PairedFromCheck> :: iterator i = m_PairedFromChecks.begin( ); i != m_PairedFromChecks.end( ); )
-        {
-                if( i->second->GetReady( ) )
-                {
-                        string Result = i->second->GetResult( );
-                        CGamePlayer *Player = GetPlayerFromName( i->first, true );
-                        if( Player )
-                        {
-                                stringstream SS;
-                                string CountryLetter;
-                                string Country;
-                                SS << Result;
-                                SS >> CountryLetter;
-                                SS >> Country;
-                                Player->SetCLetter( CountryLetter );
-                                Player->SetCountry( Country );
-                        }
-                        m_GHost->m_DB->RecoverCallable( i->second );
-                        delete i->second;
-                        i = m_PairedFromChecks.erase( i );
-                }
-                else
-                        ++i;
-        }
- 
+
         for( vector<PairedBanAdd> :: iterator i = m_PairedBanAdds.begin( ); i != m_PairedBanAdds.end( ); )
         {
               if( i->second->GetReady( ) )
@@ -2704,14 +2676,15 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 potential->SetGarenaUser( NULL );
                         Player->SetSpoofed( true );
                 Player->SetSpoofedRealm("Garena");
+                JoinedRealm = "Garena";
         }
  
-        if( m_GameNoGarena && JoinedRealm == "garena" && Level == 0 )
+        if( m_GameNoGarena && JoinedRealm == "Garena" && Level == 0 )
         {
                 m_Denied.push_back( joinPlayer->GetName( ) + " " + Player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
-                SendAllChat( "Player ["+joinPlayer->GetName( )+"] got kicked for joining from [Garena]" );
+                SendAllChat( "Player ["+joinPlayer->GetName( )+"] got kicked for joining from Garena." );
                 Player->SetDeleteMe( true );
-                Player->SetLeftReason( "was kicked for being banned." );
+                Player->SetLeftReason( "was kicked for joining from Garena." );
                 Player->SetLeftCode( PLAYERLEAVE_LOBBY );
                 Player->SetLeftMessageSent( true );
                 return;
@@ -2720,9 +2693,9 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         if( !Player->GetGProxy( ) && Player->GetForcedGproxy( ) )
         {
                 m_Denied.push_back( joinPlayer->GetName( ) + " " + Player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
-                SendAllChat( "Player ["+joinPlayer->GetName( )+"] got kicked for joining without Gproxy (but is forced to use it)." );
+                SendAllChat( "Player ["+joinPlayer->GetName( )+"] got kicked for joining without GProxy, but is forced to." );
                 Player->SetDeleteMe( true );
-                Player->SetLeftReason( "was kicked for not using Gproxy." );
+                Player->SetLeftReason( "was kicked for not using GProxy but is forced to." );
                 Player->SetLeftCode( PLAYERLEAVE_LOBBY );
                 Player->SetLeftMessageSent( true );
                 return;
@@ -2731,15 +2704,6 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         GAME_Print( 4, "", "", joinPlayer->GetName(), "", JoinedRealm );
  
         SendAllChat( "A "+LevelName+" joined [" + joinPlayer->GetName() + "@" + JoinedRealm + "]" );
- 
-        // check country code
-        // Currently disabled, some querys for the fromcheck need over 50 mseconds which does create some smaller laggs
-        // This will be disabled until we have created a decent solution
- 
-        // m_PairedFromChecks.push_back( PairedFromCheck( joinPlayer->GetName( ), m_GHost->m_DB->ThreadedFromCheck( Player->GetExternalIPString( ) ) ) );
- 
-        if( JoinedRealm.empty( ) )
-                Player->SetSpoofed( true );
  
         Player->SetWhoisShouldBeSent( m_GHost->m_SpoofChecks == 1 || ( m_GHost->m_SpoofChecks == 2 && ( Level >= 5 ) ) );
         m_Players.push_back( Player );

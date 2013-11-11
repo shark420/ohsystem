@@ -217,11 +217,6 @@ CDBDotAPlayerSummary *CGHostDB :: DotAPlayerSummaryCheck( string name )
 	return NULL;
 }
 
-string CGHostDB :: FromCheck( string ip )
-{
-	return "??";
-}
-
 bool CGHostDB :: DownloadAdd( string map, uint32_t mapsize, string name, string ip, uint32_t spoofed, string spoofedrealm, uint32_t downloadtime )
 {
 	return false;
@@ -250,11 +245,6 @@ bool CGHostDB :: W3MMDVarAdd( uint32_t gameid, map<VarP,string> var_strings )
 void CGHostDB :: CreateThread( CBaseCallable *callable )
 {
 	callable->SetReady( true );
-}
-
-CCallableFromCheck *CGHostDB :: ThreadedFromCheck( string ip )
-{
-        return NULL;
 }
 
 CCallableRegAdd *CGHostDB :: ThreadedRegAdd( string user, string server, string mail, string password, string type )
@@ -455,11 +445,6 @@ void CBaseCallable :: Close( )
 {
 	m_EndTicks = GetTicks( );
 	m_Ready = true;
-}
-
-CCallableFromCheck :: ~CCallableFromCheck( )
-{
-
 }
 
 CCallableRegAdd :: ~CCallableRegAdd( )

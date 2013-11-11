@@ -47,7 +47,6 @@ class CCallablepenp;
 class CCallableBanAdd;
 class CCallableBanCheck2;
 class CCallableStoreLog;
-class CCallableFromCheck;
 class CCallablePList;
 
 typedef pair<string,CCallablePWCheck *> PairedPWCheck;
@@ -57,7 +56,6 @@ typedef pair<string,CCallableBanCheck2 *> PairedBanCheck2;
 typedef pair<string,CCallablepenp *> Pairedpenp;
 typedef pair<string,CCallableBanAdd *> PairedBanAdd;
 typedef pair<string,CCallableStoreLog *> PairedLogUpdate;
-typedef pair<string,CCallableFromCheck *> PairedFromCheck;
 
 class CBaseGame
 {
@@ -72,7 +70,6 @@ protected:
         vector<PairedPWCheck> m_PairedPWChecks;				// vector for checking if a player joined with a password
 	vector<Pairedpm> m_Pairedpms;
 	vector<PairedWPCheck> m_PairedWPChecks;
-	vector<PairedFromCheck> m_PairedFromChecks;
         vector<PairedBanCheck2> m_PairedBanCheck2s;
         vector<PairedLogUpdate> m_PairedLogUpdates;
 	queue<CIncomingAction *> m_Actions;				// queue of actions to be sent
