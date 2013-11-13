@@ -664,7 +664,6 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
                                 }
                         }
  
-                        // autoend, check gameplayer spread
                         uint32_t spread = CountAlly > CountEnemy ? CountAlly - CountEnemy : CountEnemy - CountAlly;
  
                         if( spread <= 1 )
@@ -673,7 +672,7 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
                                 SendAllChat( "User ["+player->GetName( ) +"] will be autobanned at the end of the game, if he/seh didn't left within the last 5 minutes." );
                         }
  
-                        if( m_GHost->m_MaxAllowedSpread >= 3 && m_Stats )
+                        if( m_GHost->m_MaxAllowedSpread >= spread && m_Stats )
                         {
                                 SendAllChat( "[AUTO-END] The spread between the two teams is already ["+UTIL_ToString(spread)+"]" );
                                 m_Stats->SetWinner( ( team + 1 ) % 2 );
@@ -685,13 +684,10 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
  
                         if( CountAlly+CountEnemy <= m_GHost->m_MinPlayerAutoEnd && m_Stats )
                         {
-                                //Weired missing autoend //recheck later
                                 string Winner = ( team + 1 ) % 2 == 1 ? "Sentinel" : "Scourge";
                                 SendAllChat("[AUTO-END] Too few players ingame, this game will end in fifteen seconds." );
                                 SendAllChat("[AUTO-END] Winning team was set to ["+ Winner +"]" );
                                 m_Stats->SetWinner( ( team + 1 ) % 2 );
-                                //m_Stats->LockStats( );
-                                //m_SoftGameOver = true;
                                 m_GameOverTime = GetTime( );
                         }
  
@@ -718,7 +714,7 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
                 }
  
                 // if stats and not solo, and at least two leavers in first four minutes, then draw the game
-                if( !m_SoftGameOver && m_Stats && m_GameOverTime == 0 && Team != 12 && m_GameTicks < 1000 * 60 * 7 && m_GHost->m_EarlyEnd )
+                if( !m_SoftGameOver && m_Stats && m_GameOverTime == 0 && Team != 12 && m_GameTicks < 1000 * 60 * 5 && m_GHost->m_EarlyEnd )
                 {
                         // check how many leavers, by starting from start players and subtracting each non-leaver player
                         uint32_t m_NumLeavers = m_StartPlayers;
@@ -731,7 +727,7 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
  
                         if( m_NumLeavers >= 2 )
                         {
-                                SendAllChat( "[AUTO-END] Two players have left in the first few minutes." );
+                                SendAllChat( "[AUTO-END] Two players have left in the first 5 minutes." );
                                 SendAllChat( "[AUTO-END] This game has been marked as a draw. You may leave at any time." );
                                 SendAllChat( "[AUTO-END] Please stay till the end to avoid any false bans!" );
  
