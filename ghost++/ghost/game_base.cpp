@@ -914,7 +914,8 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                                         {
                                                 string name=(*i)->GetName();
                                                 string realm=(*i)->GetJoinedRealm( );
-                                                m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                                if(m_GHost->m_AutoDenyUsers)
+                                                    m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                                 (*i)->SetDeleteMe( true );
                                                 (*i)->SetLeftReason( "got kicked for not being registered." );
                                                 (*i)->SetLeftCode( PLAYERLEAVE_LOBBY );
@@ -924,7 +925,8 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                                         {
                                                 string name=(*i)->GetName();
                                                 string realm=(*i)->GetJoinedRealm( );
-                                                m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                                if(m_GHost->m_AutoDenyUsers)
+                                                    m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                                 (*i)->SetDeleteMe( true );
                                                 (*i)->SetLeftReason( "got kicked because he does not have enough games." );
                                                 (*i)->SetLeftCode( PLAYERLEAVE_LOBBY );
@@ -937,7 +939,8 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                                         {
                                                 string name=(*i)->GetName();
                                                 string realm=(*i)->GetJoinedRealm( );
-                                                m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                                if(m_GHost->m_AutoDenyUsers)
+                                                    m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                                 (*i)->SetDeleteMe( true );
                                                 (*i)->SetLeftReason( "got kicked because he does not have enough games." );
                                                 (*i)->SetLeftCode( PLAYERLEAVE_LOBBY );
@@ -955,7 +958,8 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 {
                         if( (*i)->GetPasswordProt( ) && GetTime( ) - (*i)->GetJoinTime( ) >= 20 )
                         {
-                                m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                if(m_GHost->m_AutoDenyUsers)
+                                    m_Denied.push_back( (*i)->GetName( ) + " " + (*i)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                 (*i)->SetDeleteMe( true );
                                 (*i)->SetLeftReason( "was kicked for non typing the password." );
                                 (*i)->SetLeftCode( PLAYERLEAVE_LOBBY );
@@ -1008,7 +1012,8 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                                         if( CC == "a1" )
                                         {
                                                 SendAllChat( "Autokicking ["+(*k)->GetName()+"] for joining with a Proxy." );
-                                                m_Denied.push_back( (*k)->GetName( ) + " " + (*k)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                                if(m_GHost->m_AutoDenyUsers)
+                                                    m_Denied.push_back( (*k)->GetName( ) + " " + (*k)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                                 (*k)->SetDeleteMe( true );
                                                 (*k)->SetLeftReason( "was kicked for joining with a proxy." );
                                                 (*k)->SetLeftCode( PLAYERLEAVE_LOBBY );
@@ -1019,7 +1024,8 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                                 if( unallowedcountry )
                                 {
                                         SendAllChat( "Autokicking User ["+(*k)->GetName()+"] for joining with a denied country: " + CC );
-                                        m_Denied.push_back( (*k)->GetName( ) + " " + (*k)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                        if(m_GHost->m_AutoDenyUsers)
+                                            m_Denied.push_back( (*k)->GetName( ) + " " + (*k)->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                         (*k)->SetDeleteMe( true );
                                         (*k)->SetLeftReason( "was kicked for having a denied country." );
                                         (*k)->SetLeftCode( PLAYERLEAVE_LOBBY );
@@ -2134,7 +2140,7 @@ void CBaseGame :: EventPlayerDeleted( CGamePlayer *player )
         if( !m_KickVotePlayer.empty( ) )
                 SendAllChat( m_GHost->m_Language->VoteKickCancelled( m_KickVotePlayer ) );
  
-        if( !m_GameLoading && !m_GameLoaded )
+        if( !m_GameLoading && !m_GameLoaded && m_GHost->m_AutoDenyUsers)
                 m_Denied.push_back( player->GetName( ) + " " + player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
  
         m_KickVotePlayer.clear( );
@@ -2352,7 +2358,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                         m_GHost->m_Callables.push_back( m_GHost->m_DB->ThreadedBanAdd( m_GHost->m_BNETs[0]->GetServer( ), joinPlayer->GetName( ), potential->GetExternalIPString( ), m_GameName, "PeaceMaker", "attempted to join with spoofed name: " + joinPlayer->GetName( ), 0, "" ) );
  
                 CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is trying to join the game with an invalid name of length " + UTIL_ToString( joinPlayer->GetName( ).size( ) ) );
-                m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                if(m_GHost->m_AutoDenyUsers)
+                    m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                 potential->Send( m_Protocol->SEND_W3GS_REJECTJOIN( REJECTJOIN_FULL ) );
                 potential->SetDeleteMe( true );
                 return;
@@ -2363,7 +2370,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         if( joinPlayer->GetName( ) == m_VirtualHostName )
         {
                 CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is trying to join the game with the virtual host name" );
-                m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ));
+                if(m_GHost->m_AutoDenyUsers)
+                    m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ));
                 potential->Send( m_Protocol->SEND_W3GS_REJECTJOIN( REJECTJOIN_FULL ) );
                 potential->SetDeleteMe( true );
                 return;
@@ -2375,7 +2383,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
         {
                 CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is trying to join the game but that name is already taken" );
                 // SendAllChat( m_GHost->m_Language->TryingToJoinTheGameButTaken( joinPlayer->GetName( ) ) );
-                m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                if(m_GHost->m_AutoDenyUsers)
+                    m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                 potential->Send( m_Protocol->SEND_W3GS_REJECTJOIN( REJECTJOIN_FULL ) );
                 potential->SetDeleteMe( true );
                 return;
@@ -2398,7 +2407,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                         // oops!
  
                         CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is trying to join the game over LAN but used an incorrect entry key" );
-                        m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                        if(m_GHost->m_AutoDenyUsers)
+                            m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                         potential->Send( m_Protocol->SEND_W3GS_REJECTJOIN( REJECTJOIN_WRONGPASSWORD ) );
                         potential->SetDeleteMe( true );
                         return;
@@ -2428,7 +2438,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                                         }
                                         // let banned players "join" the game with an arbitrary PID then immediately close the connection
                                         // this causes them to be kicked back to the chat channel on battle.net
-                                        m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                        if(m_GHost->m_AutoDenyUsers)
+                                                m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                         vector<CGameSlot> Slots = m_Map->GetSlots( );
                                         potential->Send( m_Protocol->SEND_W3GS_SLOTINFOJOIN( 1, potential->GetSocket( )->GetPort( ), potential->GetExternalIP( ), Slots, 0, m_Map->GetMapLayoutStyle( ), m_Map->GetMapNumPlayers( ) ) );
                                         potential->SetDeleteMe( true );
@@ -2457,7 +2468,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
  
                                         // let banned players "join" the game with an arbitrary PID then immediately close the connection
                                         // this causes them to be kicked back to the chat channel on battle.net
-                                        m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                        if(m_GHost->m_AutoDenyUsers)
+                                            m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                         vector<CGameSlot> Slots = m_Map->GetSlots( );
                                         potential->Send( m_Protocol->SEND_W3GS_SLOTINFOJOIN( 1, potential->GetSocket( )->GetPort( ), potential->GetExternalIP( ), Slots, 0, m_Map->GetMapLayoutStyle( ), m_Map->GetMapNumPlayers( ) ) );
                                         potential->SetDeleteMe( true );
@@ -2525,7 +2537,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 if( EnforcePID == 255 || EnforceSlot.GetPID( ) == 255 || EnforceSID >= m_Slots.size( ) )
                 {
                         CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is trying to join the game but isn't in the enforced list" );
-                        m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                        if(m_GHost->m_AutoDenyUsers)
+                            m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                         potential->Send( m_Protocol->SEND_W3GS_REJECTJOIN( REJECTJOIN_FULL ) );
                         potential->SetDeleteMe( true );
                         return;
@@ -2621,7 +2634,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                                         CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is using a banned name" );
                                         SendAllChat( m_GHost->m_Language->HasBannedName( joinPlayer->GetName( ) ) );
                                         SendAllChat( m_GHost->m_Language->UserWasBannedOnByBecause( Ban->GetServer( ), Ban->GetName( ), Ban->GetDate( ), Ban->GetAdmin( ), Ban->GetReason( ), Ban->GetExpire( ), Ban->GetMonths( ) ) );
-                                        m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                        if(m_GHost->m_AutoDenyUsers)
+                                            m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                         break;
                                 }
                         }
@@ -2635,7 +2649,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                                 CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] is using a banned IP address" );
                                 SendAllChat( m_GHost->m_Language->HasBannedIP( joinPlayer->GetName( ), potential->GetExternalIPString( ), Ban->GetName( ) ) );
                                 SendAllChat( m_GHost->m_Language->UserWasBannedOnByBecause( Ban->GetServer( ), Ban->GetName( ), Ban->GetDate( ), Ban->GetAdmin( ), Ban->GetReason( ), Ban->GetExpire( ), Ban->GetMonths( ) ) );
-                                m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                                if(m_GHost->m_AutoDenyUsers)
+                                    m_Denied.push_back( joinPlayer->GetName( ) + " " + potential->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                                 break;
                         }
                 }
@@ -2687,7 +2702,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
  
         if( m_GameNoGarena && JoinedRealm == "Garena" && Level == 0 )
         {
-                m_Denied.push_back( joinPlayer->GetName( ) + " " + Player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                if(m_GHost->m_AutoDenyUsers)
+                    m_Denied.push_back( joinPlayer->GetName( ) + " " + Player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                 SendAllChat( "Player ["+joinPlayer->GetName( )+"] got kicked for joining from Garena." );
                 Player->SetDeleteMe( true );
                 Player->SetLeftReason( "was kicked for joining from Garena." );
@@ -2698,7 +2714,8 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
  
         if( !Player->GetGProxy( ) && Player->GetForcedGproxy( ) )
         {
-                m_Denied.push_back( joinPlayer->GetName( ) + " " + Player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                if(m_GHost->m_AutoDenyUsers)
+                    m_Denied.push_back( joinPlayer->GetName( ) + " " + Player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
                 SendAllChat( "Player ["+joinPlayer->GetName( )+"] got kicked for joining without GProxy, but is forced to." );
                 Player->SetDeleteMe( true );
                 Player->SetLeftReason( "was kicked for not using GProxy but is forced to." );

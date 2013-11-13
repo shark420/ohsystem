@@ -196,6 +196,7 @@ public:
         bool m_Announce;
         bool m_FountainFarmWarning;
         string m_FountainFarmMessage;
+        bool m_AutoDenyUsers;
         
 	CGHost( CConfig *CFG );
 	~CGHost( );
