@@ -2054,17 +2054,7 @@ void CBaseGame :: EventPlayerDeleted( CGamePlayer *player )
                 GAME_Print( 2, MinString, SecString, player->GetName(), "", player->GetLeftReason( ) );
                 m_Leavers++;
         }
-        if( !m_GameLoaded && !m_GameLoading )
-        {
-                if( GetSIDFromPID( player->GetPID( ) ) == 11 )
-                {
-                        m_AutoStartPlayers = 10;
-                        CloseSlot( 11, false );
-                }
-                m_LogData = m_LogData + "2" + "\t" + "blm" + "\t" + player->GetName() + "\t" + "-" + "\t" + "-" + "\t" + "-" + "\t" + "-" + "\t" + player->GetName() + " " + player->GetLeftReason() + "\n";
-                GAME_Print( 3, "", "", player->GetName(), "", player->GetLeftReason() );
-        }
- 
+
         if( player->GetLagging( ) )
                 SendAll( m_Protocol->SEND_W3GS_STOP_LAG( player ) );
  
@@ -2126,23 +2116,33 @@ void CBaseGame :: EventPlayerDeleted( CGamePlayer *player )
                         m_Replay->AddLeaveGame( 1, player->GetPID( ), player->GetLeftCode( ) );
         }
  
-        // abort the countdown if there was one in progress
- 
-        if( m_CountDownStarted && !m_GameLoading && !m_GameLoaded )
-        {
-                SendAllChat( m_GHost->m_Language->CountDownAborted( ) );
-                m_CountDownStarted = false;
-                m_Balanced = false;
-        }
- 
         // abort the votekick
  
         if( !m_KickVotePlayer.empty( ) )
                 SendAllChat( m_GHost->m_Language->VoteKickCancelled( m_KickVotePlayer ) );
  
         if( !m_GameLoading && !m_GameLoaded && m_GHost->m_AutoDenyUsers)
-                m_Denied.push_back( player->GetName( ) + " " + player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+        {
  
+                if( GetSIDFromPID( player->GetPID( ) ) == 11 )
+                {
+                        m_AutoStartPlayers = 10;
+                        CloseSlot( 11, true );
+                }
+                m_LogData = m_LogData + "2" + "\t" + "blm" + "\t" + player->GetName() + "\t" + "-" + "\t" + "-" + "\t" + "-" + "\t" + "-" + "\t" + player->GetName() + " " + player->GetLeftReason() + "\n";
+                GAME_Print( 3, "", "", player->GetName(), "", player->GetLeftReason() );
+        
+                // abort the countdown if there was one in progress
+                if( m_CountDownStarted )
+                {
+                        SendAllChat( m_GHost->m_Language->CountDownAborted( ) );
+                        m_CountDownStarted = false;
+                        m_Balanced = false;
+                }
+        
+                m_Denied.push_back( player->GetName( ) + " " + player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+        }
+        
         m_KickVotePlayer.clear( );
         m_StartedKickVoteTime = 0;
 }

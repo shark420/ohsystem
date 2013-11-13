@@ -77,6 +77,7 @@ CGame :: CGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16_t nHost
         else if( m_Map->GetMapType( ) == "dota" )
                 m_Stats = new CStatsDOTA( this );
  
+        // Memory leak *FIX !!!!
         m_LobbyLog.clear();
         m_GameLog.clear();
 }
