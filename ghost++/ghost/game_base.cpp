@@ -2121,7 +2121,7 @@ void CBaseGame :: EventPlayerDeleted( CGamePlayer *player )
         if( !m_KickVotePlayer.empty( ) )
                 SendAllChat( m_GHost->m_Language->VoteKickCancelled( m_KickVotePlayer ) );
  
-        if( !m_GameLoading && !m_GameLoaded && m_GHost->m_AutoDenyUsers)
+        if( !m_GameLoading && !m_GameLoaded )
         {
  
                 if( GetSIDFromPID( player->GetPID( ) ) == 11 )
@@ -2139,8 +2139,8 @@ void CBaseGame :: EventPlayerDeleted( CGamePlayer *player )
                         m_CountDownStarted = false;
                         m_Balanced = false;
                 }
-        
-                m_Denied.push_back( player->GetName( ) + " " + player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
+                if(m_GHost->m_AutoDenyUsers)
+                        m_Denied.push_back( player->GetName( ) + " " + player->GetExternalIPString( ) + " " + UTIL_ToString( GetTime( ) ) );
         }
         
         m_KickVotePlayer.clear( );
