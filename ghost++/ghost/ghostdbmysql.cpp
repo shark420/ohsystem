@@ -1725,6 +1725,35 @@ bool MySQLPUp( void *conn, string *error, uint32_t botid, string name, uint32_t 
 	if( level == 3 || level == 2 )
 		time = 2592000;
 
+        if( EscRealm == "Garena")
+        {
+            string CQuery = "SELECT `user_level` from `oh_users` WHERE `bnet_username` = '" + EscName + "' AND `admin_realm` = 'Garena';";
+            if( mysql_real_query( (MYSQL *)conn, CQuery.c_str( ), CQuery.size( ) ) != 0 )
+                    *error = mysql_error( (MYSQL *)conn );
+            else
+            {
+                    MYSQL_RES *Result = mysql_store_result( (MYSQL *)conn );
+
+                    if( Result )
+                    {
+                            vector<string> Row = MySQLFetchRow( Result );
+                            if( Row.size( ) == 1 )
+                            {
+                                string Query = "UPDATE `oh_users` SET `user_level` = '" + UTIL_ToString( level ) + "', `expire_date` = 'FROM_UNIXTIME( UNIX_TIMESTAMP( ) + " + UTIL_ToString(time) + ")' WHERE `bnet_username` = '" + EscName + "' AND `admin_realm` = 'Garena';";
+                                if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
+                                        *error = mysql_error( (MYSQL *)conn );
+                                else
+                                        Success = true;          
+                                return true;
+                            } else
+                                return false;
+                            
+                            mysql_free_result( Result );
+                    }
+            }
+
+        }
+
 	string CQuery = "SELECT `user_level` from `oh_users` WHERE `bnet_username` = '" + EscName + "' AND `admin_realm` = '" + EscRealm + "';";
         if( mysql_real_query( (MYSQL *)conn, CQuery.c_str( ), CQuery.size( ) ) != 0 )
                 *error = mysql_error( (MYSQL *)conn );

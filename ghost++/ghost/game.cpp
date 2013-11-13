@@ -145,6 +145,9 @@ CGame :: ~CGame( )
                 m_CallableGameAdd = NULL;
         }
  
+        for( vector<PairedPUp> :: iterator i = m_PairedPUps.begin( ); i != m_PairedPUps.end( ); ++i )
+                m_GHost->m_Callables.push_back( i->second );
+        
         for( vector<PairedBanCheck> :: iterator i = m_PairedBanChecks.begin( ); i != m_PairedBanChecks.end( ); ++i )
                 m_GHost->m_Callables.push_back( i->second );
  
@@ -200,6 +203,23 @@ CGame :: ~CGame( )
 bool CGame :: Update( void *fd, void *send_fd )
 {
         // update callables
+        for( vector<PairedPUp> :: iterator i = m_PairedPUps.begin( ); i != m_PairedPUps.end( ); )
+        {
+                if( i->second->GetReady( ) )
+                {
+                        bool Result = i->second->GetResult( );
+                        if( Result )
+                                SendAllChat( "[" + i->second->GetName( ) + "] is now a [" + GetLevelName( i->second->GetLevel( ) ) + "] on [" + i->second->GetRealm( ) + "]" );
+                        else
+                                SendAllChat( "Error. This User isnt registered on the Database." );
+ 
+                        m_GHost->m_DB->RecoverCallable( i->second );
+                        delete i->second;
+                        i = m_PairedPUps.erase( i );
+                }
+                else
+                        ++i;
+        }
         for( vector<PairedPWCheck> :: iterator i = m_PairedPWChecks.begin( ); i != m_PairedPWChecks.end( ); )
         {
                 if( i->second->GetReady( ) )
@@ -782,6 +802,42 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                         //save admin log
                         m_AdminLog.push_back( User + " gl" + "\t" + UTIL_ToString( Level ) + "\t" + Command + "\t" + Payload );
  
+                                //
+                                // !SETPERMISSION
+                                //
+                                if( ( Command == "setp" || Command == "sep" || Command == "setpermission" ) && player->GetLevel() == 10 && m_GHost->m_GarenaHosting )
+                                {
+                                        string Name;
+                                        string NewLevel;
+                                        stringstream SS;
+                                        SS << Payload;
+                                        SS >> Name;
+ 
+                                        if( Name.length() <= 3 )
+                                        {
+                                                SendChat( player, "This is not a valid Name" );
+                                                return;
+                                        }
+ 
+                                        SS >> NewLevel;
+ 
+                                        if( SS.fail( ) || NewLevel.empty() )
+                                        {
+                                                SendChat( player, "Error. Wrong input, please add a level." );
+                                                return;
+                                        }
+                                        else
+                                        {
+                                                if( !NewLevel.find_first_not_of( "1234567890" ) == string :: npos )
+                                                {
+                                                        SendChat( player, "This is not a valid level. Please use a correct number" );
+                                                        return;
+                                                }
+ 
+                                                m_PairedPUps.push_back( PairedPUp( string( ), m_GHost->m_DB->ThreadedPUp( Name, UTIL_ToUInt32( NewLevel ), "Garena", player->GetName()) ) );
+                                        }
+                                }
+                        
                                 //
                                 // !ONLY
                                 //

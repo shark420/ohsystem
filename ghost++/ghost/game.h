@@ -38,6 +38,7 @@ class CCallableStatsPlayerSummaryCheck;
 class CCallableInboxSummaryCheck;
 //class CCallablePlayerSummaryCheck;
 class CCallableStatsSystem;
+class CCallablePUp;
 
 typedef pair<string,CCallableBanCheck *> PairedBanCheck;
 typedef pair<string,CCallablePassCheck *> PairedPassCheck;
@@ -47,6 +48,7 @@ typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedStreakCheck;
 typedef pair<string,CCallableInboxSummaryCheck *> PairedINCheck;
 typedef pair<string,CCallableStatsPlayerSummaryCheck *> PairedSCheck;
 typedef pair<string,CCallableStatsSystem *> PairedSS;
+typedef pair<string,CCallablePUp *> PairedPUp;
 
 class CGame : public CBaseGame
 {
@@ -65,6 +67,7 @@ protected:
         vector<PairedStreakCheck> m_PairedStreakChecks;       // vector of paired threaded database ingame checks in progress
 	vector<PairedSCheck> m_PairedSChecks;	// vector of paired threaded database DotA player summary checks in progress
         vector<PairedSS> m_PairedSSs;
+        vector<PairedPUp> m_PairedPUps;                   // vector of paired threaded database permission changes in progress
 	vector<string> m_AutoBans;
 	bool m_EarlyDraw;
 	bool IsAutoBanned( string name );
