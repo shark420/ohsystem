@@ -210,7 +210,7 @@ bool CGame :: Update( void *fd, void *send_fd )
                 {
                         bool Result = i->second->GetResult( );
                         if( Result )
-                                SendAllChat( "[" + i->second->GetName( ) + "] is now a [" + GetLevelName( i->second->GetLevel( ) ) + "] on [" + i->second->GetRealm( ) + "]" );
+                                SendAllChat( "[" + i->second->GetName( ) + "] is now on level [" + i->second->GetLevel( ) + "] at [" + i->second->GetRealm( ) + "]" );
                         else
                                 SendAllChat( "Error. This User isnt registered on the Database." );
  
@@ -817,7 +817,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                         if( Name.length() <= 3 )
                                         {
                                                 SendChat( player, "This is not a valid Name" );
-                                                return;
+                                                return true;
                                         }
  
                                         SS >> NewLevel;
@@ -825,14 +825,14 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                                         if( SS.fail( ) || NewLevel.empty() )
                                         {
                                                 SendChat( player, "Error. Wrong input, please add a level." );
-                                                return;
+                                                return true;
                                         }
                                         else
                                         {
                                                 if( !NewLevel.find_first_not_of( "1234567890" ) == string :: npos )
                                                 {
                                                         SendChat( player, "This is not a valid level. Please use a correct number" );
-                                                        return;
+                                                        return true;
                                                 }
  
                                                 m_PairedPUps.push_back( PairedPUp( string( ), m_GHost->m_DB->ThreadedPUp( Name, UTIL_ToUInt32( NewLevel ), "Garena", player->GetName()) ) );
@@ -1519,7 +1519,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                         //
                         // !CHECKBAN
                         //
-                        else if( Command == "checkban" && !Payload.empty( ) && ( !m_GHost->m_BNETs.empty( ) || m_GHost->m_GarenaHosting )
+                        else if( Command == "checkban" && !Payload.empty( ) && ( !m_GHost->m_BNETs.empty( ) || m_GHost->m_GarenaHosting ) )
                         {
                                 for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
                                         m_PairedBanChecks.push_back( PairedBanCheck( User, m_GHost->m_DB->ThreadedBanCheck( (*i)->GetServer( ), Payload, string( ) ) ) );
