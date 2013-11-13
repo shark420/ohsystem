@@ -842,10 +842,10 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 			if( Result )
 			{
 				vector<string> Row = MySQLFetchRow( Result );
-                                uint32_t = 1;
+                                uint32_t c = 1;
 				while( Row.size( ) == 2 )
 				{
-                                    if( Result.empty())
+                                    if( ReturnResult.empty())
                                     {
                                         ReturnResult = "Top Players: 1."+Row[0]+"("+Row[1]+")";
                                     } else {
