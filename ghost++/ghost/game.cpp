@@ -540,28 +540,32 @@ bool CGame :: Update( void *fd, void *send_fd )
                 if( i->second->GetReady( ) )
                 {
                         string Result = i->second->GetResult( );
-                        CGamePlayer *Player = GetPlayerFromName( i->second->GetUser( ), true );
-                        if( i->second->GetType( ) == "betcheck" || i->second->GetType( ) == "bet" )
+                        if( i->second->GetType( ) == "betcheck" )
+                                SendAllChat( "[" + i->second->GetUser( ) + "] Current Points: " + Result );
+                        else if( i->second->GetType( ) == "bet" )
                         {
-                                if( i->second->GetType( ) == "betcheck" )
-                                        SendAllChat( "[" + i->second->GetUser( ) + "] Current Points: " + Result );
- 
-                                else if( i->second->GetType( ) == "bet" )
-                                {
-                                        if( Result == "already bet" )
-                                                SendChat( Player, "You already bet" );
-                                        else if( Result == "successfully bet" )
-                                                SendAllChat( "User [" + i->second->GetUser( ) + "] bet [" + UTIL_ToString( i->second->GetOne( ) ) + "] to win this game." );
-                                        else if ( Result != "failed" )
-                                                SendChat( Player, "You shouldn't bet more points you got, you got currently [" + Result + " ] points" );
-                                        else
-                                                CONSOLE_Print( "Betsystem have an issue here" );
-                                }
+                                CGamePlayer *Player = GetPlayerFromName( i->second->GetUser( ), true );
+                                if( Result == "already bet" )
+                                        SendChat( Player, "You already bet" );
+                                else if( Result == "successfully bet" )
+                                        SendAllChat( "User [" + i->second->GetUser( ) + "] bet [" + UTIL_ToString( i->second->GetOne( ) ) + "] to win this game." );
                                 else if( Result == "not listed" )
                                         SendChat( Player, "You need to play at least one game to bet here" );
+                                else if ( Result != "failed" )
+                                        SendChat( Player, "You shouldn't bet more points you got, you got currently [" + Result + " ] points" );
                                 else
-                                        CONSOLE_Print( "Betsystem has an issue here" );
+                                        CONSOLE_Print( "Betsystem have an issue here" );
                         }
+                        else if( i->second->GetType() == "top")
+                        {
+                            if( Result != "failed" )
+                                SendAllChat( Result );
+                            else
+                                SendAllChat( "Something went wrong here." );
+                        }
+                        else
+                            CONSOLE_Print( "Unrecognized type was send.");
+                        
                         m_GHost->m_DB->RecoverCallable( i->second );
                         delete i->second;
                         i = m_PairedSSs.erase( i );
@@ -3252,6 +3256,13 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                         m_PairedSSs.push_back( PairedSS( User, m_GHost->m_DB->ThreadedStatsSystem( User, "betsystem", UTIL_ToUInt32( Payload ), "bet" ) ) );
         }
  
+        //
+        // !TOP        !TOP10
+        //
+        else if( Command == "top" || Command == "top10" )
+        {
+            m_PairedSSs.push_back( PairedSS( User, m_GHost->m_DB->ThreadedStatsSystem( "", "", 0, "top" ) ) );
+        }
         //
         // !PAUSE
         //

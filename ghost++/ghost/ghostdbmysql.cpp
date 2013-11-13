@@ -828,7 +828,40 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 	string EscUser = MySQLEscapeString( conn, user );
 	string EscInput = MySQLEscapeString( conn, input );
 
-	if( type == "betcheck" || type == "bet" )
+        if( type == "top" )
+        {
+  		string ReturnResult = "failed";
+		string Query = "SELECT player, score FROM oh_stats ORDER BY score DESC LIMIT 10";
+
+		if( mysql_real_query( (MYSQL *)conn, Query.c_str( ), Query.size( ) ) != 0 )
+			*error = mysql_error( (MYSQL *)conn );
+		else
+		{
+			MYSQL_RES *Result = mysql_store_result( (MYSQL *)conn );
+
+			if( Result )
+			{
+				vector<string> Row = MySQLFetchRow( Result );
+                                uint32_t = 1;
+				while( Row.size( ) == 2 )
+				{
+                                    if( Result.empty())
+                                    {
+                                        ReturnResult = "Top Players: 1."+Row[0]+"("+Row[1]+")";
+                                    } else {
+                                        c++;
+                                        ReturnResult = ", "+UTIL_ToString(c)+"."+Row[0]+"("+Row[1]+")";
+                                    }
+				}
+
+				mysql_free_result( Result );
+			}
+			else
+				*error = mysql_error( (MYSQL *)conn );
+		}          
+                return ReturnResult;
+        }
+	else if( type == "betcheck" || type == "bet" )
 	{
 		string CheckQuery = "SELECT `points`, `points_bet` FROM `oh_stats` WHERE `player_lower` = '" + EscUser + "';";
 		uint32_t currentpoints = 0;
@@ -874,7 +907,7 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 		}
 		return "failed";
 	}
-	if( type == "statsreset" )
+	else if( type == "statsreset" )
 	{
 		string ResetQuery = "UPDATE `oh_stats` SET score = 0, games = 0, wins = 0, losses = 0, draw = 0, kills = 0, deaths = 0, assists = 0, creeps = 0, denies = 0, neutrals = 0, towers = 0, rax = 0, streak = 0, maxstreak = 0, losingstreak = 0, maxlosingstreak = 0, points = 0, points_bet = 0, leaver = 0 WHERE player_lower = '"+EscUser+"';";
                 if( mysql_real_query( (MYSQL *)conn, ResetQuery.c_str( ), ResetQuery.size( ) ) != 0 )
@@ -884,7 +917,7 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 
 		return "failed";
 	}
-	if( type == "aliascheck" )
+	else if( type == "aliascheck" )
 	{
         	string GetIP = "SELECT `ip` FROM `oh_gameplayers` WHERE name = '" + EscUser + "' AND `ip` != '0' AND `ip` != '0.0.0.0' ORDER BY `id` DESC;";
         	string UserIP = "";
@@ -932,8 +965,7 @@ string MySQLStatsSystem( void *conn, string *error, uint32_t botid, string user,
 		else
 			return "Aliases: " + Aliases.substr( 2 );
 	}
-
-	if( type == "rpp" )
+	else if( type == "rpp" )
 	{
 		string LimitString;
 		if( one != 0 )

@@ -323,7 +323,14 @@ bool CBNET :: Update( void *fd, void *send_fd )
                                 else
                                         QueueChatCommand( "Something went wrong here.", i->first, !i->first.empty( ) );
                         }
- 
+                        if( i->second->GetType() == "top")
+                        {
+                            if( Result != "failed" )
+                                QueueChatCommand( Result, i->first, !i->first.empty( ) );
+                            else
+                                QueueChatCommand( "Something went wrong here.", i->first, !i->first.empty( ) );
+                        }
+                        
                         m_GHost->m_DB->RecoverCallable( i->second );
                         delete i->second;
                         i = m_PairedSSs.erase( i );
@@ -3762,6 +3769,14 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
  
                                         if( !StatsUser.empty( ) && StatsUser.size( ) < 16 && StatsUser[0] != '/' )
                                                 m_PairedSSs.push_back( PairedSS( Whisper ? User : string( ), m_GHost->m_DB->ThreadedStatsSystem( StatsUser, "", 0, "aliascheck" ) ) );
+                                }
+
+                                //
+                                // !TOP      !TOP10
+                                //
+                                else if( Command == "top" || Command == "top10" )
+                                {
+                                    m_PairedSSs.push_back( PairedSS( Whisper ? User : string( ), m_GHost->m_DB->ThreadedStatsSystem( "", "", 0, "top" ) ) );
                                 }
         }
 }
