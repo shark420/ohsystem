@@ -210,7 +210,7 @@ bool CGame :: Update( void *fd, void *send_fd )
                 {
                         bool Result = i->second->GetResult( );
                         if( Result )
-                                SendAllChat( "[" + i->second->GetName( ) + "] is now on level [" + i->second->GetLevel( ) + "] at [" + i->second->GetRealm( ) + "]" );
+                                SendAllChat( "[" + i->second->GetName( ) + "] is now on level [" + UTIL_ToString( i->second->GetLevel( ) ) + "] at [" + i->second->GetRealm( ) + "]" );
                         else
                                 SendAllChat( "Error. This User isnt registered on the Database." );
  
