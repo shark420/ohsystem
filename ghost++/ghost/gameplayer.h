@@ -162,6 +162,7 @@ private:
 	uint32_t m_AnnounceTime;
         uint32_t m_Level;
         string m_LevelName;
+        bool m_StartVoted;
 
 public:
 	CGamePlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket, unsigned char nPID, string nJoinedRealm, string nName, BYTEARRAY nInternalIP, bool nReserved );
@@ -235,6 +236,7 @@ public:
 	uint32_t GetAnnounceTime( )					{ return m_AnnounceTime; }
         uint32_t GetLevel( )                                            { return m_Level; }
         string GetLevelName( )                                          { return m_LevelName; }
+        bool GetStartVote( )                                            { return m_StartVoted; }
 
 	void SetLeftReason( string nLeftReason )										{ m_LeftReason = nLeftReason; }
 	void SetSpoofedRealm( string nSpoofedRealm )									{ m_SpoofedRealm = nSpoofedRealm; }
@@ -288,6 +290,7 @@ public:
 	void SetAnnounceTime( )											{ m_AnnounceTime = GetTime(); }
         void SetLevel( uint32_t nLevel )                                                                        { m_Level = nLevel; }
         void SetLevelName( string nLevelName )                                                                    { m_LevelName = nLevelName; }
+        void SetStartVote( bool nVoted )                                                                        { m_StartVoted = nVoted; }
 	string GetNameTerminated( );
 	uint32_t GetPing( bool LCPing );
 	bool GetIsIgnoring( string username );

@@ -72,6 +72,7 @@ CBaseGame :: CBaseGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16
         m_ModeVoted = false;
         m_Leavers = 0;
         m_CallablePList = NULL;
+        m_StartedVoteStartTime = 0;
         if( m_GHost->m_GarenaHosting )
         {
                m_CallablePList = m_GHost->m_DB->ThreadedPList( "Garena" );
@@ -1377,7 +1378,16 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
                 m_KickVotePlayer.clear( );
                 m_StartedKickVoteTime = 0;
         }
- 
+        
+         // expire the votestart
+
+        if( m_StartedVoteStartTime != 0 && GetTime( ) - m_StartedVoteStartTime >= 60 )
+        {
+                CONSOLE_Print( "[GAME: " + m_GameName + "] votestart expired" );
+                SendAllChat( "Votestart expired (sixty seconds without pass)." );
+                m_StartedVoteStartTime = 0;
+        }
+        
         // start the gameover timer if there's only one player left
  
         if( m_Players.size( ) == 1 && m_FakePlayerPID == 255 && m_GameOverTime == 0 && ( m_GameLoading || m_GameLoaded ) )

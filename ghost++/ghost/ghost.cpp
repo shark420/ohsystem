@@ -1494,6 +1494,9 @@ void CGHost :: SetConfigs( CConfig *CFG )
         m_FountainFarmWarning = CFG->GetInt("oh_fountainfarm_warning", 0 ) == 0 ? false : true;
         m_FountainFarmMessage = CFG->GetString("oh_fountainfarm_message", "Remind: Any kind or at least an attempt of fountainfarm is banable." );
         m_AutoDenyUsers = CFG->GetInt("oh_general_autodeny", 0) == 0 ? false : true;
+        m_AllowVoteStart = CFG->GetInt("oh_allowvotestart", 0) == 0 ? false : true;
+        m_VoteStartMinPlayers = CFG->GetInt("oh_votestartminimumplayers", 3);
+        
 	//m_VoteingModes = CFG->GetInt( "oh_modevoting", 0 ) == 0 ? false : true;
 }
 

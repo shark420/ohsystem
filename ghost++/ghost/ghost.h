@@ -197,6 +197,8 @@ public:
         bool m_FountainFarmWarning;
         string m_FountainFarmMessage;
         bool m_AutoDenyUsers;
+        bool m_AllowVoteStart;
+        uint32_t m_VoteStartMinPlayers;
         
 	CGHost( CConfig *CFG );
 	~CGHost( );

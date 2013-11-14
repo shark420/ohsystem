@@ -2861,7 +2861,58 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                 SendChat( player, "Maphack, Fountainfarm, Feeding, Flaming & Gameruin" );
                 return HideCommand;
         }
- 
+
+        //
+        // !VOTESTART
+        //
+
+        if( Command == "votestart" && !m_CountDownStarted && m_GHost->m_AllowVoteStart )
+        {
+
+                if( !m_GHost->m_CurrentGame->GetLocked( ) )
+                {
+                        if(m_StartedVoteStartTime == 0) { //need >minplayers or admin to START a votestart
+                            if (GetNumHumanPlayers() < m_GHost->m_VoteStartMinPlayers ) { //need at least eight players to votestart
+                                        SendChat( player, "You cannot use !votestart until there are " + UTIL_ToString(m_GHost->m_VoteStartMinPlayers) + " or more players in the game!" );
+                                        return false;
+                            }
+
+                            for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
+                                        (*i)->SetStartVote( false );
+                            m_StartedVoteStartTime = GetTime();
+
+                            CONSOLE_Print( "[GAME: " + m_GameName + "] votestart started by player [" + User + "]" );
+                        }
+
+                        player->SetStartVote(true);
+
+                        uint32_t VotesNeeded = GetNumHumanPlayers( ) - 1;
+
+                        if( VotesNeeded < 2 )
+                                VotesNeeded = 2;
+
+                        uint32_t Votes = 0;
+
+                        for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
+                        {
+                            if( (*i)->GetStartVote( ) )
+                                ++Votes;
+                        }
+
+                        if(Votes < VotesNeeded) {
+                            SendAllChat( UTIL_ToString(VotesNeeded - Votes) + " more votes needed to votestart.");
+                        } else {
+//                                if( m_MatchMaking && m_AutoStartPlayers != 0 )
+//                                        BalanceSlots( );
+
+                            StartCountDown( true );
+                        }
+                }
+                else {
+                        SendChat( player, "Error: cannot votestart because the game is locked. Owner is " + m_OwnerName );
+                }
+        }
+        
         //
         // !YES
         //
