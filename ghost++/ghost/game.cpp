@@ -697,22 +697,22 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
                                 SendAllChat( "User ["+player->GetName( ) +"] will be autobanned at the end of the game, if he/seh didn't left within the last 5 minutes." );
                         }
  
-                        if( m_GHost->m_MaxAllowedSpread >= spread && m_Stats )
+                        if( m_GHost->m_MaxAllowedSpread <= spread && m_Stats )
                         {
                                 SendAllChat( "[AUTO-END] The spread between the two teams is already ["+UTIL_ToString(spread)+"]" );
-                                m_Stats->SetWinner( ( team + 1 ) % 2 );
-                                string WinTeam = ( ( ( team + 1 ) % 2 )  == 1 ? "Scourge" : "Sentinel" );
+                                m_Stats->SetWinner( ( Team + 1 ) % 2 );
+                                string WinTeam = ( ( ( Team + 1 ) % 2 )  == 1 ? "Sentinel" : "Scourge" );
                                 SendAllChat( "[AUTO-END] The game will end in fifty seconds. The winner is set to ["+ WinTeam +"]" );
                                 SendAllChat( "[AUTO-END] Please stay until the end to save all stats correctly." );
                                 m_GameOverTime = GetTime( );
                         }
- 
+
                         if( CountAlly+CountEnemy <= m_GHost->m_MinPlayerAutoEnd && m_Stats )
                         {
-                                string Winner = ( team + 1 ) % 2 == 1 ? "Sentinel" : "Scourge";
+                                string Winner = ( Team + 1 ) % 2 == 1 ? "Sentinel" : "Scourge";
                                 SendAllChat("[AUTO-END] Too few players ingame, this game will end in fifteen seconds." );
                                 SendAllChat("[AUTO-END] Winning team was set to ["+ Winner +"]" );
-                                m_Stats->SetWinner( ( team + 1 ) % 2 );
+                                m_Stats->SetWinner( ( Team + 1 ) % 2 );
                                 m_GameOverTime = GetTime( );
                         }
  
@@ -730,7 +730,7 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
                                 else if( m_GameTicks > 1000 * 180 && m_Stats )
                                 {
                                         SendAllChat( "[AUTO-END] The other team has left, this game will be recorded as your win. You may leave at any time." );
-                                        m_Stats->SetWinner( ( team + 1 ) % 2 );
+                                        m_Stats->SetWinner( ( Team + 1 ) % 2 );
                                         m_Stats->LockStats( );
                                         m_SoftGameOver = true;
                                         m_GameOverTime = GetTime( );

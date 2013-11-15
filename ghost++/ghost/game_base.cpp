@@ -2307,7 +2307,7 @@ void CBaseGame :: EventPlayerJoined( CPotentialPlayer *potential, CIncomingJoinP
                 if( (*i)->GetServer( ) == JoinedRealm || JoinedRealm.empty() )
                 {
                         Level = (*i)->IsLevel( joinPlayer->GetName( ) );
-                        if( Level != 0 )
+                        if( Level != 0 ) 
                                 LevelName = m_GHost->m_Ranks[Level-1];
                         break;
                 }

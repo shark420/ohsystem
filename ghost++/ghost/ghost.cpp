@@ -1888,6 +1888,7 @@ void CGHost :: LoadRules( )
 
 void CGHost :: LoadRanks( )
 {
+    //TODO Fix if the file is empty, dont check levels else there is a crash
     string File = "ranks.txt";
     ifstream in;
     in.open( File.c_str() );
