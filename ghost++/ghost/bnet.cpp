@@ -507,8 +507,10 @@ bool CBNET :: Update( void *fd, void *send_fd )
                 if( i->second->GetReady( ) )
                 {
                         bool Result = i->second->GetResult( );
-                        if( Result )
-                                QueueChatCommand( "[" + i->second->GetName( ) + "] is now a [" + GetLevelName( i->second->GetLevel( ) ) + "] on [" + i->second->GetRealm( ) + "]" );
+                        if( Result && m_GHost->m_RanksLoaded)
+                            QueueChatCommand( "[" + i->second->GetName( ) + "] is now a [" + GetLevelName( i->second->GetLevel( ) ) + "] on [" + i->second->GetRealm( ) + "]" );
+                        else if( Result && !m_GHost->m_RanksLoaded)
+                            QueueChatCommand( "Could not add correctly a levelname. ranks.txt wasnt loaded.");
                         else
                                 QueueChatCommand( "Error. This User isnt registered on the Database." );
  
@@ -575,8 +577,10 @@ bool CBNET :: Update( void *fd, void *send_fd )
                 {
                         CDBStatsPlayerSummary *StatsPlayerSummary = i->second->GetResult( );
  
-                        if( StatsPlayerSummary )
+                        if( StatsPlayerSummary && m_GHost->m_RanksLoaded )
                                 QueueChatCommand( "["+i->second->GetName( )+"] Rank: "+StatsPlayerSummary->GetRank( )+" Level: "+UTIL_ToString(IsLevel( i->second->GetName( ) ))+" Class: "+GetLevelName( IsLevel( i->second->GetName( ) ) ), i->first, !i->first.empty( ) );
+                        else if( StatsPlayerSummary )
+                                QueueChatCommand( "["+i->second->GetName( )+"] Rank: "+StatsPlayerSummary->GetRank( ), i->first, !i->first.empty( ) );
                         else
                                 QueueChatCommand( m_GHost->m_Language->HasntPlayedGamesWithThisBot( i->second->GetName( ) ), i->first, !i->first.empty( ) );
  
@@ -1407,7 +1411,7 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
  
                         transform( Command.begin( ), Command.end( ), Command.begin( ), ::tolower );
  
-                        if( IsLevel( User ) >= 5 || ForceRoot )
+                        if( ( IsLevel( User ) >= 5 || ForceRoot ) && m_GHost->m_RanksLoaded )
                         {
  
                                 string level = GetLevelName( IsLevel( User ) );
@@ -3448,8 +3452,10 @@ void CBNET :: BotCommand(string Message, string User, bool Whisper, bool ForceRo
                                                 QueueChatCommand( "WARDEN STATUS --- Not connected to a BNLS server.", User, Whisper );
                                 }
                         }
+                        else if( !m_GHost->m_RanksLoaded )
+                            CONSOLE_Print( "Unable to exec command. ranks.txt was not loaded.");
                         else
-                                CONSOLE_Print( "[BNET: " + m_ServerAlias + "] non-admin [" + User + "] sent command [" + Message + "]" );
+                            CONSOLE_Print( "[BNET: " + m_ServerAlias + "] non-admin [" + User + "] sent command [" + Message + "]" );
  
                         /*********************
                         * NON ADMIN COMMANDS *

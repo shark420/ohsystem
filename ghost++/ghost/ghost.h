@@ -199,6 +199,7 @@ public:
         bool m_AutoDenyUsers;
         bool m_AllowVoteStart;
         uint32_t m_VoteStartMinPlayers;
+        bool m_RanksLoaded;
         
 	CGHost( CConfig *CFG );
 	~CGHost( );

@@ -396,15 +396,19 @@ bool CGame :: Update( void *fd, void *send_fd )
                                         string LevelName;
                                         for( vector<CBNET *> :: iterator k = m_GHost->m_BNETs.begin( ); k != m_GHost->m_BNETs.end( ); ++k )
                                         {
-                                                if( (*k)->GetServer( ) == StatsPlayerSummary->GetRealm( ) )
+                                                if( (*k)->GetServer( ) == StatsPlayerSummary->GetRealm( ) && m_GHost->m_RanksLoaded )
                                                 {
                                                         Level = (*k)->IsLevel( i->second->GetName( ) );
                                                         LevelName = (*k)->GetLevelName( Level );
                                                         break;
                                                 }
                                         }
- 
-                                        SendAllChat( "["+StatsPlayerSummary->GetPlayer( )+"] Rank: "+StatsPlayerSummary->GetRank( )+" Level: "+UTIL_ToString(Level)+" Class: "+LevelName );
+                                        if(m_GHost->m_RanksLoaded)
+                                                SendAllChat( "["+StatsPlayerSummary->GetPlayer( )+"] Rank: "+StatsPlayerSummary->GetRank( )+" Level: "+UTIL_ToString(Level)+" Class: "+LevelName );
+                                        else {
+                                                SendAllChat( "["+StatsPlayerSummary->GetPlayer( )+"] Rank: "+StatsPlayerSummary->GetRank( ));
+                                                CONSOLE_Print("Could not add correctly a levelname. ranks.txt wasnt loaded.");
+                                        }
                                 }
                                 else
                                 {
@@ -416,15 +420,19 @@ bool CGame :: Update( void *fd, void *send_fd )
                                                 string LevelName;
                                                 for( vector<CBNET *> :: iterator k = m_GHost->m_BNETs.begin( ); k != m_GHost->m_BNETs.end( ); ++k )
                                                 {
-                                                        if( (*k)->GetServer( ) == Player->GetSpoofedRealm( ) )
+                                                        if( (*k)->GetServer( ) == Player->GetSpoofedRealm( ) && m_GHost->m_RanksLoaded)
                                                         {
                                                                 Level = (*k)->IsLevel( Player->GetName( ) );
                                                                 LevelName = (*k)->GetLevelName( Level );
                                                                 break;
                                                         }
                                                 }
- 
-                                                SendAllChat( "["+Player->GetName( )+"] Rank: "+StatsPlayerSummary->GetRank( )+" Level: "+UTIL_ToString(Level)+" Class: "+LevelName );
+                                                if(m_GHost->m_RanksLoaded)
+                                                        SendAllChat( "["+Player->GetName( )+"] Rank: "+StatsPlayerSummary->GetRank( )+" Level: "+UTIL_ToString(Level)+" Class: "+LevelName );
+                                                else {
+                                                        SendAllChat( "["+Player->GetName( )+"] Rank: "+StatsPlayerSummary->GetRank( ));
+                                                        CONSOLE_Print("Could not add correctly a levelname. ranks.txt was not loaded.");
+                                                }
                                         }
                                 }
                         }
@@ -792,9 +800,16 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
         string Payload = payload;
 
         uint32_t Level = player->GetLevel();
-        string LevelName = player->GetLevelName();
+        string LevelName;
+        // do this for the public commands
+        if(m_GHost->m_RanksLoaded)
+            LevelName = player->GetLevelName();
+        else {
+            LevelName = "unknown";
+            CONSOLE_Print("Could not add correctly a levelname. ranks.txt was not loaded.");
+        }
         
-        if( player->GetSpoofed( ) && Level >= 5 )
+        if( player->GetSpoofed( ) && Level >= 5 && m_GHost->m_RanksLoaded)
         {
                 CONSOLE_Print( "[GAME: " + m_GameName + "] "+ LevelName +" [" + User + "] sent command [" + Command + "] with payload [" + Payload + "]" );
  
@@ -2548,6 +2563,8 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                         SendChat( player, m_GHost->m_Language->TheGameIsLocked( ) );
                 }
         }
+        else if(!m_GHost->m_RanksLoaded)
+            CONSOLE_Print("Could not exec command. ranks.txt was not loaded.");
         else
         {
                 if( !player->GetSpoofed( ) )
@@ -3464,7 +3481,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
                 string VLevelName;
                 for( vector<CBNET *> :: iterator i = m_GHost->m_BNETs.begin( ); i != m_GHost->m_BNETs.end( ); ++i )
                 {
-                        if( (*i)->GetServer( ) == LastMatch->GetSpoofedRealm( ) )
+                        if( (*i)->GetServer( ) == LastMatch->GetSpoofedRealm( ) && m_GHost->m_RanksLoaded )
                         {
                                 VLevel = (*i)->IsLevel( LastMatch->GetName( ) );
                                 VLevelName = (*i)->GetLevelName( Level );

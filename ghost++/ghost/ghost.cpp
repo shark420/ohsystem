@@ -376,6 +376,7 @@ CGHost :: CGHost( CConfig *CFG )
 	m_CallableCommandList = NULL;
 	m_CheckForFinishedGames = 0;
         m_GarenaHosting = false;
+        m_RanksLoaded = true;
 	string DBType = CFG->GetString( "db_type", "mysql" );
 	CONSOLE_Print( "[GHOST] opening primary database" );
 
@@ -1910,5 +1911,10 @@ void CGHost :: LoadRanks( )
                     ++Count;
             }
             in.close( );
+    }
+    else
+    {
+        CONSOLE_Print("Error. Unable to read file [ranks.txt]. User levels will not work for this session.");
+        m_RanksLoaded = false;
     }
 }
