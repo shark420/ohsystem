@@ -1911,7 +1911,7 @@ uint32_t MySQLGameAdd( void *conn, string *error, uint32_t botid, string server,
         string GIQuery = "INSERT INTO oh_game_info ( botid, gameid, server, map, datetime, gamename, ownername, duration, gamestate, gametype, creatorname, creatorserver ) VALUES ( " + UTIL_ToString( botid ) + ", '" + UTIL_ToString( RowID ) + "', '" + EscServer + "', '" + EscMap + "', NOW( ), '" + EscGameName + "', '" + EscOwnerName + "', " + UTIL_ToString( duration ) + ", " + UTIL_ToString( gamestate ) + ", " + UTIL_ToString( gametype ) + ", '" + EscCreatorName + "', '" + EscCreatorServer + "' )";
         if( mysql_real_query( (MYSQL *)conn, GIQuery.c_str( ), GIQuery.size( ) ) != 0 )
                 *error = mysql_error( (MYSQL *)conn );
-/*
+
 	if( RowID != 0 )
 	{
 		string LobbyLog;
@@ -1931,7 +1931,7 @@ uint32_t MySQLGameAdd( void *conn, string *error, uint32_t botid, string server,
 	        if( mysql_real_query( (MYSQL *)conn, InsertQ.c_str( ), InsertQ.size( ) ) != 0 )
         	        *error = mysql_error( (MYSQL *)conn );
 	}
-*/
+
 	return RowID;
 }
 
