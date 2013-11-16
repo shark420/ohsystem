@@ -629,8 +629,6 @@ void CGamePlayer :: ProcessPackets( )
                                                                         m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically permanently muted for spamming." );
 
                                                                 }
-
-
 							}
 
 							//now check for flamers
@@ -674,6 +672,14 @@ void CGamePlayer :: ProcessPackets( )
 	                                                        if( RecentCount == 4 )
         	                                                {
 									m_Game->m_PairedBanAdds.push_back( PairedBanAdd( string(), m_Game->m_GHost->m_DB->ThreadedBanAdd( m_JoinedRealm, m_Name, GetExternalIPString( ), m_Game->m_GameName, "PeaceMaker", "Flame/Insult", 172800, "" ) ) );
+                        	                                        SetMuted( true );
+                                	                                m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically permanently muted for flaming." );
+
+	                                                        }
+	                                                        if( RecentCount == 5 )
+        	                                                {
+                                                                    //some people simple dont understand the ban policy.
+									m_Game->m_PairedBanAdds.push_back( PairedBanAdd( string(), m_Game->m_GHost->m_DB->ThreadedBanAdd( m_JoinedRealm, m_Name, GetExternalIPString( ), m_Game->m_GameName, "PeaceMaker", "Flame/Insult", 345600, "" ) ) );
                         	                                        SetMuted( true );
                                 	                                m_Game->SendAllChat( "[PeaceMaker] " + m_Name + " has been automatically permanently muted for flaming." );
 
